@@ -390,6 +390,12 @@ advanceToBuildMenu();
 }
 }
 
+/* modern level finished loading, stop the loading animation */
+if(parsed.modern==="loaded"){
+hideLoadingScreen();
+}
+
+/* cinematic finished, ready for next UI step */
 if(parsed.load_ui==="modern"){
 showReadyMessage();
 }
@@ -682,6 +688,7 @@ document.getElementById("overlayText").innerText=
 "Your image has been saved";
 
 setTimeout(hideOverlay,2000);
+
 }
 
 screenshotCounter++;
