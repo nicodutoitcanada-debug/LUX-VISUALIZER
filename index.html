@@ -589,6 +589,8 @@ let selectedBuild = null;
 let lottieInstance = null;
 let readyMessageTimer = null;
 let appInAttentionState = false;
+let gameRevealed = false;
+let isRevealingGame = false;
 
 import * as PixelStreamingWebSdk from
 "https://unpkg.com/@arcware-cloud/pixelstreaming-websdk@1.3.32/index.mjs";
@@ -655,7 +657,9 @@ revealGameFromLevelLoading();
 }
 
 if(parsed.load_ui==="modern"){
+revealGameFromLevelLoading().finally(()=>{
 showReadyMessage();
+});
 }
 }catch(e){}
 
@@ -886,13 +890,22 @@ await fadeFromBlack(900);
 }
 
 async function revealGameFromLevelLoading(){
+if(gameRevealed || isRevealingGame) return;
+
+isRevealingGame = true;
+
 await fadeToBlack(800);
 hideLevelLoadingScreen();
 await fadeFromBlack(2600);
+
+gameRevealed = true;
+isRevealingGame = false;
 }
 
 function showReadyMessage(){
 clearTimeout(readyMessageTimer);
+
+hideLevelLoadingScreen();
 
 const screen = document.getElementById("readyMessage");
 const text = document.getElementById("readyText");
@@ -1046,7 +1059,10 @@ showInitialLoadingScreen();
 
 async function selectBuild(buildName){
 if(appInAttentionState) return;
+
 selectedBuild = buildName;
+gameRevealed = false;
+isRevealingGame = false;
 
 await transitionToLevelLoading(buildName);
 
