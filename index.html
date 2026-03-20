@@ -41,17 +41,6 @@ opacity:1;
 transition:opacity 1s ease;
 }
 
-#unrealLogo{
-position:absolute;
-width:min(180px,38vw);
-opacity:0;
-transform:scale(0.96);
-transition:
-opacity 1s ease,
-transform 2s ease;
-z-index:2;
-}
-
 #introVideo{
 width:100vw;
 height:100vh;
@@ -91,14 +80,31 @@ display:flex;
 }
 
 /* ===============================
-   GENERIC LOADING SCREEN
+   INITIAL LOADING SCREEN
 ================================*/
 
 #loadingScreen{
-background:transparent;
+background:black;
+overflow:hidden;
+}
+
+#loadingBgVideo{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.loadingBgShade{
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.28);
 }
 
 .loadingWrap{
+position:relative;
+z-index:2;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -205,15 +211,15 @@ user-select:none;
 }
 
 /* ===============================
-   MODERN LOADING SCREEN
+   LEVEL LOADING SCREEN
 ================================*/
 
-#modernLoadingScreen{
+#levelLoadingScreen{
 background:black;
 overflow:hidden;
 }
 
-#modernLoadingVideo{
+#levelLoadingVideo{
 position:absolute;
 inset:0;
 width:100%;
@@ -221,14 +227,14 @@ height:100%;
 object-fit:cover;
 }
 
-.modernLoadingShade{
+.levelLoadingShade{
 position:absolute;
 inset:0;
 background:
 linear-gradient(90deg, rgba(0,0,0,0.76) 0%, rgba(0,0,0,0.56) 26%, rgba(0,0,0,0.12) 52%, rgba(0,0,0,0) 100%);
 }
 
-.modernLoadingContent{
+.levelLoadingContent{
 position:relative;
 z-index:2;
 width:min(560px,42vw);
@@ -243,7 +249,7 @@ color:white;
 pointer-events:none;
 }
 
-.modernLoadingIntro{
+.levelLoadingIntro{
 display:flex;
 align-items:center;
 gap:12px;
@@ -269,7 +275,7 @@ text-transform:uppercase;
 font-weight:500;
 }
 
-.modernBrandLogo{
+.levelBrandLogo{
 width:min(250px,34vw);
 height:auto;
 margin-bottom:42px;
@@ -278,13 +284,13 @@ transform:translateX(-50px);
 animation:slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) 0.18s forwards;
 }
 
-.modernLine{
+.levelLine{
 opacity:0;
 transform:translateX(-56px);
 animation:slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) forwards;
 }
 
-.modernTitle{
+.levelTitle{
 font-size:clamp(22px,2vw,28px);
 line-height:1.12;
 font-weight:300;
@@ -293,11 +299,11 @@ margin-bottom:18px;
 text-transform:uppercase;
 }
 
-.modernTitle strong{
+.levelTitle strong{
 font-weight:700;
 }
 
-.modernBody{
+.levelBody{
 font-size:clamp(12px,0.8vw,15px);
 line-height:1.55;
 font-weight:300;
@@ -305,13 +311,13 @@ max-width:540px;
 margin-bottom:24px;
 }
 
-.modernBody:last-child{
+.levelBody:last-child{
 margin-bottom:0;
 }
 
-.modernLine.delay1{ animation-delay:0.36s; }
-.modernLine.delay2{ animation-delay:0.52s; }
-.modernLine.delay3{ animation-delay:0.68s; }
+.levelLine.delay1{ animation-delay:0.36s; }
+.levelLine.delay2{ animation-delay:0.52s; }
+.levelLine.delay3{ animation-delay:0.68s; }
 
 @keyframes slideInLeft{
 0%{
@@ -382,7 +388,7 @@ to{transform:rotate(360deg);}
 }
 
 @media (max-width: 1100px){
-.modernLoadingContent{
+.levelLoadingContent{
 width:min(620px,52vw);
 margin-left:42px;
 }
@@ -396,11 +402,11 @@ gap:18px;
 width:min(190px,28vw);
 min-width:120px;
 }
-.modernLoadingContent{
+.levelLoadingContent{
 width:min(640px,62vw);
 margin-left:34px;
 }
-.modernBrandLogo{
+.levelBrandLogo{
 width:min(220px,38vw);
 }
 }
@@ -426,19 +432,19 @@ min-width:92px;
 bottom:18px;
 width:min(120px,32vw);
 }
-.modernLoadingContent{
+.levelLoadingContent{
 width:calc(100vw - 36px);
 margin-left:18px;
 margin-right:18px;
 }
-.modernBrandLogo{
+.levelBrandLogo{
 width:min(190px,48vw);
 margin-bottom:30px;
 }
-.modernTitle{
+.levelTitle{
 font-size:clamp(18px,5.4vw,24px);
 }
-.modernBody{
+.levelBody{
 font-size:clamp(12px,3.3vw,14px);
 line-height:1.48;
 }
@@ -521,7 +527,7 @@ advanceToBuildMenu();
 }
 
 if(parsed.modern==="loaded"){
-hideModernLoadingScreen();
+hideLevelLoadingScreen();
 }
 
 if(parsed.load_ui==="modern"){
@@ -579,16 +585,31 @@ screen.classList.remove("visible");
 });
 }
 
-function showLoadingScreen(){
+function showInitialLoadingScreen(){
 hideAllUiScreens();
-document.getElementById("loadingScreen").classList.add("visible");
+const screen = document.getElementById("loadingScreen");
+const video = document.getElementById("loadingBgVideo");
+
+screen.classList.add("visible");
 playLottie();
+
+try{
+video.currentTime = 0;
+video.play().catch(()=>{});
+}catch(e){}
 }
 
-function hideLoadingScreen(){
-document.getElementById("loadingScreen").classList.remove("visible");
+function hideInitialLoadingScreen(){
+const screen = document.getElementById("loadingScreen");
+const video = document.getElementById("loadingBgVideo");
+
+screen.classList.remove("visible");
 stopLottie();
 clearInitialLoadingFallback();
+
+try{
+video.pause();
+}catch(e){}
 }
 
 function showBuildMenu(){
@@ -600,12 +621,64 @@ function hideBuildMenu(){
 document.getElementById("buildMenu").classList.remove("visible");
 }
 
-function showModernLoadingScreen(){
+function setLevelLoadingContent(buildName){
+const video = document.getElementById("levelLoadingVideo");
+const title = document.getElementById("levelLoadingTitle");
+const body1 = document.getElementById("levelLoadingBody1");
+const body2 = document.getElementById("levelLoadingBody2");
+
+if(buildName === "Trad"){
+video.src = "TRAD_MOVIE.mp4";
+title.innerHTML = 'WELCOME TO THE LUX PRODUCT <strong>VISUALIZER</strong>';
+body1.textContent = "This visualizer is meant to provide a generalized model of what our cladding products look like in a real-world setting. Built with our customers in mind, the new LUX Visualizer is designed to help builders, contractors, developers and architects picture the possibilities when it comes to our architectural cladding.";
+body2.textContent = "Note: The products and colours shown on the Visualizer have been reproduced to represent the actual products and colours as accurately as possible. However, the colours seen in the visualizer may vary slightly from the actual products due to a variety of factors which include screen calibration. For a more accurate representation of our products, we always recommend requesting samples before you purchase.";
+}else if(buildName === "Mod"){
+video.src = "MODERN_MOVIE.mp4";
+title.innerHTML = 'WELCOME TO THE LUX PRODUCT <strong>VISUALIZER</strong>';
+body1.textContent = "This visualizer is meant to provide a generalized model of what our cladding products look like in a real-world setting. Built with our customers in mind, the new LUX Visualizer is designed to help builders, contractors, developers and architects picture the possibilities when it comes to our architectural cladding.";
+body2.textContent = "Note: The products and colours shown on the Visualizer have been reproduced to represent the actual products and colours as accurately as possible. However, the colours seen in the visualizer may vary slightly from the actual products due to a variety of factors which include screen calibration. For a more accurate representation of our products, we always recommend requesting samples before you purchase.";
+}else if(buildName === "Multi"){
+video.src = "MULTI_MOVIE.mp4";
+title.innerHTML = 'WELCOME TO THE LUX PRODUCT <strong>VISUALIZER</strong>';
+body1.textContent = "This visualizer is meant to provide a generalized model of what our cladding products look like in a real-world setting. Built with our customers in mind, the new LUX Visualizer is designed to help builders, contractors, developers and architects picture the possibilities when it comes to our architectural cladding.";
+body2.textContent = "Note: The products and colours shown on the Visualizer have been reproduced to represent the actual products and colours as accurately as possible. However, the colours seen in the visualizer may vary slightly from the actual products due to a variety of factors which include screen calibration. For a more accurate representation of our products, we always recommend requesting samples before you purchase.";
+}
+}
+
+function restartLevelLoadingAnimations(){
+const intro = document.getElementById("levelLoadingIntro");
+const logo = document.getElementById("levelBrandLogo");
+const lines = document.querySelectorAll(".levelLine");
+
+intro.style.animation = "none";
+logo.style.animation = "none";
+lines.forEach(line => line.style.animation = "none");
+
+void intro.offsetWidth;
+
+intro.style.animation = "slideInLeft 0.9s cubic-bezier(0.22,1,0.36,1) forwards";
+logo.style.animation = "slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) 0.18s forwards";
+lines.forEach(line => {
+const delayClass = [...line.classList].find(c => c.startsWith("delay"));
+let delay = "0s";
+if(delayClass === "delay1") delay = "0.36s";
+if(delayClass === "delay2") delay = "0.52s";
+if(delayClass === "delay3") delay = "0.68s";
+line.style.animation = `slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) ${delay} forwards`;
+});
+}
+
+function showLevelLoadingScreen(buildName){
 hideAllUiScreens();
-const screen = document.getElementById("modernLoadingScreen");
-const video = document.getElementById("modernLoadingVideo");
+setLevelLoadingContent(buildName);
+restartLevelLoadingAnimations();
+
+const screen = document.getElementById("levelLoadingScreen");
+const video = document.getElementById("levelLoadingVideo");
 
 screen.classList.add("visible");
+
+video.load();
 
 try{
 video.currentTime = 0;
@@ -613,9 +686,9 @@ video.play().catch(()=>{});
 }catch(e){}
 }
 
-function hideModernLoadingScreen(){
-const screen = document.getElementById("modernLoadingScreen");
-const video = document.getElementById("modernLoadingVideo");
+function hideLevelLoadingScreen(){
+const screen = document.getElementById("levelLoadingScreen");
+const video = document.getElementById("levelLoadingVideo");
 
 screen.classList.remove("visible");
 
@@ -652,7 +725,7 @@ function advanceToBuildMenu(){
 if(hasAdvancedPastInitialLoading) return;
 
 hasAdvancedPastInitialLoading = true;
-hideLoadingScreen();
+hideInitialLoadingScreen();
 showBuildMenu();
 }
 
@@ -685,27 +758,16 @@ console.log(sent ? "Sent to Unreal:" : "Could not send to Unreal:", message);
 }
 
 function startIntro(){
-
-const logo=document.getElementById("unrealLogo");
 const video=document.getElementById("introVideo");
-
-setTimeout(()=>{
-logo.style.opacity=1;
-logo.style.transform="scale(1)";
-},300);
-
-setTimeout(()=>{
-logo.style.opacity=0;
-},2500);
 
 setTimeout(()=>{
 video.style.opacity=1;
 video.play().catch(()=>{});
-},3400);
+},200);
 
 setTimeout(()=>{
 document.getElementById("blackFade").style.opacity=1;
-},12400);
+},11400);
 
 setTimeout(()=>{
 const overlay=document.getElementById("introOverlay");
@@ -719,11 +781,10 @@ introFinished = true;
 if(gameLoaded){
 advanceToBuildMenu();
 }else{
-showLoadingScreen();
+showInitialLoadingScreen();
 startInitialLoadingFallback();
 }
-},13400);
-
+},12400);
 }
 
 function selectBuild(buildName){
@@ -732,23 +793,21 @@ selectedBuild = buildName;
 hideBuildMenu();
 
 if(buildName === "Trad"){
-showLoadingScreen();
+showLevelLoadingScreen("Trad");
 sendToUnreal('{"LoadLevel":"Trad"}');
 }else if(buildName === "Mod"){
-showModernLoadingScreen();
+showLevelLoadingScreen("Mod");
 sendToUnreal('{"LoadLevel":"Mod"}');
 }else if(buildName === "Multi"){
-showLoadingScreen();
+showLevelLoadingScreen("Multi");
 sendToUnreal('{"LoadLevel":"Multi"}');
 }
 }
 
 window.addEventListener("DOMContentLoaded",()=>{
-
 document.getElementById("btnTrad").addEventListener("click",()=>selectBuild("Trad"));
 document.getElementById("btnMod").addEventListener("click",()=>selectBuild("Mod"));
 document.getElementById("btnMulti").addEventListener("click",()=>selectBuild("Multi"));
-
 });
 
 function showOverlay(message){
@@ -761,15 +820,12 @@ document.getElementById("screenshotOverlay").style.display="none";
 }
 
 function createFile(file){
-
 const blob=new Blob(file.data,{type:file.mimetype});
 const counterString=String(screenshotCounter).padStart(2,"0");
 const fileName=`screenshot${counterString}${file.extension}`;
 
 if(window.showSaveFilePicker){
-
 (async()=>{
-
 try{
 const handle=await window.showSaveFilePicker({
 suggestedName:fileName,
@@ -785,11 +841,8 @@ await writable.close();
 }catch(err){
 hideOverlay();
 }
-
 })();
-
 }else{
-
 const url=URL.createObjectURL(blob);
 const a=document.createElement("a");
 
@@ -806,7 +859,6 @@ document.getElementById("overlayText").innerText=
 "Your image has been saved";
 
 setTimeout(hideOverlay,2000);
-
 }
 
 screenshotCounter++;
@@ -819,8 +871,6 @@ screenshotCounter++;
 <div id="video-container"></div>
 
 <div id="introOverlay">
-<img id="unrealLogo" src="UNREAL LOGO.png" alt="Unreal Logo">
-
 <video
 id="introVideo"
 src="IntroSequence06.mp4"
@@ -834,6 +884,14 @@ playsinline>
 <div id="uiLayer">
 
 <div id="loadingScreen" class="uiScreen">
+<video
+id="loadingBgVideo"
+src="LOADING_BG.mp4"
+muted
+playsinline
+loop>
+</video>
+<div class="loadingBgShade"></div>
 <div class="loadingWrap">
 <div id="lottieLoader"></div>
 </div>
@@ -865,34 +923,34 @@ playsinline>
 </div>
 </div>
 
-<div id="modernLoadingScreen" class="uiScreen">
+<div id="levelLoadingScreen" class="uiScreen">
 <video
-id="modernLoadingVideo"
+id="levelLoadingVideo"
 src="MODERN_MOVIE.mp4"
 muted
 playsinline
 loop>
 </video>
 
-<div class="modernLoadingShade"></div>
+<div class="levelLoadingShade"></div>
 
-<div class="modernLoadingContent">
-<div class="modernLoadingIntro">
+<div class="levelLoadingContent">
+<div id="levelLoadingIntro" class="levelLoadingIntro">
 <div class="loadingTumbler"></div>
 <div class="loadingWord">LOADING</div>
 </div>
 
-<img class="modernBrandLogo" src="LOGO.png" alt="Logo">
+<img id="levelBrandLogo" class="levelBrandLogo" src="LOGO.png" alt="Logo">
 
-<div class="modernLine modernTitle delay1">
+<div id="levelLoadingTitle" class="levelLine levelTitle delay1">
 WELCOME TO THE LUX PRODUCT <strong>VISUALIZER</strong>
 </div>
 
-<div class="modernLine modernBody delay2">
+<div id="levelLoadingBody1" class="levelLine levelBody delay2">
 This visualizer is meant to provide a generalized model of what our cladding products look like in a real-world setting. Built with our customers in mind, the new LUX Visualizer is designed to help builders, contractors, developers and architects picture the possibilities when it comes to our architectural cladding.
 </div>
 
-<div class="modernLine modernBody delay3">
+<div id="levelLoadingBody2" class="levelLine levelBody delay3">
 Note: The products and colours shown on the Visualizer have been reproduced to represent the actual products and colours as accurately as possible. However, the colours seen in the visualizer may vary slightly from the actual products due to a variety of factors which include screen calibration. For a more accurate representation of our products, we always recommend requesting samples before you purchase.
 </div>
 </div>
