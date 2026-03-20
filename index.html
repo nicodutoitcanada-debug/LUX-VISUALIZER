@@ -125,11 +125,28 @@ min-height:120px;
 ================================*/
 
 #buildMenu{
-background:rgba(0,0,0,0.72);
+background:black;
 pointer-events:auto;
+overflow:hidden;
+}
+
+#menuBgVideo{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.menuBgShade{
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.54);
 }
 
 .menuInner{
+position:relative;
+z-index:2;
 width:100%;
 height:100%;
 display:flex;
@@ -138,24 +155,30 @@ align-items:center;
 justify-content:center;
 padding:40px 20px 32px;
 box-sizing:border-box;
-position:relative;
+}
+
+.menuFadeIn{
+opacity:0;
+animation:menuFadeIn 1.2s ease forwards;
 }
 
 #menuLogo{
-width:min(360px,58vw);
+width:min(300px,50vw);
 height:auto;
-margin-bottom:26px;
+margin-bottom:22px;
 user-select:none;
 pointer-events:none;
+animation-delay:0.18s;
 }
 
 .buttonRow{
 display:flex;
 align-items:flex-start;
 justify-content:center;
-gap:28px;
+gap:22px;
 flex-wrap:wrap;
-margin-bottom:26px;
+margin-bottom:22px;
+animation-delay:0.35s;
 }
 
 .menuButton{
@@ -182,8 +205,8 @@ transform:scale(0.98);
 
 .menuButton img{
 display:block;
-width:min(210px,24vw);
-min-width:140px;
+width:min(170px,20vw);
+min-width:120px;
 height:auto;
 pointer-events:none;
 user-select:none;
@@ -191,23 +214,34 @@ user-select:none;
 
 .menuSubtitle{
 color:white;
-font-size:clamp(16px,1.5vw,24px);
-letter-spacing:0.26em;
+font-size:clamp(14px,1.2vw,20px);
+letter-spacing:0.22em;
 text-transform:uppercase;
 margin-top:2px;
 text-align:center;
+animation-delay:0.52s;
 }
 
 #menuUnrealLogo{
 position:absolute;
 left:50%;
-bottom:24px;
+bottom:22px;
 transform:translateX(-50%);
-width:min(140px,28vw);
+width:min(115px,24vw);
 height:auto;
-opacity:0.95;
+opacity:0;
 pointer-events:none;
 user-select:none;
+animation:menuFadeIn 1.2s ease 0.68s forwards;
+}
+
+@keyframes menuFadeIn{
+0%{
+opacity:0;
+}
+100%{
+opacity:1;
+}
 }
 
 /* ===============================
@@ -256,7 +290,7 @@ gap:12px;
 margin-bottom:26px;
 opacity:0;
 transform:translateX(-40px);
-animation:slideInLeft 0.9s cubic-bezier(0.22,1,0.36,1) forwards;
+animation:slideInLeft 1.8s cubic-bezier(0.22,1,0.36,1) forwards;
 }
 
 .loadingTumbler{
@@ -281,13 +315,13 @@ height:auto;
 margin-bottom:42px;
 opacity:0;
 transform:translateX(-50px);
-animation:slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) 0.18s forwards;
+animation:slideInLeft 1.9s cubic-bezier(0.22,1,0.36,1) 0.36s forwards;
 }
 
 .levelLine{
 opacity:0;
 transform:translateX(-56px);
-animation:slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) forwards;
+animation:slideInLeft 1.9s cubic-bezier(0.22,1,0.36,1) forwards;
 }
 
 .levelTitle{
@@ -315,9 +349,9 @@ margin-bottom:24px;
 margin-bottom:0;
 }
 
-.levelLine.delay1{ animation-delay:0.36s; }
-.levelLine.delay2{ animation-delay:0.52s; }
-.levelLine.delay3{ animation-delay:0.68s; }
+.levelLine.delay1{ animation-delay:0.72s; }
+.levelLine.delay2{ animation-delay:1.04s; }
+.levelLine.delay3{ animation-delay:1.36s; }
 
 @keyframes slideInLeft{
 0%{
@@ -396,11 +430,11 @@ margin-left:42px;
 
 @media (max-width: 900px){
 .buttonRow{
-gap:18px;
+gap:16px;
 }
 .menuButton img{
-width:min(190px,28vw);
-min-width:120px;
+width:min(155px,24vw);
+min-width:110px;
 }
 .levelLoadingContent{
 width:min(640px,62vw);
@@ -408,6 +442,9 @@ margin-left:34px;
 }
 .levelBrandLogo{
 width:min(220px,38vw);
+}
+#menuLogo{
+width:min(270px,56vw);
 }
 }
 
@@ -417,20 +454,20 @@ padding-top:28px;
 padding-bottom:24px;
 }
 #menuLogo{
-width:min(300px,72vw);
-margin-bottom:20px;
+width:min(250px,66vw);
+margin-bottom:18px;
 }
 .buttonRow{
-gap:14px;
-margin-bottom:22px;
+gap:12px;
+margin-bottom:18px;
 }
 .menuButton img{
-width:min(168px,28vw);
-min-width:92px;
+width:min(145px,28vw);
+min-width:88px;
 }
 #menuUnrealLogo{
-bottom:18px;
-width:min(120px,32vw);
+bottom:16px;
+width:min(100px,28vw);
 }
 .levelLoadingContent{
 width:calc(100vw - 36px);
@@ -451,6 +488,9 @@ line-height:1.48;
 .loadingWord{
 font-size:11px;
 letter-spacing:0.28em;
+}
+.menuSubtitle{
+font-size:clamp(13px,3vw,16px);
 }
 }
 </style>
@@ -614,11 +654,26 @@ video.pause();
 
 function showBuildMenu(){
 hideAllUiScreens();
-document.getElementById("buildMenu").classList.add("visible");
+const screen = document.getElementById("buildMenu");
+const video = document.getElementById("menuBgVideo");
+
+screen.classList.add("visible");
+
+try{
+video.currentTime = 0;
+video.play().catch(()=>{});
+}catch(e){}
 }
 
 function hideBuildMenu(){
-document.getElementById("buildMenu").classList.remove("visible");
+const screen = document.getElementById("buildMenu");
+const video = document.getElementById("menuBgVideo");
+
+screen.classList.remove("visible");
+
+try{
+video.pause();
+}catch(e){}
 }
 
 function setLevelLoadingContent(buildName){
@@ -656,15 +711,15 @@ lines.forEach(line => line.style.animation = "none");
 
 void intro.offsetWidth;
 
-intro.style.animation = "slideInLeft 0.9s cubic-bezier(0.22,1,0.36,1) forwards";
-logo.style.animation = "slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) 0.18s forwards";
+intro.style.animation = "slideInLeft 1.8s cubic-bezier(0.22,1,0.36,1) forwards";
+logo.style.animation = "slideInLeft 1.9s cubic-bezier(0.22,1,0.36,1) 0.36s forwards";
 lines.forEach(line => {
 const delayClass = [...line.classList].find(c => c.startsWith("delay"));
 let delay = "0s";
-if(delayClass === "delay1") delay = "0.36s";
-if(delayClass === "delay2") delay = "0.52s";
-if(delayClass === "delay3") delay = "0.68s";
-line.style.animation = `slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) ${delay} forwards`;
+if(delayClass === "delay1") delay = "0.72s";
+if(delayClass === "delay2") delay = "1.04s";
+if(delayClass === "delay3") delay = "1.36s";
+line.style.animation = `slideInLeft 1.9s cubic-bezier(0.22,1,0.36,1) ${delay} forwards`;
 });
 }
 
@@ -765,9 +820,10 @@ video.style.opacity=1;
 video.play().catch(()=>{});
 },200);
 
+/* fade out after 3 seconds */
 setTimeout(()=>{
 document.getElementById("blackFade").style.opacity=1;
-},11400);
+},3000);
 
 setTimeout(()=>{
 const overlay=document.getElementById("introOverlay");
@@ -784,7 +840,7 @@ advanceToBuildMenu();
 showInitialLoadingScreen();
 startInitialLoadingFallback();
 }
-},12400);
+},4000);
 }
 
 function selectBuild(buildName){
@@ -898,11 +954,19 @@ loop>
 </div>
 
 <div id="buildMenu" class="uiScreen">
+<video
+id="menuBgVideo"
+src="LOADING_BG.mp4"
+muted
+playsinline
+loop>
+</video>
+<div class="menuBgShade"></div>
+
 <div class="menuInner">
+<img id="menuLogo" class="menuFadeIn" src="LOGO.png" alt="Logo">
 
-<img id="menuLogo" src="LOGO.png" alt="Logo">
-
-<div class="buttonRow">
+<div class="buttonRow menuFadeIn">
 <button id="btnTrad" class="menuButton" aria-label="Load Traditional">
 <img src="Load_Trad.png" alt="Load Traditional">
 </button>
@@ -916,10 +980,9 @@ loop>
 </button>
 </div>
 
-<div class="menuSubtitle">CHOOSE BUILDING</div>
+<div class="menuSubtitle menuFadeIn">CHOOSE BUILDING</div>
 
 <img id="menuUnrealLogo" src="UNREAL LOGO.png" alt="Unreal Logo">
-
 </div>
 </div>
 
