@@ -28,37 +28,6 @@ height:100% !important;
 object-fit:cover;
 }
 
-#introOverlay{
-position:fixed;
-inset:0;
-background:black;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:5000;
-pointer-events:none;
-opacity:1;
-transition:opacity 1s ease;
-}
-
-#introVideo{
-width:100vw;
-height:100vh;
-object-fit:cover;
-opacity:0;
-transition:opacity 1s ease;
-}
-
-#blackFade{
-position:fixed;
-inset:0;
-background:black;
-opacity:0;
-z-index:4000;
-pointer-events:none;
-transition:opacity 1s ease;
-}
-
 #uiLayer{
 position:fixed;
 inset:0;
@@ -77,6 +46,28 @@ pointer-events:none;
 
 .uiScreen.visible{
 display:flex;
+}
+
+/* ===============================
+   GLOBAL TRANSITION FADE
+================================*/
+
+#transitionFade{
+position:fixed;
+inset:0;
+background:black;
+opacity:0;
+pointer-events:none;
+z-index:9000;
+transition:opacity 0.9s ease;
+}
+
+#transitionFade.visible{
+opacity:1;
+}
+
+#transitionFade.slowReveal{
+transition:opacity 2.4s ease;
 }
 
 /* ===============================
@@ -236,12 +227,8 @@ animation:menuFadeIn 1.2s ease 0.68s forwards;
 }
 
 @keyframes menuFadeIn{
-0%{
-opacity:0;
-}
-100%{
-opacity:1;
-}
+0%{opacity:0;}
+100%{opacity:1;}
 }
 
 /* ===============================
@@ -365,7 +352,7 @@ transform:translateX(0);
 }
 
 /* ===============================
-   READY MESSAGE
+   GAME READY MESSAGE
 ================================*/
 
 #readyMessage{
@@ -381,6 +368,30 @@ text-transform:uppercase;
 text-align:center;
 text-shadow:0 0 18px rgba(0,0,0,0.5);
 padding:24px;
+opacity:0;
+}
+
+.readyText.animate{
+animation:readyFade 3s ease forwards;
+}
+
+@keyframes readyFade{
+0%{
+opacity:0;
+transform:translateY(10px);
+}
+15%{
+opacity:1;
+transform:translateY(0);
+}
+75%{
+opacity:1;
+transform:translateY(0);
+}
+100%{
+opacity:0;
+transform:translateY(-6px);
+}
 }
 
 /* ===============================
@@ -501,12 +512,12 @@ font-size:clamp(13px,3vw,16px);
 let Application;
 let screenshotCounter = 1;
 
-let introFinished = false;
 let gameLoaded = false;
 let selectedBuild = null;
 let lottieInstance = null;
 let loadingFallbackTimer = null;
 let hasAdvancedPastInitialLoading = false;
+let readyMessageTimer = null;
 
 import * as PixelStreamingWebSdk from
 "https://unpkg.com/@arcware-cloud/pixelstreaming-websdk@1.3.32/index.mjs";
@@ -561,13 +572,13 @@ showOverlay("Generating high resolution image");
 if(parsed.game==="loaded"){
 gameLoaded = true;
 
-if(introFinished && !selectedBuild && !hasAdvancedPastInitialLoading){
-advanceToBuildMenu();
+if(!selectedBuild && !hasAdvancedPastInitialLoading){
+advanceToBuildMenuWithFade();
 }
 }
 
 if(parsed.modern==="loaded"){
-hideLevelLoadingScreen();
+revealGameFromLevelLoading();
 }
 
 if(parsed.load_ui==="modern"){
@@ -588,7 +599,7 @@ document
 });
 
 initLottie();
-startIntro();
+startApp();
 
 window.file=Application.webRtcController.file;
 
@@ -625,6 +636,19 @@ screen.classList.remove("visible");
 });
 }
 
+function restartMenuAnimations(){
+const animated = document.querySelectorAll("#buildMenu .menuFadeIn, #menuUnrealLogo");
+animated.forEach(el=>{
+el.style.animation = "none";
+void el.offsetWidth;
+});
+
+document.getElementById("menuLogo").style.animation = "menuFadeIn 1.2s ease 0.18s forwards";
+document.querySelector(".buttonRow").style.animation = "menuFadeIn 1.2s ease 0.35s forwards";
+document.querySelector(".menuSubtitle").style.animation = "menuFadeIn 1.2s ease 0.52s forwards";
+document.getElementById("menuUnrealLogo").style.animation = "menuFadeIn 1.2s ease 0.68s forwards";
+}
+
 function showInitialLoadingScreen(){
 hideAllUiScreens();
 const screen = document.getElementById("loadingScreen");
@@ -658,6 +682,7 @@ const screen = document.getElementById("buildMenu");
 const video = document.getElementById("menuBgVideo");
 
 screen.classList.add("visible");
+restartMenuAnimations();
 
 try{
 video.currentTime = 0;
@@ -752,19 +777,98 @@ video.pause();
 }catch(e){}
 }
 
+function setFadeVisible(visible, slowReveal=false){
+const fade = document.getElementById("transitionFade");
+fade.classList.toggle("slowReveal", slowReveal);
+fade.classList.toggle("visible", visible);
+}
+
+function fadeToBlack(duration=900){
+return new Promise(resolve=>{
+const fade = document.getElementById("transitionFade");
+fade.style.transitionDuration = `${duration}ms`;
+fade.classList.remove("slowReveal");
+requestAnimationFrame(()=>{
+fade.classList.add("visible");
+setTimeout(resolve, duration);
+});
+});
+}
+
+function fadeFromBlack(duration=900){
+return new Promise(resolve=>{
+const fade = document.getElementById("transitionFade");
+fade.style.transitionDuration = `${duration}ms`;
+fade.classList.remove("slowReveal");
+requestAnimationFrame(()=>{
+fade.classList.remove("visible");
+setTimeout(resolve, duration);
+});
+});
+}
+
+function slowFadeFromBlack(duration=2400){
+return new Promise(resolve=>{
+const fade = document.getElementById("transitionFade");
+fade.style.transitionDuration = `${duration}ms`;
+fade.classList.add("slowReveal");
+requestAnimationFrame(()=>{
+fade.classList.remove("visible");
+setTimeout(()=>{
+fade.classList.remove("slowReveal");
+resolve();
+}, duration);
+});
+});
+}
+
+async function advanceToBuildMenuWithFade(){
+if(hasAdvancedPastInitialLoading) return;
+
+hasAdvancedPastInitialLoading = true;
+await fadeToBlack(900);
+hideInitialLoadingScreen();
+showBuildMenu();
+await fadeFromBlack(1100);
+}
+
+async function transitionToLevelLoading(buildName){
+await fadeToBlack(900);
+hideBuildMenu();
+showLevelLoadingScreen(buildName);
+}
+
+async function revealGameFromLevelLoading(){
+await fadeToBlack(900);
+hideLevelLoadingScreen();
+await slowFadeFromBlack(2600);
+}
+
 function showReadyMessage(){
+clearTimeout(readyMessageTimer);
 hideAllUiScreens();
-clearInitialLoadingFallback();
-document.getElementById("readyMessage").classList.add("visible");
+
+const screen = document.getElementById("readyMessage");
+const text = document.getElementById("readyText");
+
+screen.classList.add("visible");
+text.classList.remove("animate");
+void text.offsetWidth;
+text.classList.add("animate");
+
+readyMessageTimer = setTimeout(()=>{
+screen.classList.remove("visible");
+text.classList.remove("animate");
+},3000);
 }
 
 function startInitialLoadingFallback(){
 clearInitialLoadingFallback();
 
 loadingFallbackTimer = setTimeout(()=>{
-if(!gameLoaded && !selectedBuild && introFinished && !hasAdvancedPastInitialLoading){
+if(!gameLoaded && !selectedBuild && !hasAdvancedPastInitialLoading){
 console.log('No {"game":"loaded"} after 5 seconds of loading animation, continuing anyway.');
-advanceToBuildMenu();
+advanceToBuildMenuWithFade();
 }
 },5000);
 }
@@ -774,14 +878,6 @@ if(loadingFallbackTimer){
 clearTimeout(loadingFallbackTimer);
 loadingFallbackTimer = null;
 }
-}
-
-function advanceToBuildMenu(){
-if(hasAdvancedPastInitialLoading) return;
-
-hasAdvancedPastInitialLoading = true;
-hideInitialLoadingScreen();
-showBuildMenu();
 }
 
 function sendToUnreal(payload){
@@ -812,50 +908,28 @@ sent = true;
 console.log(sent ? "Sent to Unreal:" : "Could not send to Unreal:", message);
 }
 
-function startIntro(){
-const video=document.getElementById("introVideo");
-
-setTimeout(()=>{
-video.style.opacity=1;
-video.play().catch(()=>{});
-},200);
-
-/* fade out after 3 seconds */
-setTimeout(()=>{
-document.getElementById("blackFade").style.opacity=1;
-},3000);
-
-setTimeout(()=>{
-const overlay=document.getElementById("introOverlay");
-const fade=document.getElementById("blackFade");
-
-if(overlay) overlay.remove();
-if(fade) fade.remove();
-
-introFinished = true;
+function startApp(){
+setFadeVisible(false);
+showInitialLoadingScreen();
 
 if(gameLoaded){
-advanceToBuildMenu();
+advanceToBuildMenuWithFade();
 }else{
-showInitialLoadingScreen();
 startInitialLoadingFallback();
 }
-},4000);
 }
 
 function selectBuild(buildName){
 selectedBuild = buildName;
 
-hideBuildMenu();
-
 if(buildName === "Trad"){
-showLevelLoadingScreen("Trad");
+transitionToLevelLoading("Trad");
 sendToUnreal('{"LoadLevel":"Trad"}');
 }else if(buildName === "Mod"){
-showLevelLoadingScreen("Mod");
+transitionToLevelLoading("Mod");
 sendToUnreal('{"LoadLevel":"Mod"}');
 }else if(buildName === "Multi"){
-showLevelLoadingScreen("Multi");
+transitionToLevelLoading("Multi");
 sendToUnreal('{"LoadLevel":"Multi"}');
 }
 }
@@ -925,17 +999,6 @@ screenshotCounter++;
 <body>
 
 <div id="video-container"></div>
-
-<div id="introOverlay">
-<video
-id="introVideo"
-src="IntroSequence06.mp4"
-muted
-playsinline>
-</video>
-</div>
-
-<div id="blackFade"></div>
 
 <div id="uiLayer">
 
@@ -1020,10 +1083,12 @@ Note: The products and colours shown on the Visualizer have been reproduced to r
 </div>
 
 <div id="readyMessage" class="uiScreen">
-<div class="readyText">READY FOR NEXT STEP!</div>
+<div id="readyText" class="readyText">GAME READY !</div>
 </div>
 
 </div>
+
+<div id="transitionFade"></div>
 
 <div id="screenshotOverlay">
 <div class="overlayBox">
