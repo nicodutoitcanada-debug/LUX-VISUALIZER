@@ -13,10 +13,6 @@ font-family:"Futura PT",sans-serif;
 -webkit-tap-highlight-color:transparent;
 }
 
-/* ===============================
-   PIXEL STREAM
-================================*/
-
 #video-container{
 width:100vw;
 height:100vh;
@@ -31,10 +27,6 @@ width:100% !important;
 height:100% !important;
 object-fit:cover;
 }
-
-/* ===============================
-   INTRO VIDEO OVERLAY
-================================*/
 
 #introOverlay{
 position:fixed;
@@ -68,10 +60,6 @@ opacity:0;
 transition:opacity 1s ease;
 }
 
-/* ===============================
-   BLACK FADE
-================================*/
-
 #blackFade{
 position:fixed;
 inset:0;
@@ -81,10 +69,6 @@ z-index:4000;
 pointer-events:none;
 transition:opacity 1s ease;
 }
-
-/* ===============================
-   GENERIC UI LAYER
-================================*/
 
 #uiLayer{
 position:fixed;
@@ -107,7 +91,7 @@ display:flex;
 }
 
 /* ===============================
-   LOTTIE LOADING SCREEN
+   GENERIC LOADING SCREEN
 ================================*/
 
 #loadingScreen{
@@ -221,6 +205,126 @@ user-select:none;
 }
 
 /* ===============================
+   MODERN LOADING SCREEN
+================================*/
+
+#modernLoadingScreen{
+background:black;
+overflow:hidden;
+}
+
+#modernLoadingVideo{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.modernLoadingShade{
+position:absolute;
+inset:0;
+background:
+linear-gradient(90deg, rgba(0,0,0,0.76) 0%, rgba(0,0,0,0.56) 26%, rgba(0,0,0,0.12) 52%, rgba(0,0,0,0) 100%);
+}
+
+.modernLoadingContent{
+position:relative;
+z-index:2;
+width:min(560px,42vw);
+max-width:560px;
+margin-right:auto;
+margin-left:58px;
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+justify-content:center;
+color:white;
+pointer-events:none;
+}
+
+.modernLoadingIntro{
+display:flex;
+align-items:center;
+gap:12px;
+margin-bottom:26px;
+opacity:0;
+transform:translateX(-40px);
+animation:slideInLeft 0.9s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+
+.loadingTumbler{
+width:22px;
+height:22px;
+border:2px solid rgba(255,255,255,0.28);
+border-top:2px solid white;
+border-radius:50%;
+animation:spin 0.9s linear infinite;
+}
+
+.loadingWord{
+font-size:12px;
+letter-spacing:0.34em;
+text-transform:uppercase;
+font-weight:500;
+}
+
+.modernBrandLogo{
+width:min(250px,34vw);
+height:auto;
+margin-bottom:42px;
+opacity:0;
+transform:translateX(-50px);
+animation:slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) 0.18s forwards;
+}
+
+.modernLine{
+opacity:0;
+transform:translateX(-56px);
+animation:slideInLeft 0.95s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+
+.modernTitle{
+font-size:clamp(22px,2vw,28px);
+line-height:1.12;
+font-weight:300;
+letter-spacing:0.01em;
+margin-bottom:18px;
+text-transform:uppercase;
+}
+
+.modernTitle strong{
+font-weight:700;
+}
+
+.modernBody{
+font-size:clamp(12px,0.8vw,15px);
+line-height:1.55;
+font-weight:300;
+max-width:540px;
+margin-bottom:24px;
+}
+
+.modernBody:last-child{
+margin-bottom:0;
+}
+
+.modernLine.delay1{ animation-delay:0.36s; }
+.modernLine.delay2{ animation-delay:0.52s; }
+.modernLine.delay3{ animation-delay:0.68s; }
+
+@keyframes slideInLeft{
+0%{
+opacity:0;
+transform:translateX(-56px);
+}
+100%{
+opacity:1;
+transform:translateX(0);
+}
+}
+
+/* ===============================
    READY MESSAGE
 ================================*/
 
@@ -277,6 +381,13 @@ animation:spin 1s linear infinite;
 to{transform:rotate(360deg);}
 }
 
+@media (max-width: 1100px){
+.modernLoadingContent{
+width:min(620px,52vw);
+margin-left:42px;
+}
+}
+
 @media (max-width: 900px){
 .buttonRow{
 gap:18px;
@@ -284,6 +395,13 @@ gap:18px;
 .menuButton img{
 width:min(190px,28vw);
 min-width:120px;
+}
+.modernLoadingContent{
+width:min(640px,62vw);
+margin-left:34px;
+}
+.modernBrandLogo{
+width:min(220px,38vw);
 }
 }
 
@@ -308,6 +426,26 @@ min-width:92px;
 bottom:18px;
 width:min(120px,32vw);
 }
+.modernLoadingContent{
+width:calc(100vw - 36px);
+margin-left:18px;
+margin-right:18px;
+}
+.modernBrandLogo{
+width:min(190px,48vw);
+margin-bottom:30px;
+}
+.modernTitle{
+font-size:clamp(18px,5.4vw,24px);
+}
+.modernBody{
+font-size:clamp(12px,3.3vw,14px);
+line-height:1.48;
+}
+.loadingWord{
+font-size:11px;
+letter-spacing:0.28em;
+}
 }
 </style>
 
@@ -330,10 +468,6 @@ import * as PixelStreamingWebSdk from
 (() => {
 
 const { ArcwareInit } = PixelStreamingWebSdk;
-
-/* ===============================
-   RANDOM SEAT SELECTION
-================================*/
 
 const shareIds=[
 "share-a913ed5d-44d6-42e6-bc9d-2e4ea72c4eba",
@@ -367,10 +501,6 @@ connectionStrengthIcon:false
 
 Application=initResult.Application;
 
-/* ===============================
-   RESPONSES FROM UNREAL
-================================*/
-
 Application.getApplicationResponse((response)=>{
 
 console.log("Response from Unreal:", response);
@@ -390,12 +520,10 @@ advanceToBuildMenu();
 }
 }
 
-/* modern level finished loading, stop the loading animation */
 if(parsed.modern==="loaded"){
-hideLoadingScreen();
+hideModernLoadingScreen();
 }
 
-/* cinematic finished, ready for next UI step */
 if(parsed.load_ui==="modern"){
 showReadyMessage();
 }
@@ -407,19 +535,11 @@ createFile(window.file);
 
 });
 
-/* ===============================
-   ATTACH STREAM
-================================*/
-
 setTimeout(()=>{
 document
 .getElementById("video-container")
 .appendChild(Application.rootElement);
 });
-
-/* ===============================
-   INTRO SEQUENCE
-================================*/
 
 initLottie();
 startIntro();
@@ -427,10 +547,6 @@ startIntro();
 window.file=Application.webRtcController.file;
 
 })();
-
-/* ===============================
-   LOTTIE
-================================*/
 
 function initLottie(){
 const container = document.getElementById("lottieLoader");
@@ -456,10 +572,6 @@ if(lottieInstance){
 lottieInstance.stop();
 }
 }
-
-/* ===============================
-   UI SCREEN HELPERS
-================================*/
 
 function hideAllUiScreens(){
 document.querySelectorAll(".uiScreen").forEach(screen=>{
@@ -488,15 +600,35 @@ function hideBuildMenu(){
 document.getElementById("buildMenu").classList.remove("visible");
 }
 
+function showModernLoadingScreen(){
+hideAllUiScreens();
+const screen = document.getElementById("modernLoadingScreen");
+const video = document.getElementById("modernLoadingVideo");
+
+screen.classList.add("visible");
+
+try{
+video.currentTime = 0;
+video.play().catch(()=>{});
+}catch(e){}
+}
+
+function hideModernLoadingScreen(){
+const screen = document.getElementById("modernLoadingScreen");
+const video = document.getElementById("modernLoadingVideo");
+
+screen.classList.remove("visible");
+
+try{
+video.pause();
+}catch(e){}
+}
+
 function showReadyMessage(){
 hideAllUiScreens();
 clearInitialLoadingFallback();
 document.getElementById("readyMessage").classList.add("visible");
 }
-
-/* ===============================
-   INITIAL LOADING FALLBACK
-================================*/
 
 function startInitialLoadingFallback(){
 clearInitialLoadingFallback();
@@ -523,10 +655,6 @@ hasAdvancedPastInitialLoading = true;
 hideLoadingScreen();
 showBuildMenu();
 }
-
-/* ===============================
-   SEND TO UNREAL
-================================*/
 
 function sendToUnreal(payload){
 const message = typeof payload === "string" ? payload : JSON.stringify(payload);
@@ -555,10 +683,6 @@ sent = true;
 
 console.log(sent ? "Sent to Unreal:" : "Could not send to Unreal:", message);
 }
-
-/* ===============================
-   INTRO LOGO / VIDEO FLOW
-================================*/
 
 function startIntro(){
 
@@ -602,22 +726,20 @@ startInitialLoadingFallback();
 
 }
 
-/* ===============================
-   BUILD SELECTION
-================================*/
-
 function selectBuild(buildName){
 selectedBuild = buildName;
 
 hideBuildMenu();
-showLoadingScreen();
 
 if(buildName === "Trad"){
-sendToUnreal({LoadLevel:"Trad"});
+showLoadingScreen();
+sendToUnreal('{"LoadLevel":"Trad"}');
 }else if(buildName === "Mod"){
-sendToUnreal({LoadLevel:"Mod"});
+showModernLoadingScreen();
+sendToUnreal('{"LoadLevel":"Mod"}');
 }else if(buildName === "Multi"){
-sendToUnreal({LoadLevel:"Multi"});
+showLoadingScreen();
+sendToUnreal('{"LoadLevel":"Multi"}');
 }
 }
 
@@ -628,10 +750,6 @@ document.getElementById("btnMod").addEventListener("click",()=>selectBuild("Mod"
 document.getElementById("btnMulti").addEventListener("click",()=>selectBuild("Multi"));
 
 });
-
-/* ===============================
-   SCREENSHOT FUNCTIONS
-================================*/
 
 function showOverlay(message){
 document.getElementById("overlayText").innerText=message;
@@ -744,6 +862,39 @@ playsinline>
 
 <img id="menuUnrealLogo" src="UNREAL LOGO.png" alt="Unreal Logo">
 
+</div>
+</div>
+
+<div id="modernLoadingScreen" class="uiScreen">
+<video
+id="modernLoadingVideo"
+src="MODERN_MOVIE.mp4"
+muted
+playsinline
+loop>
+</video>
+
+<div class="modernLoadingShade"></div>
+
+<div class="modernLoadingContent">
+<div class="modernLoadingIntro">
+<div class="loadingTumbler"></div>
+<div class="loadingWord">LOADING</div>
+</div>
+
+<img class="modernBrandLogo" src="LOGO.png" alt="Logo">
+
+<div class="modernLine modernTitle delay1">
+WELCOME TO THE LUX PRODUCT <strong>VISUALIZER</strong>
+</div>
+
+<div class="modernLine modernBody delay2">
+This visualizer is meant to provide a generalized model of what our cladding products look like in a real-world setting. Built with our customers in mind, the new LUX Visualizer is designed to help builders, contractors, developers and architects picture the possibilities when it comes to our architectural cladding.
+</div>
+
+<div class="modernLine modernBody delay3">
+Note: The products and colours shown on the Visualizer have been reproduced to represent the actual products and colours as accurately as possible. However, the colours seen in the visualizer may vary slightly from the actual products due to a variety of factors which include screen calibration. For a more accurate representation of our products, we always recommend requesting samples before you purchase.
+</div>
 </div>
 </div>
 
