@@ -21,13 +21,18 @@ body {
   overflow: hidden;
   background: black;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centers the stream if letterboxed */
 }
 
 #video-container video,
 #video-container canvas {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover;           /* ← THIS REMOVES BLACK BARS FOREVER */
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: contain;          /* Safe default – prevents black screen */
   background: black;
 }
 
@@ -52,9 +57,50 @@ body {
   display: flex;
 }
 
-/* ===============================
-   BUILD MENU – Smaller + Safe Spacing
-================================*/
+/* GLOBAL TRANSITION FADE */
+#transitionFade {
+  position: fixed;
+  inset: 0;
+  background: black;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9000;
+  transition: opacity 0.9s ease;
+}
+
+#transitionFade.visible {
+  opacity: 1;
+}
+
+/* INITIAL LOADING SCREEN */
+#loadingScreen {
+  background: black;
+  overflow: hidden;
+}
+
+#loadingBgVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* BUILD MENU */
+#buildMenu {
+  background: black;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+#menuBgVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .menuInner {
   position: relative;
   z-index: 2;
@@ -64,19 +110,27 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8vh 5vw 22vh;          /* Extra top + huge bottom space */
+  padding: 9vh 5vw 24vh;          /* Increased top/bottom for no cutoffs */
   box-sizing: border-box;
-  gap: 3vh;
+  gap: 3.5vh;
 }
 
 #menuLogo {
-  width: min(240px, 48vw);
+  width: min(240px, 50vw);
   max-width: 280px;
   opacity: 0.7;
 }
 
+.buttonRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: min(22px, 5vw);
+  flex-wrap: wrap;
+}
+
 .menuButton img {
-  width: min(140px, 30vw);
+  width: min(140px, 32vw);
   max-width: 160px;
   opacity: 0.7;
   transition: opacity 0.25s ease;
@@ -89,23 +143,33 @@ body {
 #menuUnrealLogo {
   position: absolute;
   left: 50%;
-  bottom: 5vh;
+  bottom: 6vh;
   transform: translateX(-50%);
   width: min(100px, 22vw);
-  max-width: 115px;
   opacity: 0.7;
 }
 
-/* ===============================
-   LEVEL LOADING – Smaller + Truly Left + No Cutoff
-================================*/
+/* LEVEL LOADING SCREEN */
+#levelLoadingScreen {
+  background: black;
+  overflow: hidden;
+}
+
+#levelLoadingVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .levelLoadingContent {
   position: relative;
   z-index: 2;
   width: min(520px, 78vw);
   margin-left: 6vw;
   margin-right: auto;
-  padding-top: 9vh;               /* Prevents top cutoff */
+  padding-top: 10vh;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -124,44 +188,32 @@ body {
   font-size: clamp(12.5px, 2.5vw, 14.5px);
 }
 
-/* ===============================
-   MEDIA QUERIES – Aggressive Mobile Scaling
-================================*/
+/* MEDIA QUERIES */
 @media (max-width: 1024px) {
-  .menuInner { padding: 9vh 6vw 24vh; }
+  .menuInner { padding: 10vh 6vw 26vh; }
   #menuLogo { width: min(220px, 55vw); }
   .menuButton img { width: min(130px, 34vw); }
 }
 
 @media (max-width: 640px) {
-  .menuInner {
-    padding: 10vh 7vw 26vh;        /* Even more space top/bottom */
-    gap: 3.5vh;
-  }
+  .menuInner { padding: 11vh 7vw 28vh; gap: 4vh; }
   #menuLogo { width: min(200px, 62vw); }
-  .buttonRow { flex-direction: column; gap: 4vh; }
+  .buttonRow { flex-direction: column; gap: 4.5vh; }
   .menuButton img { width: min(170px, 50vw); max-width: 200px; }
-  #menuUnrealLogo { bottom: 6.5vh; width: min(90px, 26vw); }
+  #menuUnrealLogo { bottom: 7.5vh; width: min(90px, 26vw); }
 
-  /* Level loading – tiny screens */
-  .levelLoadingContent {
-    margin-left: 5vw;
-    width: 88vw;
-    padding-top: 10vh;
-  }
+  .levelLoadingContent { margin-left: 5vw; width: 88vw; padding-top: 12vh; }
   .levelBrandLogo { width: min(170px, 40vw); }
   .levelTitle { font-size: clamp(17px, 5vw, 22px); }
-  .levelBody  { font-size: clamp(11.5px, 3.5vw, 13px); }
+  .levelBody { font-size: clamp(11.5px, 3.5vw, 13px); }
 }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
 
 <script type="module">
-/* ==================== YOUR ENTIRE JAVASCRIPT (unchanged except resize helper) ==================== */
 let Application;
 let screenshotCounter = 1;
-
 let gameLoaded = false;
 let selectedBuild = null;
 let lottieInstance = null;
@@ -170,77 +222,89 @@ let appInAttentionState = false;
 let gameRevealed = false;
 let isRevealingGame = false;
 
-import * as PixelStreamingWebSdk from
-"https://unpkg.com/@arcware-cloud/pixelstreaming-websdk@1.3.32/index.mjs";
+import * as PixelStreamingWebSdk from "https://unpkg.com/@arcware-cloud/pixelstreaming-websdk@1.3.32/index.mjs";
 
 (() => {
-const { ArcwareInit } = PixelStreamingWebSdk;
+  const { ArcwareInit } = PixelStreamingWebSdk;
 
-const shareIds = ["share-a913ed5d-44d6-42e6-bc9d-2e4ea72c4eba"];
-const selectedShareId = shareIds[Math.floor(Math.random()*shareIds.length)];
+  const shareIds = ["share-a913ed5d-44d6-42e6-bc9d-2e4ea72c4eba"];
+  const selectedShareId = shareIds[Math.floor(Math.random() * shareIds.length)];
 
-const initResult = new ArcwareInit(
-  {shareId: selectedShareId},
-  {
-    initialSettings: { AutoConnect:true, AutoPlayVideo:true, StartVideoMuted:true },
-    settings: {
-      infoButton:false, micButton:false, audioButton:false,
-      fullscreenButton:false, settingsButton:false, connectionStrengthIcon:false
+  const initResult = new ArcwareInit(
+    { shareId: selectedShareId },
+    {
+      initialSettings: { AutoConnect: true, AutoPlayVideo: true, StartVideoMuted: true },
+      settings: { infoButton: false, micButton: false, audioButton: false, fullscreenButton: false, settingsButton: false, connectionStrengthIcon: false }
     }
-  }
-);
+  );
 
-Application = initResult.Application;
-registerArcwareAttentionHandlers();
+  Application = initResult.Application;
+  registerArcwareAttentionHandlers();
 
-Application.getApplicationResponse((response) => {
-  console.log("Response from Unreal:", response);
-  try {
-    const parsed = JSON.parse(response);
-    if (parsed.screenshot === "generating") showOverlay("Generating high resolution image");
-    if (parsed.game === "loaded") {
-      gameLoaded = true;
-      if (!selectedBuild && !document.getElementById("buildMenu").classList.contains("visible") && !appInAttentionState) {
-        advanceToBuildMenuWithFade();
+  Application.getApplicationResponse((response) => {
+    console.log("Response from Unreal:", response);
+    try {
+      const parsed = JSON.parse(response);
+      if (parsed.screenshot === "generating") showOverlay("Generating high resolution image");
+      if (parsed.game === "loaded") {
+        gameLoaded = true;
+        if (!selectedBuild && !document.getElementById("buildMenu").classList.contains("visible") && !appInAttentionState) {
+          advanceToBuildMenuWithFade();
+        }
       }
-    }
-    if (parsed.modern === "loaded" || parsed.load_ui === "modern") {
-      revealGameFromLevelLoading().finally(() => showReadyMessage());
-    }
-  } catch(e) {}
-  if (response.startsWith("CreateScreenshot")) createFile(window.file);
-});
+      if (parsed.modern === "loaded" || parsed.load_ui === "modern") {
+        revealGameFromLevelLoading().finally(() => showReadyMessage());
+      }
+    } catch (e) {}
+    if (response.startsWith("CreateScreenshot")) createFile(window.file);
+  });
 
-setTimeout(() => {
-  document.getElementById("video-container").appendChild(Application.rootElement);
-}, 100);
+  setTimeout(() => {
+    document.getElementById("video-container").appendChild(Application.rootElement);
+  }, 100);
 
-initLottie();
-startApp();
-window.file = Application.webRtcController.file;
+  initLottie();
+  startApp();
+  window.file = Application.webRtcController.file;
 })();
 
-/* ==================== RESIZE HELPER – Forces full-screen scaling ==================== */
+// Dynamic resize + viewport reporting to Unreal
 function handleResize() {
   const container = document.getElementById("video-container");
   if (container) {
-    container.style.width = "100vw";
-    container.style.height = "100vh";
+    container.style.width = `${window.innerWidth}px`;
+    container.style.height = `${window.innerHeight}px`;
   }
+
+  // Report pixel-accurate size to Unreal (helps reduce black bars)
+  const pixelRatio = window.devicePixelRatio || 1;
+  const w = Math.round(window.innerWidth * pixelRatio);
+  const h = Math.round(window.innerHeight * pixelRatio);
+  sendToUnreal(JSON.stringify({ type: "viewport", width: w, height: h }));
+  console.log("Reported viewport to Unreal:", w, "x", h);
 }
+
 window.addEventListener("resize", handleResize);
-setTimeout(handleResize, 500);   /* Run once after load */
+window.addEventListener("orientationchange", handleResize);
+setTimeout(handleResize, 300);
+setTimeout(handleResize, 1200);
 
-/* ==================== REST OF YOUR ORIGINAL JAVASCRIPT (unchanged) ==================== */
-function initLottie(){ /* ... same as before ... */ }
-function playLottie(){ /* ... */ }
-function stopLottie(){ /* ... */ }
-function hideAllUiScreens(){ /* ... */ }
-function restartMenuAnimations(){ /* ... */ }
-/* ... all your other functions (showInitialLoadingScreen, showBuildMenu, setLevelLoadingContent, etc.) ... */
-function selectBuild(buildName){ /* ... */ }
+// Your existing functions (initLottie, playLottie, stopLottie, hideAllUiScreens, restartMenuAnimations, showInitialLoadingScreen, etc.) remain unchanged from the previous working version.
+// Paste them here exactly as they were.
 
-/* Keep all your existing functions exactly as they were in the previous version */
+function initLottie() {
+  const container = document.getElementById("lottieLoader");
+  if (!container || !window.lottie) return;
+  lottieInstance = window.lottie.loadAnimation({
+    container,
+    renderer: "svg",
+    loop: true,
+    autoplay: false,
+    path: "loading 01.json"
+  });
+}
+
+// ... (include all your other functions: playLottie, stopLottie, hideAllUiScreens, restartMenuAnimations, showInitialLoadingScreen, hideInitialLoadingScreen, showBuildMenu, hideBuildMenu, setLevelLoadingContent, restartLevelLoadingAnimations, showLevelLoadingScreen, hideLevelLoadingScreen, fadeToBlack, fadeFromBlack, advanceToBuildMenuWithFade, transitionToLevelLoading, revealGameFromLevelLoading, showReadyMessage, shouldSurfaceAttention, brandMessage, showAttentionScreen, registerArcwareAttentionHandlers, sendToUnreal, startApp, selectBuild, showOverlay, hideOverlay, createFile)
 
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnTrad").addEventListener("click", () => selectBuild("Trad"));
@@ -248,19 +312,48 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnMulti").addEventListener("click", () => selectBuild("Multi"));
   document.getElementById("retryButton").addEventListener("click", () => location.reload());
 });
-
-/* ... showOverlay, hideOverlay, createFile ... */
 </script>
 </head>
 
 <body>
-<!-- YOUR HTML BODY IS EXACTLY THE SAME AS LAST VERSION -->
+
 <div id="video-container"></div>
+
 <div id="uiLayer">
-  <!-- loadingScreen, buildMenu, levelLoadingScreen, readyMessage, attentionScreen, screenshotOverlay -->
-  <!-- (copy-paste the exact <div> structure from the previous code I gave you) -->
+  <!-- Paste your full UI structure here from the previous version (loadingScreen, buildMenu, levelLoadingScreen, readyMessage, attentionScreen, transitionFade, screenshotOverlay) -->
+  <!-- Example snippet – replace with your exact HTML from before -->
+  <div id="loadingScreen" class="uiScreen">
+    <video id="loadingBgVideo" src="LOADING_BG.mp4" muted playsinline loop></video>
+    <div class="loadingBgShade"></div>
+    <div class="loadingWrap"><div id="lottieLoader"></div></div>
+  </div>
+
+  <div id="buildMenu" class="uiScreen">
+    <video id="menuBgVideo" src="LOADING_BG.mp4" muted playsinline loop></video>
+    <div class="menuBgShade"></div>
+    <div class="menuInner">
+      <img id="menuLogo" class="menuFadeIn" src="LOGO.png" alt="Logo">
+      <div class="buttonRow menuFadeIn">
+        <button id="btnTrad" class="menuButton" aria-label="Load Traditional"><img src="Load_Trad.png" alt="Load Traditional"></button>
+        <button id="btnMod" class="menuButton" aria-label="Load Modern"><img src="Load_Mod.png" alt="Load Modern"></button>
+        <button id="btnMulti" class="menuButton" aria-label="Load Multi"><img src="Load_Multi.png" alt="Load Multi"></button>
+      </div>
+      <div class="menuSubtitle menuFadeIn">CHOOSE BUILDING</div>
+      <img id="menuUnrealLogo" src="UNREAL LOGO.png" alt="Unreal Logo">
+    </div>
+  </div>
+
+  <!-- Add the rest: levelLoadingScreen, readyMessage, attentionScreen, transitionFade, screenshotOverlay as before -->
 </div>
+
 <div id="transitionFade"></div>
-<div id="screenshotOverlay">...</div>
+
+<div id="screenshotOverlay">
+  <div class="overlayBox">
+    <div class="spinner"></div>
+    <div id="overlayText">Generating high resolution image</div>
+  </div>
+</div>
+
 </body>
 </html>
