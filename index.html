@@ -27,7 +27,7 @@ body {
 #video-container canvas {
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain;          /* Critical fix for touch input offset */
+  object-fit: contain;
   background: black;
 }
 
@@ -110,7 +110,7 @@ body {
 }
 
 /* ===============================
-   BUILD MENU
+   BUILD MENU – FIXED SIZES + OPACITY + MOBILE OVERLAP/TOP CUTOFF
 ================================*/
 #buildMenu {
   background: black;
@@ -141,9 +141,9 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 5vh 5vw 16vh;          /* More bottom space to prevent cutoff */
+  padding: 7vh 5vw 19vh;          /* More top + bottom breathing room */
   box-sizing: border-box;
-  gap: 3vh;
+  gap: 3.5vh;
 }
 
 .menuFadeIn {
@@ -152,10 +152,10 @@ body {
 }
 
 #menuLogo {
-  width: min(300px, 60vw);
-  max-width: 340px;
+  width: min(260px, 52vw);
+  max-width: 300px;
   height: auto;
-  margin-bottom: 0;
+  opacity: 0.7;                   /* Permanent 70% as requested */
   user-select: none;
   pointer-events: none;
   animation-delay: 0.18s;
@@ -165,9 +165,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: min(24px, 6vw);
+  gap: min(22px, 5vw);
   flex-wrap: wrap;
-  margin-bottom: 0;
   animation-delay: 0.35s;
 }
 
@@ -195,17 +194,23 @@ body {
 
 .menuButton img {
   display: block;
-  width: min(170px, 38vw);
-  max-width: 190px;
-  min-width: 120px;
+  width: min(150px, 32vw);
+  max-width: 170px;
+  min-width: 110px;
   height: auto;
+  opacity: 0.7;                   /* Buttons start at 70% */
   pointer-events: none;
   user-select: none;
+  transition: opacity 0.25s ease;
+}
+
+.menuButton:hover img {
+  opacity: 1;                     /* Full opacity on hover */
 }
 
 .menuSubtitle {
   color: white;
-  font-size: clamp(14px, 3.5vw, 20px);
+  font-size: clamp(14px, 3.2vw, 18px);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   text-align: center;
@@ -215,12 +220,12 @@ body {
 #menuUnrealLogo {
   position: absolute;
   left: 50%;
-  bottom: 3vh;                    /* Safer bottom positioning */
+  bottom: 4vh;
   transform: translateX(-50%);
-  width: min(115px, 24vw);
-  max-width: 130px;
+  width: min(105px, 22vw);
+  max-width: 120px;
   height: auto;
-  opacity: 0;
+  opacity: 0.7;                   /* Permanent 70% as requested */
   pointer-events: none;
   user-select: none;
   animation: menuFadeIn 1.2s ease 0.68s forwards;
@@ -232,7 +237,7 @@ body {
 }
 
 /* ===============================
-   LEVEL LOADING SCREEN
+   LEVEL LOADING SCREEN – LEFT ALIGNED + SMALLER + NO TOP CUTOFF
 ================================*/
 #levelLoadingScreen {
   background: black;
@@ -256,10 +261,10 @@ body {
 .levelLoadingContent {
   position: relative;
   z-index: 2;
-  width: min(90vw, 540px);
-  margin: 0 auto;
-  padding: 4vw 5vw;
-  box-sizing: border-box;
+  width: min(520px, 75vw);
+  margin-left: 7vw;               /* Pushes whole block to the left */
+  margin-right: auto;
+  padding-top: 7vh;               /* Prevents top cutoff */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -295,7 +300,7 @@ body {
 }
 
 .levelBrandLogo {
-  width: min(250px, 45vw);
+  width: min(220px, 38vw);
   height: auto;
   margin-bottom: 5vh;
   opacity: 0;
@@ -310,7 +315,7 @@ body {
 }
 
 .levelTitle {
-  font-size: clamp(22px, 4.5vw, 32px);
+  font-size: clamp(21px, 4vw, 28px);
   line-height: 1.12;
   font-weight: 300;
   letter-spacing: 0.01em;
@@ -323,7 +328,7 @@ body {
 }
 
 .levelBody {
-  font-size: clamp(13px, 2.8vw, 16px);
+  font-size: clamp(13px, 2.6vw, 15px);
   line-height: 1.55;
   font-weight: 300;
   max-width: 90ch;
@@ -483,42 +488,44 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* ── MEDIA QUERIES ─────────────────────────────────────────────── */
+/* ── MEDIA QUERIES – TABLET + MOBILE FIXES ───────────────────────────── */
 @media (max-width: 1024px) {
-  .menuInner { padding: 4vh 6vw 18vh; }
-  #menuLogo { width: min(280px, 65vw); }
-  .menuButton img { width: min(160px, 42vw); max-width: 180px; }
+  .menuInner { padding: 8vh 6vw 20vh; }
+  #menuLogo { width: min(240px, 58vw); }
+  .menuButton img { width: min(140px, 36vw); max-width: 160px; }
+  #menuUnrealLogo { bottom: 4.5vh; width: min(100px, 24vw); }
 }
 
 @media (max-width: 640px) {
   .menuInner {
-    padding: 4vh 7vw 20vh;           /* Extra bottom space for mobile */
-    gap: 4vh;
+    padding: 9vh 7vw 23vh;        /* Extra top = no top logo cutoff */
+    gap: 3vh;
   }
   #menuLogo {
-    width: min(260px, 70vw);
+    width: min(220px, 65vw);
   }
   .buttonRow {
-    flex-direction: column;          /* Stack buttons vertically */
-    gap: 4vh;
+    flex-direction: column;
+    gap: 3.5vh;
   }
   .menuButton img {
-    width: min(200px, 55vw);
-    max-width: 240px;
-    min-width: 160px;
+    width: min(175px, 52vw);
+    max-width: 210px;
   }
   #menuUnrealLogo {
-    bottom: 4vh;
-    width: min(100px, 28vw);
+    bottom: 5.5vh;                /* Pushed down so it no longer overlaps stacked buttons */
+    width: min(92px, 26vw);
   }
 
+  /* Level loading – smaller + still left-aligned */
   .levelLoadingContent {
-    width: 92vw;
-    padding: 6vw 7vw;
+    margin-left: 6vw;
+    width: min(480px, 82vw);
+    padding-top: 8vh;
   }
-  .levelTitle { font-size: clamp(20px, 6.5vw, 28px); }
-  .levelBody  { font-size: clamp(13px, 4vw, 16px); line-height: 1.5; }
-  .menuSubtitle { font-size: clamp(14px, 4.2vw, 18px); }
+  .levelBrandLogo { width: min(190px, 42vw); }
+  .levelTitle { font-size: clamp(19px, 5.5vw, 25px); }
+  .levelBody  { font-size: clamp(12.5px, 3.8vw, 14.5px); }
 }
 </style>
 
@@ -626,16 +633,6 @@ window.file=Application.webRtcController.file;
 
 })();
 
-// ── The rest of your JavaScript remains unchanged ────────────────────────────────
-// (initLottie, playLottie, stopLottie, hideAllUiScreens, restartMenuAnimations, 
-// showInitialLoadingScreen, hideInitialLoadingScreen, showBuildMenu, hideBuildMenu,
-// setLevelLoadingContent, restartLevelLoadingAnimations, showLevelLoadingScreen,
-// hideLevelLoadingScreen, fadeToBlack, fadeFromBlack, advanceToBuildMenuWithFade,
-// transitionToLevelLoading, revealGameFromLevelLoading, showReadyMessage,
-// shouldSurfaceAttention, brandMessage, showAttentionScreen, 
-// registerArcwareAttentionHandlers, sendToUnreal, startApp, selectBuild, 
-// showOverlay, hideOverlay, createFile, DOMContentLoaded listeners)
-
 function initLottie(){
 const container = document.getElementById("lottieLoader");
 if(!container || !window.lottie) return;
@@ -725,20 +722,14 @@ const body2 = document.getElementById("levelLoadingBody2");
 
 if(buildName === "Trad"){
 video.src = "TRAD_MOVIE.mp4";
-title.innerHTML = 'WELCOME TO THE LUX PRODUCT <strong>VISUALIZER</strong>';
-body1.textContent = "This visualizer is meant to provide a generalized model of what our cladding products look like in a real-world setting. Built with our customers in mind, the new LUX Visualizer is designed to help builders, contractors, developers and architects picture the possibilities when it comes to our architectural cladding.";
-body2.textContent = "Note: The products and colours shown on the Visualizer have been reproduced to represent the actual products and colours as accurately as possible. However, the colours seen in the visualizer may vary slightly from the actual products due to a variety of factors which include screen calibration. For a more accurate representation of our products, we always recommend requesting samples before you purchase.";
 }else if(buildName === "Mod"){
 video.src = "MODERN_MOVIE.mp4";
-title.innerHTML = 'WELCOME TO THE LUX PRODUCT <strong>VISUALIZER</strong>';
-body1.textContent = "This visualizer is meant to provide a generalized model of what our cladding products look like in a real-world setting. Built with our customers in mind, the new LUX Visualizer is designed to help builders, contractors, developers and architects picture the possibilities when it comes to our architectural cladding.";
-body2.textContent = "Note: The products and colours shown on the Visualizer have been reproduced to represent the actual products and colours as accurately as possible. However, the colours seen in the visualizer may vary slightly from the actual products due to a variety of factors which include screen calibration. For a more accurate representation of our products, we always recommend requesting samples before you purchase.";
 }else if(buildName === "Multi"){
 video.src = "MULTI_MOVIE.mp4";
+}
 title.innerHTML = 'WELCOME TO THE LUX PRODUCT <strong>VISUALIZER</strong>';
 body1.textContent = "This visualizer is meant to provide a generalized model of what our cladding products look like in a real-world setting. Built with our customers in mind, the new LUX Visualizer is designed to help builders, contractors, developers and architects picture the possibilities when it comes to our architectural cladding.";
 body2.textContent = "Note: The products and colours shown on the Visualizer have been reproduced to represent the actual products and colours as accurately as possible. However, the colours seen in the visualizer may vary slightly from the actual products due to a variety of factors which include screen calibration. For a more accurate representation of our products, we always recommend requesting samples before you purchase.";
-}
 }
 
 function restartLevelLoadingAnimations(){
