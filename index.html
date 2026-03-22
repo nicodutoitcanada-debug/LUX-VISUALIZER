@@ -5,61 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 <style>
-body {
-  margin: 0;
-  overflow: hidden;
-  background: black;
-  font-family: "Futura PT", sans-serif;
-  -webkit-tap-highlight-color: transparent;
-}
-
-#video-container {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  background: black;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* Your full CSS from last working version – no change needed here, but confirm object-fit: contain */
 #video-container video,
 #video-container canvas {
   width: 100% !important;
   height: 100% !important;
-  min-width: 100%;
-  min-height: 100%;
   object-fit: contain;
   background: black;
 }
-
-#uiLayer {
-  position: fixed;
-  inset: 0;
-  z-index: 4500;
-  pointer-events: none;
-  touch-action: none;
-}
-
-.uiScreen {
-  position: absolute;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-.uiScreen.visible {
-  display: flex;
-}
-
-/* Transition fade, loading, build menu, level loading, etc. styles – keep your latest from previous messages */
-#transitionFade { /* ... your styles ... */ }
-/* ... include all your other CSS rules for menus, loading, etc. as before ... */
+/* ... rest of your CSS ... */
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
@@ -75,37 +29,30 @@ let appInAttentionState = false;
 let gameRevealed = false;
 let isRevealingGame = false;
 
-// IMPORTANT: Define handlers FIRST so it's available when called
+// Define handlers EARLY
 function registerArcwareAttentionHandlers() {
   if (typeof Application?.on === "function") {
-    ["error", "disconnect", "close"].forEach(eventName => {
-      try {
-        Application.on(eventName, (evt) => {
-          const message = evt?.reason || evt?.message || evt?.detail?.reason || evt?.detail?.message || String(evt || "");
-          if (shouldSurfaceAttention(message)) {
-            showAttentionScreen(message);
-          }
-        });
-      } catch (e) {}
+    ["error","disconnect","close"].forEach(eventName => {
+      Application.on(eventName, (evt) => {
+        const message = evt?.reason || evt?.message || String(evt || "");
+        if (shouldSurfaceAttention(message)) {
+          showAttentionScreen(message);
+        }
+      });
     });
   }
 
   window.addEventListener("unhandledrejection", (event) => {
-    const reasonText = event?.reason?.message || event?.reason?.reason || String(event?.reason || "");
-    if (shouldSurfaceAttention(reasonText)) {
-      showAttentionScreen(reasonText);
-    }
+    const reason = event?.reason?.message || String(event?.reason || "");
+    if (shouldSurfaceAttention(reason)) showAttentionScreen(reason);
   });
 
   window.addEventListener("error", (event) => {
-    const message = event?.message || event?.error?.message || String(event?.error || "");
-    if (shouldSurfaceAttention(message)) {
-      showAttentionScreen(message);
-    }
+    const msg = event?.message || String(event?.error || "");
+    if (shouldSurfaceAttention(msg)) showAttentionScreen(msg);
   });
 }
 
-// Now the main IIFE
 import * as PixelStreamingWebSdk from "https://unpkg.com/@arcware-cloud/pixelstreaming-websdk@1.3.32/index.mjs";
 
 (() => {
@@ -125,34 +72,46 @@ import * as PixelStreamingWebSdk from "https://unpkg.com/@arcware-cloud/pixelstr
 
   Application = initResult.Application;
 
-  // Now safe to call
+  // Call handlers now that it's defined
   registerArcwareAttentionHandlers();
 
+  // Wrap response handler in try/catch to survive Zod errors
   Application.getApplicationResponse((response) => {
-    console.log("Response from Unreal:", response);
+    console.log("Raw response from Unreal:", response);
     try {
       const parsed = JSON.parse(response);
-      if (parsed.screenshot === "generating") {
-        showOverlay("Generating high resolution image");
-      }
+      console.log("Parsed response:", parsed);
+
+      if (parsed.screenshot === "generating") showOverlay("Generating high resolution image");
+
       if (parsed.game === "loaded") {
         gameLoaded = true;
         if (!selectedBuild && !document.getElementById("buildMenu").classList.contains("visible") && !appInAttentionState) {
           advanceToBuildMenuWithFade();
         }
       }
+
       if (parsed.modern === "loaded" || parsed.load_ui === "modern") {
         revealGameFromLevelLoading().finally(() => showReadyMessage());
       }
-    } catch (e) {}
-    if (response.startsWith("CreateScreenshot")) {
-      createFile(window.file);
+    } catch (e) {
+      console.error("Error parsing Unreal response:", e, "Raw:", response);
+      // Continue anyway – don't let Zod-like parse error kill the stream
     }
+
+    if (response.startsWith("CreateScreenshot")) createFile(window.file);
   });
 
+  // Append root element with delay + log
   setTimeout(() => {
-    document.getElementById("video-container").appendChild(Application.rootElement);
-  }, 100);
+    const container = document.getElementById("video-container");
+    if (container && Application.rootElement) {
+      container.appendChild(Application.rootElement);
+      console.log("Root element appended to container!");
+    } else {
+      console.error("Failed to append rootElement – missing container or element");
+    }
+  }, 500);  // Slightly longer delay for safety
 
   initLottie();
   startApp();
@@ -160,40 +119,42 @@ import * as PixelStreamingWebSdk from "https://unpkg.com/@arcware-cloud/pixelstr
   window.file = Application.webRtcController.file;
 })();
 
-// Resize + viewport reporting
+// Resize handler + viewport report
 function handleResize() {
   const container = document.getElementById("video-container");
   if (container) {
     container.style.width = `${window.innerWidth}px`;
     container.style.height = `${window.innerHeight}px`;
   }
-  const pixelRatio = window.devicePixelRatio || 1;
-  const w = Math.round(window.innerWidth * pixelRatio);
-  const h = Math.round(window.innerHeight * pixelRatio);
-  sendToUnreal(JSON.stringify({ type: "viewport", width: w, height: h }));
-  console.log("Reported viewport:", w, "x", h);
+  const pr = window.devicePixelRatio || 1;
+  sendToUnreal(JSON.stringify({
+    type: "viewport",
+    width: Math.round(window.innerWidth * pr),
+    height: Math.round(window.innerHeight * pr)
+  }));
 }
-
 window.addEventListener("resize", handleResize);
 window.addEventListener("orientationchange", handleResize);
-setTimeout(handleResize, 300);
-setTimeout(handleResize, 1200);
+setTimeout(handleResize, 500);
+setTimeout(handleResize, 1500);
 
-// Paste ALL your other function definitions here (initLottie, playLottie, stopLottie, hideAllUiScreens, restartMenuAnimations, showInitialLoadingScreen, ..., selectBuild, showOverlay, etc.)
-// They should be exactly as in your previous working versions – no changes needed there.
+// Paste your full function definitions here (initLottie, showInitialLoadingScreen, selectBuild, sendToUnreal, etc.)
+// Make sure sendToUnreal is defined before handleResize calls it
 
-// DOMContentLoaded listeners
+function sendToUnreal(payload) {
+  // Your sendToUnreal function here – unchanged
+}
+
+// ... all other functions ...
+
 window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("btnTrad").addEventListener("click", () => selectBuild("Trad"));
-  document.getElementById("btnMod").addEventListener("click", () => selectBuild("Mod"));
-  document.getElementById("btnMulti").addEventListener("click", () => selectBuild("Multi"));
-  document.getElementById("retryButton").addEventListener("click", () => location.reload());
+  // Your button listeners
 });
 </script>
 </head>
 
 <body>
-  <!-- Your full UI HTML structure here – loadingScreen, buildMenu, levelLoadingScreen, readyMessage, attentionScreen, transitionFade, screenshotOverlay -->
-  <!-- Copy from your last working HTML body -->
+<!-- Your full <div id="video-container"></div> and #uiLayer with all screens -->
+<!-- Include transitionFade and screenshotOverlay -->
 </body>
 </html>
