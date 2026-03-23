@@ -24,41 +24,68 @@ body{
 font-family:"Futura PT",sans-serif;
 -webkit-tap-highlight-color:transparent;
 position:relative;
-min-height:100dvh;
-}
-
-#video-container,
-#uiLayer,
-#transitionFade,
-#screenshotOverlay{
-position:absolute;
-inset:0;
-width:100%;
-height:100%;
 }
 
 #video-container{
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
 z-index:1;
-overflow:hidden;
 background:black;
-display:flex;
-align-items:center;
-justify-content:center;
-min-height:100dvh;
+overflow:hidden;
 }
 
-#video-container video,
-#video-container canvas{
+/* =============================================
+   ARCWARE SDK INJECTED ELEMENT OVERRIDES
+   Forces the SDK's root div, any inner divs,
+   the <video> tag, and the <canvas> tag to
+   always fill the container on every screen
+   size and orientation — including iPad portrait.
+=============================================== */
+
+#video-container > *,
+#video-container > * > *{
+position:absolute !important;
+inset:0 !important;
 width:100% !important;
 height:100% !important;
-object-fit:contain !important;
-background:black;
+margin:0 !important;
+padding:0 !important;
+border:none !important;
+outline:none !important;
+border-radius:0 !important;
+}
+
+/* The actual video element the SDK injects */
+#video-container video,
+#video-container canvas{
+position:absolute !important;
+inset:0 !important;
+width:100% !important;
+height:100% !important;
+object-fit:cover !important;  /* COVER: fills the viewport, crops rather than letterboxes */
+object-position:center center !important;
+display:block !important;
+background:black !important;
+}
+
+/* Arcware wraps content in a div with inline styles — override them */
+#video-container [style]{
+width:100% !important;
+height:100% !important;
+position:absolute !important;
+top:0 !important;
+left:0 !important;
+right:0 !important;
+bottom:0 !important;
 }
 
 #uiLayer{
+position:fixed;
+inset:0;
 z-index:4500;
 pointer-events:none;
-min-height:100dvh;
 }
 
 .uiScreen{
@@ -79,6 +106,8 @@ display:flex;
 ================================*/
 
 #transitionFade{
+position:fixed;
+inset:0;
 background:black;
 opacity:0;
 pointer-events:none;
@@ -450,7 +479,6 @@ position:relative;
 z-index:2;
 width:min(560px,88vw);
 padding:36px 28px;
-box-sizing:border-box;
 display:flex;
 flex-direction:column;
 align-items:center;
@@ -508,6 +536,8 @@ transform:scale(0.98);
 ================================*/
 
 #screenshotOverlay{
+position:fixed;
+inset:0;
 display:none;
 align-items:center;
 justify-content:center;
@@ -762,11 +792,58 @@ createFile(window.file);
 
 });
 
-setTimeout(()=>{
-document
-.getElementById("video-container")
-.appendChild(Application.rootElement);
-fixRootElementLayout();
+window.addEventListener("DOMContentLoaded",()=>{
+const container = document.getElementById("video-container");
+container.appendChild(Application.rootElement);
+
+// ─── ARCWARE RESIZE FIX ───────────────────────────────────────────
+// The SDK injects elements with inline width/height styles that
+// fight our CSS. This observer strips them whenever the SDK adds
+// or mutates child elements, and also fires on orientation change.
+
+function forceArcwareFill(){
+const children = container.querySelectorAll("*");
+children.forEach(el => {
+// Remove any inline dimension/position styles the SDK sets
+el.style.removeProperty("width");
+el.style.removeProperty("height");
+el.style.removeProperty("top");
+el.style.removeProperty("left");
+el.style.removeProperty("right");
+el.style.removeProperty("bottom");
+el.style.removeProperty("position");
+el.style.removeProperty("object-fit");
+el.style.removeProperty("max-width");
+el.style.removeProperty("max-height");
+});
+}
+
+const arcwareMutationObserver = new MutationObserver(() => {
+forceArcwareFill();
+});
+
+arcwareMutationObserver.observe(container, {
+childList: true,
+subtree: true,
+attributes: true,
+attributeFilter: ["style"]
+});
+
+// Also run on resize and orientation change
+const arcwareResizeObserver = new ResizeObserver(() => {
+forceArcwareFill();
+});
+arcwareResizeObserver.observe(container);
+
+window.addEventListener("orientationchange", () => {
+// Delay slightly to let the browser settle the new dimensions
+setTimeout(forceArcwareFill, 150);
+setTimeout(forceArcwareFill, 400);
+});
+
+// Initial pass
+forceArcwareFill();
+// ─────────────────────────────────────────────────────────────────
 });
 
 initLottie();
@@ -775,17 +852,6 @@ startApp();
 window.file=Application.webRtcController.file;
 
 })();
-
-function fixRootElementLayout(){
-if(!Application?.rootElement) return;
-
-Application.rootElement.style.width = "100%";
-Application.rootElement.style.height = "100%";
-Application.rootElement.style.maxWidth = "100%";
-Application.rootElement.style.maxHeight = "100%";
-Application.rootElement.style.position = "absolute";
-Application.rootElement.style.inset = "0";
-}
 
 function initLottie(){
 const container = document.getElementById("lottieLoader");
