@@ -40,7 +40,7 @@ font-family:"Futura PT", Arial, sans-serif;
 }
 body{
 height:var(--app-height);
-touch-action:manipulation;
+touch-action:none;
 }
 
 #video-container{
@@ -314,10 +314,6 @@ z-index:5200;
 pointer-events:none;
 }
 
-body.inGameUiVisible #editUiRoot{
-pointer-events:auto;
-}
-
 #uiWrapper,
 #cameraMenuWrapper,
 #buildingMenuWrapper,
@@ -390,6 +386,26 @@ body.inGameUiVisible #soloDockButton{
 visibility:hidden;
 pointer-events:none;
 transform:translate3d(0, -50%, 0) rotate(var(--solo-rotate));
+}
+
+body.inGameUiVisible #uiWrapper,
+body.inGameUiVisible #cameraMenuWrapper,
+body.inGameUiVisible #buildingMenuWrapper,
+body.inGameUiVisible #environmentMenuWrapper,
+body.inGameUiVisible #confirmMenuWrapper,
+body.inGameUiVisible #teleportMenuWrapper,
+body.inGameUiVisible #profileMenuWrapper,
+body.inGameUiVisible #sliderContainer,
+body.inGameUiVisible #soloDockButton{
+pointer-events:auto;
+}
+
+.uiInteractive,
+.uiInteractive *,
+#sliderContainer,
+#sliderContainer *,
+#soloDockButton{
+touch-action:manipulation;
 }
 
 
@@ -531,6 +547,20 @@ body.teleport-mode #teleportMenuWrapper{ opacity:1; visibility:visible; pointer-
 body.profile-mode{ --main-x:260px; --camera-x:260px; --building-x:260px; --environment-x:260px; --confirm-x:260px; --teleport-x:260px; --profile-x:0px; }
 body.profile-mode #uiWrapper, body.profile-mode #cameraMenuWrapper, body.profile-mode #buildingMenuWrapper, body.profile-mode #environmentMenuWrapper, body.profile-mode #confirmMenuWrapper, body.profile-mode #teleportMenuWrapper{ opacity:0; visibility:hidden; pointer-events:none; }
 body.profile-mode #profileMenuWrapper{ opacity:1; visibility:visible; pointer-events:auto; transition-delay:0s, 0s, 0s; }
+
+body.menu-switching #uiWrapper,
+body.menu-switching #cameraMenuWrapper,
+body.menu-switching #buildingMenuWrapper,
+body.menu-switching #environmentMenuWrapper,
+body.menu-switching #confirmMenuWrapper,
+body.menu-switching #teleportMenuWrapper,
+body.menu-switching #profileMenuWrapper{
+pointer-events:none !important;
+}
+body.menu-switching #sliderContainer,
+body.menu-switching #soloDockButton{
+pointer-events:none !important;
+}
 
 /* responsive */
 @media (max-width:1100px){
@@ -794,7 +824,7 @@ screenshotCounter++;
 /* ===============================
    IN-GAME UI LOGIC
 ================================*/
-const TELEPORT_MENU_OPEN_ANIMATION_DELAY = 180;
+const TELEPORT_MENU_OPEN_ANIMATION_DELAY = 380;
 const root = document.documentElement;
 const bodyEl = document.body;
 let teleportTitleAnimationId = 0;
@@ -807,21 +837,95 @@ let teleportGroundButton;
 let teleportFirstButton;
 
 function setUIScale(value) { root.style.setProperty('--ui-scale', value); }
-function clearModes(){ bodyEl.classList.remove('walk-mode','camera-mode','building-mode','environment-mode','confirm-mode','teleport-mode','profile-mode'); }
-function hideInGameUi(){ clearModes(); bodyEl.classList.remove('inGameUiVisible'); }
-function showInGameUiAnimated(){ if(inGameUiLoaded) return; inGameUiLoaded = true; clearModes(); requestAnimationFrame(()=>bodyEl.classList.add('inGameUiVisible')); }
-function enterWalkMode(){ clearModes(); bodyEl.classList.add('walk-mode'); }
-function exitWalkMode(){ bodyEl.classList.remove('walk-mode'); }
-function openCameraMenu(){ clearModes(); bodyEl.classList.add('camera-mode'); }
-function closeCameraMenu(){ bodyEl.classList.remove('camera-mode'); }
-function openBuildingMenu(){ clearModes(); bodyEl.classList.add('building-mode'); }
-function closeBuildingMenu(){ bodyEl.classList.remove('building-mode'); }
-function openEnvironmentMenu(){ clearModes(); bodyEl.classList.add('environment-mode'); }
-function closeEnvironmentMenu(){ bodyEl.classList.remove('environment-mode'); }
-function openConfirmMenu(){ clearModes(); bodyEl.classList.add('confirm-mode'); }
-function closeConfirmMenu(){ bodyEl.classList.remove('confirm-mode'); }
-function openProfileMenu(){ clearModes(); bodyEl.classList.add('profile-mode'); }
-function closeProfileMenu(){ bodyEl.classList.remove('profile-mode'); }
+const uiModeClasses = ['walk-mode','camera-mode','building-mode','environment-mode','confirm-mode','teleport-mode','profile-mode'];
+const panelWrapperMap = {
+main: 'uiWrapper',
+walk: null,
+camera: 'cameraMenuWrapper',
+building: 'buildingMenuWrapper',
+environment: 'environmentMenuWrapper',
+confirm: 'confirmMenuWrapper',
+teleport: 'teleportMenuWrapper',
+profile: 'profileMenuWrapper'
+};
+let menuSwitchTimer = null;
+
+function clearModes(){ bodyEl.classList.remove(...uiModeClasses); }
+function getCurrentPanelName(){
+    if (bodyEl.classList.contains('camera-mode')) return 'camera';
+    if (bodyEl.classList.contains('building-mode')) return 'building';
+    if (bodyEl.classList.contains('environment-mode')) return 'environment';
+    if (bodyEl.classList.contains('confirm-mode')) return 'confirm';
+    if (bodyEl.classList.contains('teleport-mode')) return 'teleport';
+    if (bodyEl.classList.contains('profile-mode')) return 'profile';
+    if (bodyEl.classList.contains('walk-mode')) return 'walk';
+    return 'main';
+}
+function getWrapperByPanelName(name){
+    const id = panelWrapperMap[name];
+    return id ? document.getElementById(id) : null;
+}
+function resetPanelInlineStyles(){
+    Object.values(panelWrapperMap).forEach(id => {
+        if (!id) return;
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.opacity = '';
+        el.style.visibility = '';
+        el.style.pointerEvents = '';
+        el.style.transform = '';
+        el.style.transitionDelay = '';
+    });
+}
+function applyPanelMode(panelName){
+    clearModes();
+    if (panelName === 'walk') bodyEl.classList.add('walk-mode');
+    else if (panelName !== 'main') bodyEl.classList.add(`${panelName}-mode`);
+}
+function switchPanel(panelName){
+    if (!bodyEl.classList.contains('inGameUiVisible')) return;
+    const currentPanel = getCurrentPanelName();
+    if (currentPanel === panelName) return;
+    clearTimeout(menuSwitchTimer);
+    const outgoing = getWrapperByPanelName(currentPanel);
+    bodyEl.classList.add('menu-switching');
+
+    if (outgoing) {
+        const currentScale = getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1';
+        outgoing.style.opacity = '1';
+        outgoing.style.visibility = 'visible';
+        outgoing.style.pointerEvents = 'none';
+        outgoing.style.transitionDelay = '0s, 0s, 0s';
+        outgoing.style.transform = `translate3d(0, -50%, 0) scale(${currentScale})`;
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                outgoing.style.opacity = '0';
+                outgoing.style.transform = `translate3d(260px, -50%, 0) scale(${currentScale})`;
+            });
+        });
+    }
+
+    clearModes();
+    menuSwitchTimer = setTimeout(() => {
+        resetPanelInlineStyles();
+        applyPanelMode(panelName);
+        bodyEl.classList.remove('menu-switching');
+    }, currentPanel === 'walk' ? 40 : 320);
+}
+function hideInGameUi(){ clearTimeout(menuSwitchTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.remove('inGameUiVisible'); }
+function showInGameUiAnimated(){ if(inGameUiLoaded) return; inGameUiLoaded = true; clearTimeout(menuSwitchTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); requestAnimationFrame(()=>bodyEl.classList.add('inGameUiVisible')); }
+function enterWalkMode(){ switchPanel('walk'); }
+function exitWalkMode(){ clearTimeout(menuSwitchTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); bodyEl.classList.remove('walk-mode'); }
+function openCameraMenu(){ switchPanel('camera'); }
+function closeCameraMenu(){ switchPanel('main'); }
+function openBuildingMenu(){ switchPanel('building'); }
+function closeBuildingMenu(){ switchPanel('main'); }
+function openEnvironmentMenu(){ switchPanel('environment'); }
+function closeEnvironmentMenu(){ switchPanel('main'); }
+function openConfirmMenu(){ switchPanel('confirm'); }
+function closeConfirmMenu(){ switchPanel('main'); }
+function openProfileMenu(){ switchPanel('profile'); }
+function closeProfileMenu(){ switchPanel('main'); }
 function wait(ms){ return new Promise(resolve=>setTimeout(resolve, ms)); }
 function getButtonsForFloor(floor){ return Array.from(document.querySelectorAll(`.teleportJumpTarget[data-floor="${floor}"]`)); }
 function getTargetSequenceDuration(floor){ const count = jumpTargetData[floor]?.length || 0; if(count===0) return 0; return 420 + ((count - 1) * 80); }
@@ -866,7 +970,7 @@ function mountAnimatedLetters() {
 }
 }
 function openTeleportMenu(){
-clearModes(); bodyEl.classList.add('teleport-mode');
+switchPanel('teleport');
 teleportFloorButtons.forEach((button)=>{ button.disabled = true; });
 teleportTitleAnimationId += 1;
 teleportMapTitle.classList.remove('is-fading');
@@ -895,7 +999,7 @@ teleportMapTitle.classList.add('is-fading');
 hideJumpTargets(currentTeleportFloor);
 setTimeout(() => {
     if (transitionId !== teleportFloorTransitionId) return;
-    bodyEl.classList.remove('teleport-mode');
+    switchPanel('main');
     teleportFloorButtons.forEach((button)=>{ button.disabled = false; });
 }, 80);
 }
