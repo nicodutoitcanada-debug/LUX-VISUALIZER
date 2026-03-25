@@ -381,12 +381,33 @@ body.inGameUiVisible #sliderContainer{
 opacity:1;
 visibility:visible;
 pointer-events:auto;
+transition-delay:0s, 0s, 0s;
 transform:translate3d(0, -50%, 0);
 }
 body.inGameUiVisible #soloDockButton{
 visibility:hidden;
 pointer-events:none;
+transition-delay:0s, 0s, 0s;
 transform:translate3d(0, -50%, 0) rotate(var(--solo-rotate));
+}
+
+body.ui-entering #uiWrapper{
+opacity:0 !important;
+visibility:visible !important;
+pointer-events:none !important;
+transform:translate3d(260px, -50%, 0) scale(var(--ui-scale)) !important;
+}
+body.ui-entering #sliderContainer{
+opacity:0 !important;
+visibility:visible !important;
+pointer-events:none !important;
+transform:translate3d(140px, -50%, 0) !important;
+}
+body.ui-entering #soloDockButton{
+opacity:0 !important;
+visibility:hidden !important;
+pointer-events:none !important;
+transform:translate3d(140px, -50%, 0) rotate(90deg) !important;
 }
 
 body.inGameUiVisible #uiWrapper,
@@ -894,47 +915,177 @@ function resetPanelInlineStyles(){
         el.style.transform = '';
         el.style.transitionDelay = '';
     });
+    const slider = document.getElementById('sliderContainer');
+    const solo = document.getElementById('soloDockButton');
+    [slider, solo].forEach(el => {
+        if (!el) return;
+        el.style.opacity = '';
+        el.style.visibility = '';
+        el.style.pointerEvents = '';
+        el.style.transform = '';
+        el.style.transitionDelay = '';
+    });
 }
 function applyPanelMode(panelName){
     clearModes();
     if (panelName === 'walk') bodyEl.classList.add('walk-mode');
     else if (panelName !== 'main') bodyEl.classList.add(`${panelName}-mode`);
 }
+function animateWrapperIn(el, x = 260, scaleValue = null){
+    if (!el) return;
+    const scale = scaleValue || (getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1');
+    el.style.opacity = '0';
+    el.style.visibility = 'visible';
+    el.style.pointerEvents = 'none';
+    el.style.transitionDelay = '0s, 0s, 0s';
+    el.style.transform = `translate3d(${x}px, -50%, 0) scale(${scale})`;
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            el.style.opacity = '1';
+            el.style.transform = `translate3d(0, -50%, 0) scale(${scale})`;
+        });
+    });
+}
+function animateWrapperOut(el, x = 260, scaleValue = null){
+    if (!el) return;
+    const scale = scaleValue || (getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1');
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+    el.style.pointerEvents = 'none';
+    el.style.transitionDelay = '0s, 0s, 0s';
+    el.style.transform = `translate3d(0, -50%, 0) scale(${scale})`;
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            el.style.opacity = '0';
+            el.style.transform = `translate3d(${x}px, -50%, 0) scale(${scale})`;
+        });
+    });
+}
+function animateSliderIn(){
+    const slider = document.getElementById('sliderContainer');
+    if (!slider) return;
+    slider.style.opacity = '0';
+    slider.style.visibility = 'visible';
+    slider.style.pointerEvents = 'none';
+    slider.style.transitionDelay = '0s, 0s, 0s';
+    slider.style.transform = 'translate3d(140px, -50%, 0)';
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            slider.style.opacity = '1';
+            slider.style.transform = 'translate3d(0, -50%, 0)';
+        });
+    });
+}
+function animateSliderOut(){
+    const slider = document.getElementById('sliderContainer');
+    if (!slider) return;
+    slider.style.opacity = '1';
+    slider.style.visibility = 'visible';
+    slider.style.pointerEvents = 'none';
+    slider.style.transitionDelay = '0s, 0s, 0s';
+    slider.style.transform = 'translate3d(0, -50%, 0)';
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            slider.style.opacity = '0';
+            slider.style.transform = 'translate3d(140px, -50%, 0)';
+        });
+    });
+}
+function animateSoloIn(){
+    const solo = document.getElementById('soloDockButton');
+    if (!solo) return;
+    solo.style.opacity = '0';
+    solo.style.visibility = 'visible';
+    solo.style.pointerEvents = 'none';
+    solo.style.transitionDelay = '0s, 0s, 0s';
+    solo.style.transform = 'translate3d(140px, -50%, 0) rotate(90deg)';
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            solo.style.opacity = '1';
+            solo.style.transform = 'translate3d(0, -50%, 0) rotate(0deg)';
+        });
+    });
+}
+function animateSoloOut(){
+    const solo = document.getElementById('soloDockButton');
+    if (!solo) return;
+    solo.style.opacity = '1';
+    solo.style.visibility = 'visible';
+    solo.style.pointerEvents = 'none';
+    solo.style.transitionDelay = '0s, 0s, 0s';
+    solo.style.transform = 'translate3d(0, -50%, 0) rotate(0deg)';
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            solo.style.opacity = '0';
+            solo.style.transform = 'translate3d(140px, -50%, 0) rotate(90deg)';
+        });
+    });
+}
+function finalizeSwitch(panelName){
+    resetPanelInlineStyles();
+    bodyEl.classList.remove('menu-switching');
+    applyPanelMode(panelName);
+}
 function switchPanel(panelName){
     if (!bodyEl.classList.contains('inGameUiVisible')) return;
     const currentPanel = getCurrentPanelName();
     if (currentPanel === panelName) return;
     clearTimeout(menuSwitchTimer);
-    const outgoing = getWrapperByPanelName(currentPanel);
     bodyEl.classList.add('menu-switching');
 
-    if (outgoing) {
-        const currentScale = getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1';
-        outgoing.style.opacity = '1';
-        outgoing.style.visibility = 'visible';
-        outgoing.style.pointerEvents = 'none';
-        outgoing.style.transitionDelay = '0s, 0s, 0s';
-        outgoing.style.transform = `translate3d(0, -50%, 0) scale(${currentScale})`;
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                outgoing.style.opacity = '0';
-                outgoing.style.transform = `translate3d(260px, -50%, 0) scale(${currentScale})`;
-            });
-        });
+    const outgoing = getWrapperByPanelName(currentPanel);
+    if (outgoing) animateWrapperOut(outgoing, 260);
+
+    const goingToMain = panelName === 'main';
+    const goingToWalk = panelName === 'walk';
+    const returningFromWalk = currentPanel === 'walk' && panelName === 'main';
+
+    if (currentPanel === 'main' && (goingToWalk || !goingToMain)) {
+        animateSliderOut();
+    }
+    if (goingToWalk) {
+        animateSoloIn();
+    } else if (currentPanel === 'walk') {
+        animateSoloOut();
     }
 
     menuSwitchTimer = setTimeout(() => {
-        clearModes();
         applyPanelMode(panelName);
-    }, currentPanel === 'walk' ? 20 : 80);
+
+        if (goingToMain) {
+            animateWrapperIn(document.getElementById('uiWrapper'), 260);
+            animateSliderIn();
+        } else if (!goingToWalk) {
+            animateWrapperIn(getWrapperByPanelName(panelName), 260);
+        }
+    }, goingToMain || returningFromWalk ? 60 : 35);
 
     setTimeout(() => {
-        resetPanelInlineStyles();
-        bodyEl.classList.remove('menu-switching');
-    }, 520);
+        finalizeSwitch(panelName);
+    }, 560);
 }
-function hideInGameUi(){ clearTimeout(menuSwitchTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.remove('inGameUiVisible'); }
-function showInGameUiAnimated(){ if(inGameUiLoaded) return; inGameUiLoaded = true; clearTimeout(menuSwitchTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); requestAnimationFrame(()=>bodyEl.classList.add('inGameUiVisible')); }
+function hideInGameUi(){
+    clearTimeout(menuSwitchTimer);
+    bodyEl.classList.remove('menu-switching', 'ui-entering');
+    resetPanelInlineStyles();
+    clearModes();
+    bodyEl.classList.remove('inGameUiVisible');
+}
+function showInGameUiAnimated(){
+    if(inGameUiLoaded) return;
+    inGameUiLoaded = true;
+    clearTimeout(menuSwitchTimer);
+    bodyEl.classList.remove('menu-switching');
+    resetPanelInlineStyles();
+    clearModes();
+    bodyEl.classList.add('ui-entering');
+    bodyEl.classList.add('inGameUiVisible');
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            bodyEl.classList.remove('ui-entering');
+        });
+    });
+}
 function enterDockedMode(mode='walk'){
     activeDockMode = mode;
     switchPanel('walk');
@@ -949,14 +1100,18 @@ function enterEditMode(){
     enterDockedMode('edit');
 }
 function exitWalkMode(){
+    if (!bodyEl.classList.contains('inGameUiVisible')) return;
     clearTimeout(menuSwitchTimer);
-    bodyEl.classList.remove('menu-switching');
-    resetPanelInlineStyles();
-    bodyEl.classList.remove('walk-mode');
+    bodyEl.classList.add('menu-switching');
+    animateSoloOut();
+    applyPanelMode('main');
+    animateWrapperIn(document.getElementById('uiWrapper'), 260);
+    animateSliderIn();
     if (activeDockMode === 'edit') {
         sendToUnreal('{"exit":"editMode"}');
     }
     activeDockMode = 'walk';
+    setTimeout(() => finalizeSwitch('main'), 560);
 }
 function openCameraMenu(){ switchPanel('camera'); }
 function closeCameraMenu(){ switchPanel('main'); }
@@ -1173,7 +1328,7 @@ teleportFirstButton.addEventListener('click', () => setTeleportFloor('first'));
 endSessionButton.addEventListener('click', openConfirmMenu);
 confirmMenuCloseButton.addEventListener('click', closeConfirmMenu);
 confirmNoButton.addEventListener('click', closeConfirmMenu);
-confirmYesButton.addEventListener('click', () => location.reload());
+confirmYesButton.addEventListener('click', () => sendToUnreal('{"end":"session"}'));
 
 document.getElementById('generateImageButton').addEventListener('click', ()=>sendToUnreal('{"CreateScreenshot":true}'));
 document.querySelectorAll('#buildingOptions .buildingCard')[0].addEventListener('click', ()=>selectBuild('Trad'));
@@ -1266,3 +1421,4 @@ document.querySelectorAll('#buildingOptions .buildingCard')[2].addEventListener(
 <div id="screenshotOverlay"><div class="overlayBox"><div class="spinner"></div><div id="overlayText">Generating high resolution image</div></div></div>
 </body>
 </html>
+
