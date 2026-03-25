@@ -151,13 +151,12 @@ pointer-events:none;
 }
 .menuFadeIn{ opacity:0; animation:menuFadeIn 1.2s ease forwards; }
 #menuLogo{
-width:clamp(67px,14.4vw,125px);
-max-width:34%;
+width:clamp(84px,18vw,156px);
+max-width:42%;
 height:auto;
 margin:0;
 user-select:none;
 pointer-events:none;
-opacity:0.86;
 animation-delay:0.18s;
 }
 .buttonRow{
@@ -381,33 +380,12 @@ body.inGameUiVisible #sliderContainer{
 opacity:1;
 visibility:visible;
 pointer-events:auto;
-transition-delay:0s, 0s, 0s;
 transform:translate3d(0, -50%, 0);
 }
 body.inGameUiVisible #soloDockButton{
 visibility:hidden;
 pointer-events:none;
-transition-delay:0s, 0s, 0s;
 transform:translate3d(0, -50%, 0) rotate(var(--solo-rotate));
-}
-
-body.ui-entering #uiWrapper{
-opacity:0 !important;
-visibility:visible !important;
-pointer-events:none !important;
-transform:translate3d(260px, -50%, 0) scale(var(--ui-scale)) !important;
-}
-body.ui-entering #sliderContainer{
-opacity:0 !important;
-visibility:visible !important;
-pointer-events:none !important;
-transform:translate3d(140px, -50%, 0) !important;
-}
-body.ui-entering #soloDockButton{
-opacity:0 !important;
-visibility:hidden !important;
-pointer-events:none !important;
-transform:translate3d(140px, -50%, 0) rotate(90deg) !important;
 }
 
 body.inGameUiVisible #uiWrapper,
@@ -533,25 +511,29 @@ width:100%; height:34px; background:linear-gradient(to bottom, rgba(255,255,255,
 #profileInfoCard{ margin-top:-2px; width:calc(100% + 16px); margin-left:-8px; margin-right:-8px; background:linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.03) 24%, rgba(0,0,0,0.08) 100%), rgba(25,25,25,0.16); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:0.5px 2px 2px 4px; position:relative; z-index:2; box-shadow:0 6px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -6px 12px rgba(0,0,0,0.04); box-sizing:border-box; }
 .profileTitleText,.profileColorText{ color:rgba(255,255,255,0.96); font-weight:700; font-size:13px; letter-spacing:0.8px; text-transform:uppercase; user-select:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .profileColorText{ font-weight:300; font-size:13px; color:rgba(255,255,255,0.94); }
+.profileTitleText .title-letter,.profileColorText .title-letter{ display:inline-block; opacity:0; transform:translateY(4px); animation:teleportTitleLetterIn 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.profileTitleText.is-fading,.profileColorText.is-fading{ opacity:0; transition:opacity 190ms ease; }
+.profileTypeButton.is-disabled{ cursor:default; }
+.profileTypeButton.is-disabled img{ opacity:0.34 !important; filter:grayscale(1) saturate(0); transform:none !important; }
+.profileTypeButton.is-disabled:hover img,.profileTypeButton.is-disabled:active img{ opacity:0.34 !important; transform:none !important; }
 .profileInfoRow,.profileColorRow{ min-height:46px; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px; padding:0 12px; }
 .profileColorRow{ margin-top:6px; }
 .profilePillButton{ appearance:none; -webkit-appearance:none; border:1px solid rgba(255,255,255,0.08); min-width:118px; height:40px; padding:0 18px; border-radius:999px; background:linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.02) 28%, rgba(0, 0, 0, 0.14) 100%), rgba(255,255,255,0.03); color:rgba(255,255,255,0.78); font-size:10px; font-weight:300; letter-spacing:0.9px; text-transform:uppercase; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; box-shadow:0 4px 10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.10); }
 .profilePillButton:hover,.profilePillButton:active{ color:rgba(255,255,255,1); }
 body.walk-mode #editButton{ transform:translateY(-62px); opacity:0; }
 body.walk-mode #redPlate{ transform:translateY(-52px); opacity:0; }
-#sliderContainer{ position:absolute; right:20px; top:50%; transform:translate3d(var(--slider-x), -50%, 0); width:82px; height:500px; background:linear-gradient(to bottom, rgba(255,255,255,0.09), rgba(255,255,255,0.02) 26%, rgba(0,0,0,0.08) 100%), rgba(22,22,22,0.30); border:1px solid rgba(255,255,255,0.08); border-radius:41px; backdrop-filter:blur(10px) saturate(118%); -webkit-backdrop-filter:blur(10px) saturate(118%); display:flex; justify-content:center; align-items:center; transition:transform var(--anim-time) var(--anim-ease), opacity var(--anim-time) var(--anim-ease), visibility 0s linear var(--anim-time), background 0.2s ease; will-change:transform, opacity; z-index:9; overflow:hidden; box-shadow:0 10px 26px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.12); }
+#sliderContainer{ position:absolute; right:20px; top:50%; transform:translate3d(var(--slider-x), -50%, 0); width:82px; height:500px; background:linear-gradient(to bottom, rgba(255,255,255,0.09), rgba(255,255,255,0.02) 26%, rgba(0,0,0,0.08) 100%), rgba(22,22,22,0.30); border:1px solid rgba(255,255,255,0.08); border-radius:41px; backdrop-filter:blur(10px) saturate(118%); -webkit-backdrop-filter:blur(10px) saturate(118%); display:flex; justify-content:center; align-items:center; transition:transform var(--anim-time) var(--anim-ease), opacity var(--anim-time) var(--anim-ease), background 0.2s ease; will-change:transform, opacity; z-index:9; overflow:hidden; box-shadow:0 10px 26px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.12); }
 #sliderContainer.engaged::before{ content:""; position:absolute; top:10px; right:10px; bottom:10px; left:10px; border-radius:31px; background:rgba(180,0,0,0.55); pointer-events:none; z-index:0; }
-#scaleSlider{ position:absolute; width:400px; height:82px; transform:rotate(-90deg); appearance:none; -webkit-appearance:none; background:transparent; cursor:pointer; z-index:1; filter:none; box-shadow:none; }
+#scaleSlider{ position:absolute; width:400px; height:82px; transform:rotate(-90deg); appearance:none; background:transparent; cursor:pointer; z-index:1; }
 #scaleSlider::-webkit-slider-runnable-track{ width:100%; height:82px; background:transparent; }
-#scaleSlider::-webkit-slider-thumb{ appearance:none; -webkit-appearance:none; width:175px; height:175px; background:url('01 SCALE UI.png') center center / contain no-repeat; cursor:pointer; margin-top:-46px; opacity:0.7; box-shadow:none; filter:none; border:none; }
-#scaleSlider::-moz-range-thumb{ width:175px; height:175px; background:url('01 SCALE UI.png') center center / contain no-repeat; cursor:pointer; opacity:0.7; box-shadow:none; filter:none; border:none; border-radius:0; }
-#soloDockButton{ position:absolute; right:20px; top:50%; transform:translate3d(var(--solo-x), -50%, 0) rotate(var(--solo-rotate)); transform-origin:center center; width:74px; height:74px; border:1px solid rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; background:linear-gradient(to bottom, rgba(255,255,255,0.09), rgba(255,255,255,0.02) 26%, rgba(0,0,0,0.08) 100%), rgba(24,24,24,0.30); backdrop-filter:blur(10px) saturate(118%); -webkit-backdrop-filter:blur(10px) saturate(118%); box-shadow:0 10px 22px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; transition:transform var(--anim-time) var(--anim-ease), opacity var(--anim-time) var(--anim-ease), visibility 0s linear var(--anim-time); will-change:transform, opacity; z-index:11; opacity:0; pointer-events:none; }
+#scaleSlider::-webkit-slider-thumb{ appearance:none; width:175px; height:175px; background:url('01 SCALE UI.png') center center / contain no-repeat; cursor:pointer; margin-top:-46px; opacity:0.7; }
+#soloDockButton{ position:absolute; right:20px; top:50%; transform:translate3d(var(--solo-x), -50%, 0) rotate(var(--solo-rotate)); transform-origin:center center; width:74px; height:74px; border:1px solid rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; background:linear-gradient(to bottom, rgba(255,255,255,0.09), rgba(255,255,255,0.02) 26%, rgba(0,0,0,0.08) 100%), rgba(24,24,24,0.30); backdrop-filter:blur(10px) saturate(118%); -webkit-backdrop-filter:blur(10px) saturate(118%); box-shadow:0 10px 22px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; transition:transform var(--anim-time) var(--anim-ease), opacity var(--anim-time) var(--anim-ease); will-change:transform, opacity; z-index:11; opacity:0; pointer-events:none; }
 #soloDockButton::before{ content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02) 35%, rgba(0,0,0,0.03) 100%); pointer-events:none; }
 #soloDockButton img{ width:36px; height:36px; object-fit:contain; opacity:0.92; transform:scaleX(-1); pointer-events:none; position:relative; z-index:1; }
 #soloDockButton:active img{ transform:scaleX(-1) scale(0.96); }
 body.walk-mode{ --main-x:260px; --slider-x:140px; --solo-x:0px; --solo-rotate:0deg; }
-body.walk-mode #uiWrapper, body.walk-mode #sliderContainer{ opacity:0; visibility:hidden; pointer-events:none; transition-delay:0s, 0s, var(--anim-time); }
-body.walk-mode #soloDockButton{ opacity:1; visibility:visible; pointer-events:auto; transition-delay:0s, 0s, 0s; }
+body.walk-mode #uiWrapper, body.walk-mode #sliderContainer{ opacity:0; visibility:hidden; pointer-events:none; }
+body.walk-mode #soloDockButton{ opacity:1; visibility:visible; pointer-events:auto; }
 body.camera-mode{ --main-x:260px; --camera-x:0px; --building-x:260px; --environment-x:260px; --confirm-x:260px; --teleport-x:260px; --profile-x:260px; }
 body.camera-mode #uiWrapper, body.camera-mode #buildingMenuWrapper, body.camera-mode #environmentMenuWrapper, body.camera-mode #confirmMenuWrapper, body.camera-mode #teleportMenuWrapper, body.camera-mode #profileMenuWrapper{ opacity:0; visibility:hidden; pointer-events:none; }
 body.camera-mode #cameraMenuWrapper{ opacity:1; visibility:visible; pointer-events:auto; transition-delay:0s, 0s, 0s; }
@@ -593,11 +575,8 @@ pointer-events:none !important;
 @media (max-width:1024px){
 :root{ --level-scale:0.7; --level-left-space:max(26px, env(safe-area-inset-left)); }
 .levelLoadingContent{ width:min(760px, calc((100% - 44px) / 0.7)); max-width:none; }
-#uiWrapper,#cameraMenuWrapper,#buildingMenuWrapper,#environmentMenuWrapper,#confirmMenuWrapper,#teleportMenuWrapper,#profileMenuWrapper{ right:112px; }
-#sliderContainer{ right:12px; width:58px; height:350px; border-radius:29px; }
-#scaleSlider{ width:280px; height:58px; }
-#scaleSlider::-webkit-slider-thumb,#scaleSlider::-moz-range-thumb{ width:118px; height:118px; margin-top:-30px; }
-#soloDockButton{ right:12px; width:60px; height:60px; }
+#uiWrapper,#cameraMenuWrapper,#buildingMenuWrapper,#environmentMenuWrapper,#confirmMenuWrapper,#teleportMenuWrapper,#profileMenuWrapper{ right:96px; }
+#sliderContainer,#soloDockButton{ right:12px; }
 }
 @media (max-width:900px){
 #menuLogo{ width:clamp(80px,20vw,132px); }
@@ -611,29 +590,27 @@ pointer-events:none !important;
 .menuCenterGroup{ gap:10px; width:min(92%, 420px); }
 .buttonRow{ gap:8px; max-width:100%; }
 .menuButton img{ width:clamp(46px,16vw,68px); max-width:20vw; }
-#menuLogo{ width:clamp(58px,22vw,94px); max-width:42%; }
+#menuLogo{ width:clamp(72px,28vw,118px); max-width:50%; }
 .menuSubtitle{ font-size:10px; letter-spacing:0.14em; }
 #menuUnrealLogo{ width:clamp(36px,10vw,52px); }
 .levelLoadingContent{ width:calc((100% - 32px) / 0.5); max-width:none; padding-right:8px; }
 .loadingWord{ font-size:11px; letter-spacing:0.28em; }
-#uiWrapper,#cameraMenuWrapper,#buildingMenuWrapper,#environmentMenuWrapper,#confirmMenuWrapper,#teleportMenuWrapper,#profileMenuWrapper{ right:72px; transform-origin:right center; }
-#sliderContainer{ right:8px; height:250px; width:42px; border-radius:21px; }
-#sliderContainer.engaged::before{ top:6px; right:6px; bottom:6px; left:6px; border-radius:15px; }
-#scaleSlider{ width:200px; height:42px; }
-#scaleSlider::-webkit-slider-thumb,#scaleSlider::-moz-range-thumb{ width:88px; height:88px; margin-top:-23px; }
-#soloDockButton{ right:8px; width:48px; height:48px; }
-#soloDockButton img{ width:28px; height:28px; }
+#uiWrapper,#cameraMenuWrapper,#buildingMenuWrapper,#environmentMenuWrapper,#confirmMenuWrapper,#teleportMenuWrapper,#profileMenuWrapper{ right:16px; transform-origin:right center; }
+#sliderContainer{ right:8px; height:420px; width:68px; }
+#scaleSlider{ width:336px; height:68px; }
+#scaleSlider::-webkit-slider-thumb{ width:144px; height:144px; margin-top:-38px; }
+#soloDockButton{ right:8px; width:62px; height:62px; }
 }
 @media (max-width:480px){
 .buttonRow{ gap:6px; }
 .menuButton img{ width:clamp(42px,17vw,60px); max-width:21vw; }
-#menuLogo{ width:clamp(54px,24vw,84px); max-width:38%; }
+#menuLogo{ width:clamp(68px,30vw,100px); }
 .menuSubtitle{ font-size:9px; letter-spacing:0.12em; }
 #menuUnrealLogo{ width:clamp(34px,11vw,48px); }
 #lottieLoader{ width:min(170px,42vw); height:min(170px,42vw); min-width:90px; min-height:90px; }
-#uiWrapper,#cameraMenuWrapper,#buildingMenuWrapper,#environmentMenuWrapper,#confirmMenuWrapper,#teleportMenuWrapper,#profileMenuWrapper{ right:62px; }
-#buildingOuterBox,#environmentOuterBox,#teleportOuterBox,#profileOuterBox{ width:min(88vw, 420px); }
-#confirmOuterBox{ width:min(84vw, 286px); }
+#uiWrapper,#cameraMenuWrapper,#buildingMenuWrapper,#environmentMenuWrapper,#confirmMenuWrapper,#teleportMenuWrapper,#profileMenuWrapper{ right:10px; }
+#buildingOuterBox,#environmentOuterBox,#teleportOuterBox,#profileOuterBox{ width:min(92vw, 420px); }
+#confirmOuterBox{ width:min(88vw, 286px); }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
@@ -648,6 +625,12 @@ let appInAttentionState = false;
 let gameRevealed = false;
 let isRevealingGame = false;
 let inGameUiLoaded = false;
+let currentProfileSet = '';
+let currentProfileVariant = 'BOARD_AND_BATTEN';
+let currentColorVariant = 'KNOTTY_CHESTNUT';
+let currentShowButtonsMode = 'profile';
+let profileTitleAnimationId = 0;
+let colorTitleAnimationId = 0;
 
 import * as PixelStreamingWebSdk from "https://unpkg.com/@arcware-cloud/pixelstreaming-websdk@1.3.32/index.mjs";
 
@@ -708,6 +691,21 @@ if(parsed.load_ui==="modern"){
         showReadyMessage();
         showInGameUiAnimated();
     });
+}
+if(typeof parsed.profileSet === 'string'){
+    currentProfileSet = parsed.profileSet.trim();
+}
+if(typeof parsed.profileTitle === 'string'){
+    updateProfileVariant(parsed.profileTitle.trim(), { animate:true, syncButton:true });
+}
+if(typeof parsed.colorTitle === 'string'){
+    updateColorTitle(parsed.colorTitle.trim(), { animate:true });
+}
+if(parsed.showButtons === 'profile' || parsed.showButtons === 'soffit'){
+    updateProfileButtonAvailability(parsed.showButtons);
+}
+if(parsed.open === 'editProfiles'){
+    openProfileMenu();
 }
 }catch(e){}
 if(response.startsWith("CreateScreenshot")) createFile(window.file);
@@ -864,18 +862,7 @@ let teleportBasementButton;
 let teleportGroundButton;
 let teleportFirstButton;
 
-let activeDockMode = 'walk';
-function getResponsiveUiScaleMultiplier(){
-    const width = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-    if (width <= 680) return 0.5;
-    if (width <= 1024) return 0.7;
-    return 1;
-}
-function setUIScale(value) {
-    const userScale = parseFloat(value) || 1;
-    const responsiveScale = userScale * getResponsiveUiScaleMultiplier();
-    root.style.setProperty('--ui-scale', responsiveScale.toFixed(3));
-}
+function setUIScale(value) { root.style.setProperty('--ui-scale', value); }
 const uiModeClasses = ['walk-mode','camera-mode','building-mode','environment-mode','confirm-mode','teleport-mode','profile-mode'];
 const panelWrapperMap = {
 main: 'uiWrapper',
@@ -915,204 +902,46 @@ function resetPanelInlineStyles(){
         el.style.transform = '';
         el.style.transitionDelay = '';
     });
-    const slider = document.getElementById('sliderContainer');
-    const solo = document.getElementById('soloDockButton');
-    [slider, solo].forEach(el => {
-        if (!el) return;
-        el.style.opacity = '';
-        el.style.visibility = '';
-        el.style.pointerEvents = '';
-        el.style.transform = '';
-        el.style.transitionDelay = '';
-    });
 }
 function applyPanelMode(panelName){
     clearModes();
     if (panelName === 'walk') bodyEl.classList.add('walk-mode');
     else if (panelName !== 'main') bodyEl.classList.add(`${panelName}-mode`);
 }
-function animateWrapperIn(el, x = 260, scaleValue = null){
-    if (!el) return;
-    const scale = scaleValue || (getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1');
-    el.style.opacity = '0';
-    el.style.visibility = 'visible';
-    el.style.pointerEvents = 'none';
-    el.style.transitionDelay = '0s, 0s, 0s';
-    el.style.transform = `translate3d(${x}px, -50%, 0) scale(${scale})`;
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            el.style.opacity = '1';
-            el.style.transform = `translate3d(0, -50%, 0) scale(${scale})`;
-        });
-    });
-}
-function animateWrapperOut(el, x = 260, scaleValue = null){
-    if (!el) return;
-    const scale = scaleValue || (getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1');
-    el.style.opacity = '1';
-    el.style.visibility = 'visible';
-    el.style.pointerEvents = 'none';
-    el.style.transitionDelay = '0s, 0s, 0s';
-    el.style.transform = `translate3d(0, -50%, 0) scale(${scale})`;
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            el.style.opacity = '0';
-            el.style.transform = `translate3d(${x}px, -50%, 0) scale(${scale})`;
-        });
-    });
-}
-function animateSliderIn(){
-    const slider = document.getElementById('sliderContainer');
-    if (!slider) return;
-    slider.style.opacity = '0';
-    slider.style.visibility = 'visible';
-    slider.style.pointerEvents = 'none';
-    slider.style.transitionDelay = '0s, 0s, 0s';
-    slider.style.transform = 'translate3d(140px, -50%, 0)';
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            slider.style.opacity = '1';
-            slider.style.transform = 'translate3d(0, -50%, 0)';
-        });
-    });
-}
-function animateSliderOut(){
-    const slider = document.getElementById('sliderContainer');
-    if (!slider) return;
-    slider.style.opacity = '1';
-    slider.style.visibility = 'visible';
-    slider.style.pointerEvents = 'none';
-    slider.style.transitionDelay = '0s, 0s, 0s';
-    slider.style.transform = 'translate3d(0, -50%, 0)';
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            slider.style.opacity = '0';
-            slider.style.transform = 'translate3d(140px, -50%, 0)';
-        });
-    });
-}
-function animateSoloIn(){
-    const solo = document.getElementById('soloDockButton');
-    if (!solo) return;
-    solo.style.opacity = '0';
-    solo.style.visibility = 'visible';
-    solo.style.pointerEvents = 'none';
-    solo.style.transitionDelay = '0s, 0s, 0s';
-    solo.style.transform = 'translate3d(140px, -50%, 0) rotate(90deg)';
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            solo.style.opacity = '1';
-            solo.style.transform = 'translate3d(0, -50%, 0) rotate(0deg)';
-        });
-    });
-}
-function animateSoloOut(){
-    const solo = document.getElementById('soloDockButton');
-    if (!solo) return;
-    solo.style.opacity = '1';
-    solo.style.visibility = 'visible';
-    solo.style.pointerEvents = 'none';
-    solo.style.transitionDelay = '0s, 0s, 0s';
-    solo.style.transform = 'translate3d(0, -50%, 0) rotate(0deg)';
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            solo.style.opacity = '0';
-            solo.style.transform = 'translate3d(140px, -50%, 0) rotate(90deg)';
-        });
-    });
-}
-function finalizeSwitch(panelName){
-    resetPanelInlineStyles();
-    bodyEl.classList.remove('menu-switching');
-    applyPanelMode(panelName);
-}
 function switchPanel(panelName){
     if (!bodyEl.classList.contains('inGameUiVisible')) return;
     const currentPanel = getCurrentPanelName();
     if (currentPanel === panelName) return;
     clearTimeout(menuSwitchTimer);
-    bodyEl.classList.add('menu-switching');
-
     const outgoing = getWrapperByPanelName(currentPanel);
-    if (outgoing) animateWrapperOut(outgoing, 260);
-
-    const goingToMain = panelName === 'main';
-    const goingToWalk = panelName === 'walk';
-    const returningFromWalk = currentPanel === 'walk' && panelName === 'main';
-
-    if (currentPanel === 'main' && (goingToWalk || !goingToMain)) {
-        animateSliderOut();
-    }
-    if (goingToWalk) {
-        animateSoloIn();
-    } else if (currentPanel === 'walk') {
-        animateSoloOut();
-    }
-
-    menuSwitchTimer = setTimeout(() => {
-        applyPanelMode(panelName);
-
-        if (goingToMain) {
-            animateWrapperIn(document.getElementById('uiWrapper'), 260);
-            animateSliderIn();
-        } else if (!goingToWalk) {
-            animateWrapperIn(getWrapperByPanelName(panelName), 260);
-        }
-    }, goingToMain || returningFromWalk ? 60 : 35);
-
-    setTimeout(() => {
-        finalizeSwitch(panelName);
-    }, 560);
-}
-function hideInGameUi(){
-    clearTimeout(menuSwitchTimer);
-    bodyEl.classList.remove('menu-switching', 'ui-entering');
-    resetPanelInlineStyles();
-    clearModes();
-    bodyEl.classList.remove('inGameUiVisible');
-}
-function showInGameUiAnimated(){
-    if(inGameUiLoaded) return;
-    inGameUiLoaded = true;
-    clearTimeout(menuSwitchTimer);
-    bodyEl.classList.remove('menu-switching');
-    resetPanelInlineStyles();
-    clearModes();
-    bodyEl.classList.add('ui-entering');
-    bodyEl.classList.add('inGameUiVisible');
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            bodyEl.classList.remove('ui-entering');
-        });
-    });
-}
-function enterDockedMode(mode='walk'){
-    activeDockMode = mode;
-    switchPanel('walk');
-}
-function enterWalkMode(){
-    activeDockMode = 'walk';
-    enterDockedMode('walk');
-}
-function enterEditMode(){
-    activeDockMode = 'edit';
-    sendToUnreal('{"modern":"editMode"}');
-    enterDockedMode('edit');
-}
-function exitWalkMode(){
-    if (!bodyEl.classList.contains('inGameUiVisible')) return;
-    clearTimeout(menuSwitchTimer);
     bodyEl.classList.add('menu-switching');
-    animateSoloOut();
-    applyPanelMode('main');
-    animateWrapperIn(document.getElementById('uiWrapper'), 260);
-    animateSliderIn();
-    if (activeDockMode === 'edit') {
-        sendToUnreal('{"exit":"editMode"}');
+
+    if (outgoing) {
+        const currentScale = getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1';
+        outgoing.style.opacity = '1';
+        outgoing.style.visibility = 'visible';
+        outgoing.style.pointerEvents = 'none';
+        outgoing.style.transitionDelay = '0s, 0s, 0s';
+        outgoing.style.transform = `translate3d(0, -50%, 0) scale(${currentScale})`;
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                outgoing.style.opacity = '0';
+                outgoing.style.transform = `translate3d(260px, -50%, 0) scale(${currentScale})`;
+            });
+        });
     }
-    activeDockMode = 'walk';
-    setTimeout(() => finalizeSwitch('main'), 560);
+
+    clearModes();
+    menuSwitchTimer = setTimeout(() => {
+        resetPanelInlineStyles();
+        applyPanelMode(panelName);
+        bodyEl.classList.remove('menu-switching');
+    }, currentPanel === 'walk' ? 40 : 320);
 }
+function hideInGameUi(){ clearTimeout(menuSwitchTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.remove('inGameUiVisible'); }
+function showInGameUiAnimated(){ if(inGameUiLoaded) return; inGameUiLoaded = true; clearTimeout(menuSwitchTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); requestAnimationFrame(()=>bodyEl.classList.add('inGameUiVisible')); }
+function enterWalkMode(){ switchPanel('walk'); }
+function exitWalkMode(){ clearTimeout(menuSwitchTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); bodyEl.classList.remove('walk-mode'); }
 function openCameraMenu(){ switchPanel('camera'); }
 function closeCameraMenu(){ switchPanel('main'); }
 function openBuildingMenu(){ switchPanel('building'); }
@@ -1165,6 +994,114 @@ function mountAnimatedLetters() {
         teleportMapTitle.appendChild(span);
     });
 }
+}
+
+function formatVariantDisplayName(value){
+const trimmed = String(value || '').trim();
+return trimmed.replace(/_/g, ' ');
+}
+function getProfileOptionText(variantName){
+const map = {
+'BOARD_AND_BATTEN':'NO OPTIONS',
+'RANDOM_PLANK':'JOINER',
+'V_GROOVE_6_INCH':'4 INCH',
+'FOLDED_WALL':'NO OPTIONS',
+'DOUBL7_VENTED':'NON VENTED',
+'V_GROOVE_6INCH_VENTED':'OPTIONS'
+};
+return map[String(variantName || '').trim()] || 'OPTIONS';
+}
+function animateMenuInfoTitle(element, text, options={}){
+if (!element) return;
+const { immediate=false, animationKey='profile' } = options;
+if (animationKey === 'profile') profileTitleAnimationId += 1;
+if (animationKey === 'color') colorTitleAnimationId += 1;
+const animationId = animationKey === 'profile' ? profileTitleAnimationId : colorTitleAnimationId;
+const letters = Array.from(String(text || ''));
+const baseDelay = immediate ? 0 : 120;
+const staggerStep = 42;
+if (immediate) {
+    element.classList.remove('is-fading');
+    element.innerHTML = '';
+    mountAnimatedLetters();
+    return;
+}
+    element.classList.add('is-fading');
+    setTimeout(() => {
+        const latestId = animationKey === 'profile' ? profileTitleAnimationId : colorTitleAnimationId;
+        if (animationId !== latestId) return;
+        element.classList.remove('is-fading');
+        element.innerHTML = '';
+        mountAnimatedLetters();
+    }, 150);
+    function mountAnimatedLetters() {
+        const latestId = animationKey === 'profile' ? profileTitleAnimationId : colorTitleAnimationId;
+        if (animationId !== latestId) return;
+        letters.forEach((char, index) => {
+            const span = document.createElement('span');
+            span.className = 'title-letter';
+            span.textContent = char === ' ' ? ' ' : char;
+            span.style.animationDelay = `${baseDelay + (index * staggerStep)}ms`;
+            element.appendChild(span);
+        });
+    }
+}
+function getProfileButtons(){
+return Array.from(document.querySelectorAll('.profileTypeButton'));
+}
+function setActiveProfileVariantButton(variantName){
+getProfileButtons().forEach((button)=>{
+    button.classList.toggle('active', button.dataset.variant === variantName && !button.disabled);
+});
+}
+function updateProfileButtonAvailability(mode){
+currentShowButtonsMode = mode === 'soffit' ? 'soffit' : 'profile';
+const enabledVariants = currentShowButtonsMode === 'soffit'
+    ? new Set(['DOUBL7_VENTED', 'V_GROOVE_6INCH_VENTED'])
+    : new Set(['BOARD_AND_BATTEN', 'RANDOM_PLANK', 'V_GROOVE_6_INCH', 'FOLDED_WALL']);
+getProfileButtons().forEach((button)=>{
+    const enabled = enabledVariants.has(button.dataset.variant);
+    button.disabled = !enabled;
+    button.classList.toggle('is-disabled', !enabled);
+    if (!enabled) button.classList.remove('active');
+});
+if (!enabledVariants.has(currentProfileVariant)) {
+    const firstEnabled = getProfileButtons().find((button)=>!button.disabled);
+    if (firstEnabled) setActiveProfileVariantButton(firstEnabled.dataset.variant);
+} else {
+    setActiveProfileVariantButton(currentProfileVariant);
+}
+}
+function updateProfileVariant(variantName, options={}){
+const { animate=false, syncButton=false } = options;
+const normalized = String(variantName || '').trim();
+if (!normalized) return;
+currentProfileVariant = normalized;
+const titleEl = document.getElementById('profileTitleDisplay');
+const optionsEl = document.getElementById('profileOptionsButton');
+animateMenuInfoTitle(titleEl, formatVariantDisplayName(normalized), { immediate: !animate, animationKey:'profile' });
+if (optionsEl) optionsEl.textContent = getProfileOptionText(normalized);
+if (syncButton) setActiveProfileVariantButton(normalized);
+}
+function updateColorTitle(colorName, options={}){
+const { animate=false } = options;
+const normalized = String(colorName || '').trim();
+if (!normalized) return;
+currentColorVariant = normalized;
+const colorEl = document.getElementById('profileColorDisplay');
+animateMenuInfoTitle(colorEl, formatVariantDisplayName(normalized), { immediate: !animate, animationKey:'color' });
+}
+function handleProfileVariantButtonClick(button){
+if (!button || button.disabled) return;
+const variantName = button.dataset.variant;
+if (!variantName) return;
+setActiveProfileVariantButton(variantName);
+updateProfileVariant(variantName, { animate:true, syncButton:false });
+if (currentProfileSet) {
+    sendToUnreal({ [currentProfileSet]: variantName });
+  } else {
+    console.warn('No profileSet received yet from backend; profile variant not sent.');
+  }
 }
 function openTeleportMenu(){
 switchPanel('teleport');
@@ -1220,7 +1157,6 @@ await wait(Math.max(outDuration, inDuration) + 120);
 if (transitionId !== teleportFloorTransitionId) return;
 teleportFloorButtons.forEach((button)=>{ button.disabled = false; });
 }
-function setActiveProfileType(clickedButton){ document.querySelectorAll('.profileTypeButton').forEach(button=>button.classList.remove('active')); clickedButton.classList.add('active'); }
 function handleJumpTargetClick(targetId, floor){ console.log(`Jump target clicked: ${targetId} on ${floor}`); }
 function buildJumpTargets(){
 teleportJumpTargetsLayer.innerHTML = '';
@@ -1279,6 +1215,8 @@ const teleportMenuCloseButton = document.getElementById('teleportMenuCloseButton
 const editButton = document.getElementById('editButton');
 const profileMenuCloseButton = document.getElementById('profileMenuCloseButton');
 const profileTypeButtons = Array.from(document.querySelectorAll('.profileTypeButton'));
+const profileOptionsButton = document.getElementById('profileOptionsButton');
+const profileColoursButton = document.getElementById('profileColoursButton');
 teleportMapTitle = document.getElementById('teleportMapTitle');
 teleportJumpTargetsLayer = document.getElementById('teleportJumpTargetsLayer');
 teleportBasementButton = document.getElementById('teleportBasementButton');
@@ -1290,11 +1228,12 @@ teleportPlans.first = document.getElementById('teleportPlanFirst');
 teleportFloorButtons.push(teleportBasementButton, teleportGroundButton, teleportFirstButton);
 
 setUIScale(scaleSlider.value);
-window.addEventListener('resize', () => setUIScale(scaleSlider.value));
-window.addEventListener('orientationchange', () => setTimeout(() => setUIScale(scaleSlider.value), 120));
 buildJumpTargets();
 setActiveFloorButton(currentTeleportFloor);
 animateTeleportTitle(teleportFloorTitles[currentTeleportFloor], { immediate:true });
+updateProfileButtonAvailability(currentShowButtonsMode);
+updateProfileVariant(currentProfileVariant, { animate:false, syncButton:true });
+updateColorTitle(currentColorVariant, { animate:false });
 
 scaleSlider.addEventListener('input', () => setUIScale(scaleSlider.value));
 const engageSlider = ()=>sliderContainer.classList.add('engaged');
@@ -1319,16 +1258,18 @@ environmentMenuButton.addEventListener('click', openEnvironmentMenu);
 environmentMenuCloseButton.addEventListener('click', closeEnvironmentMenu);
 teleportMenuButton.addEventListener('click', openTeleportMenu);
 teleportMenuCloseButton.addEventListener('click', closeTeleportMenu);
-editButton.addEventListener('click', enterEditMode);
+editButton.addEventListener('click', openProfileMenu);
 profileMenuCloseButton.addEventListener('click', closeProfileMenu);
-profileTypeButtons.forEach((button) => button.addEventListener('click', () => setActiveProfileType(button)));
+profileTypeButtons.forEach((button) => button.addEventListener('click', () => handleProfileVariantButtonClick(button)));
 teleportBasementButton.addEventListener('click', () => setTeleportFloor('basement'));
 teleportGroundButton.addEventListener('click', () => setTeleportFloor('ground'));
 teleportFirstButton.addEventListener('click', () => setTeleportFloor('first'));
 endSessionButton.addEventListener('click', openConfirmMenu);
 confirmMenuCloseButton.addEventListener('click', closeConfirmMenu);
 confirmNoButton.addEventListener('click', closeConfirmMenu);
-confirmYesButton.addEventListener('click', () => sendToUnreal('{"end":"session"}'));
+confirmYesButton.addEventListener('click', () => location.reload());
+profileOptionsButton.addEventListener('click', (event) => event.preventDefault());
+profileColoursButton.addEventListener('click', (event) => event.preventDefault());
 
 document.getElementById('generateImageButton').addEventListener('click', ()=>sendToUnreal('{"CreateScreenshot":true}'));
 document.querySelectorAll('#buildingOptions .buildingCard')[0].addEventListener('click', ()=>selectBuild('Trad'));
@@ -1405,7 +1346,7 @@ document.querySelectorAll('#buildingOptions .buildingCard')[2].addEventListener(
 
 <div id="teleportMenuWrapper" class="uiInteractive"><div id="teleportOuterBox" class="glassPanel"><div id="teleportTopBar"><img id="teleportLogo" src="LOGO.png" alt="Logo"><button class="topIconButton" id="teleportMenuCloseButton" type="button" aria-label="Exit teleport menu"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="teleportInnerBoxWrapper"><div id="teleportInnerBox"><div id="teleportMapTitle" aria-live="polite">GROUND FLOOR</div><div class="teleportMapStage" id="teleportMapStage"><img class="teleportPlanImage" id="teleportPlanBasement" src="PLAN_MODERN_BASEMENT.png" alt="Modern home basement floor plan"><img class="teleportPlanImage active" id="teleportPlanGround" src="PLAN_MODERN_GROUND_FLOOR.png" alt="Modern home ground floor plan"><img class="teleportPlanImage" id="teleportPlanFirst" src="PLAN_MODERN_FIRST_FLOOR.png" alt="Modern home first floor plan"><div id="teleportJumpTargetsLayer"></div></div></div></div><div id="teleportFloorButtons"><button class="teleportFloorButton" id="teleportBasementButton" type="button">BASEMENT</button><button class="teleportFloorButton active" id="teleportGroundButton" type="button">GROUND FLOOR</button><button class="teleportFloorButton" id="teleportFirstButton" type="button">FIRST FLOOR</button></div></div></div>
 
-<div id="profileMenuWrapper" class="uiInteractive"><div id="profileOuterBox" class="glassPanel"><div id="profileTopBar"><img id="profileLogo" src="LOGO.png" alt="Logo"><button class="topIconButton" id="profileMenuCloseButton" type="button" aria-label="Exit edit profile menu"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="profileInnerBoxWrapper"><div id="profileInnerBox"><div id="profileTopRow"><button class="profileTypeButton active" type="button" aria-label="Profile type B+B"><img src="PROFILE_BTN_B+B.png" alt="B+B"></button><button class="profileTypeButton" type="button" aria-label="Profile type Random Plank"><img src="PROFILE_BTN_RANDOM-PLANK.png" alt="Random Plank"></button><button class="profileTypeButton" type="button" aria-label="Profile type V Groove"><img src="PROFILE_BTN_V-GROOVE.png" alt="V Groove"></button><button class="profileTypeButton" type="button" aria-label="Profile type Folded Wall"><img src="PROFILE_BTN_FOLDED-WALL.png" alt="Folded Wall"></button><button class="profileTypeButton" type="button" aria-label="Profile type Double Seven"><img src="PROFILE_BTN_DOUBLE-SEVEN.png" alt="Double Seven"></button><button class="profileTypeButton" type="button" aria-label="Profile type V Groove Vented"><img src="PROFILE_BTN_V-GROOVE-VENTED.png" alt="V Groove Vented"></button></div><div id="profileInfoCard"><div class="profileInfoRow"><div class="profileTitleText">PROFILE TITLE</div><button class="profilePillButton" id="profileOptionsButton" type="button">OPTIONS</button></div></div><div class="profileColorRow"><div class="profileColorText">KNOTTY_CHESTNUT</div><button class="profilePillButton" id="profileColoursButton" type="button">COLOURS</button></div></div></div></div></div>
+<div id="profileMenuWrapper" class="uiInteractive"><div id="profileOuterBox" class="glassPanel"><div id="profileTopBar"><img id="profileLogo" src="LOGO.png" alt="Logo"><button class="topIconButton" id="profileMenuCloseButton" type="button" aria-label="Exit edit profile menu"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="profileInnerBoxWrapper"><div id="profileInnerBox"><div id="profileTopRow"><button class="profileTypeButton active" type="button" data-variant="BOARD_AND_BATTEN" aria-label="Profile type B+B"><img src="PROFILE_BTN_B+B.png" alt="B+B"></button><button class="profileTypeButton" type="button" data-variant="RANDOM_PLANK" aria-label="Profile type Random Plank"><img src="PROFILE_BTN_RANDOM-PLANK.png" alt="Random Plank"></button><button class="profileTypeButton" type="button" data-variant="V_GROOVE_6_INCH" aria-label="Profile type V Groove"><img src="PROFILE_BTN_V-GROOVE.png" alt="V Groove"></button><button class="profileTypeButton" type="button" data-variant="FOLDED_WALL" aria-label="Profile type Folded Wall"><img src="PROFILE_BTN_FOLDED-WALL.png" alt="Folded Wall"></button><button class="profileTypeButton" type="button" data-variant="DOUBL7_VENTED" aria-label="Profile type Double Seven"><img src="PROFILE_BTN_DOUBLE-SEVEN.png" alt="Double Seven"></button><button class="profileTypeButton" type="button" data-variant="V_GROOVE_6INCH_VENTED" aria-label="Profile type V Groove Vented"><img src="PROFILE_BTN_V-GROOVE-VENTED.png" alt="V Groove Vented"></button></div><div id="profileInfoCard"><div class="profileInfoRow"><div class="profileTitleText" id="profileTitleDisplay">PROFILE TITLE</div><button class="profilePillButton" id="profileOptionsButton" type="button">OPTIONS</button></div></div><div class="profileColorRow"><div class="profileColorText" id="profileColorDisplay">KNOTTY_CHESTNUT</div><button class="profilePillButton" id="profileColoursButton" type="button">COLOURS</button></div></div></div></div></div>
 
 <div id="buildingMenuWrapper" class="uiInteractive"><div id="buildingOuterBox" class="glassPanel"><div id="buildingTopBar"><div id="buildingTitle">CHOOSE BUILDING</div><button class="topIconButton" id="buildingMenuCloseButton" type="button" aria-label="Exit building menu"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="buildingInnerBoxWrapper"><div id="buildingInnerBox"><div id="buildingOptions"><button class="buildingCard" type="button" aria-label="Load Traditional Building"><img src="Load_Trad.png" alt="Traditional Building"></button><button class="buildingCard" type="button" aria-label="Load Modern Building"><img src="Load_Mod.png" alt="Modern Building"></button><button class="buildingCard" type="button" aria-label="Load Multi Building"><img src="Load_Multi.png" alt="Multi Building"></button></div></div></div></div></div>
 
@@ -1421,4 +1362,3 @@ document.querySelectorAll('#buildingOptions .buildingCard')[2].addEventListener(
 <div id="screenshotOverlay"><div class="overlayBox"><div class="spinner"></div><div id="overlayText">Generating high resolution image</div></div></div>
 </body>
 </html>
-
