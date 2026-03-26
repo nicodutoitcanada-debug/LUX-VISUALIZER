@@ -1183,7 +1183,34 @@ function handleProfileBackendPayload(parsed){
     if (typeof parsed.showButtons === 'string') applyProfileButtonAvailability(parsed.showButtons);
     if (parsed.open === 'editProfiles') openProfileMenu();
 }
-function handleJumpTargetClick(targetId, floor){ console.log(`Jump target clicked: ${targetId} on ${floor}`); }
+const teleportJumpTargetMessages = {
+    first: {
+        'first-01': { teleportMapMod: 'modFirst_01' },
+        'first-02': { teleportMapMod: 'modFirst_02' },
+        'first-03': { teleportMapMod: 'modFirst_03' }
+    },
+    ground: {
+        'ground-01': { teleportMapMod: 'modGround_01' },
+        'ground-02': { teleportMapMod: 'modGround_02' },
+        'ground-03': { teleportMapMod: 'modGround_03' },
+        'ground-04': { teleportMapMod: 'modGround_04' },
+        'ground-05': { teleportMapMod: 'modGround_05' }
+    },
+    basement: {
+        'basement-01': { teleportMapMod: 'modBasement_01' },
+        'basement-02': { teleportMapMod: 'modBasement_02' },
+        'basement-03': { teleportMapMod: 'modBasement_03' }
+    }
+};
+function handleJumpTargetClick(targetId, floor){
+    const payload = teleportJumpTargetMessages[floor]?.[targetId];
+    if (!payload) {
+        console.warn(`No teleport payload mapped for ${targetId} on ${floor}`);
+        return;
+    }
+    console.log(`Jump target clicked: ${targetId} on ${floor}`, payload);
+    sendToUnreal(payload);
+}
 function buildJumpTargets(){
 teleportJumpTargetsLayer.innerHTML = '';
 Object.entries(jumpTargetData).forEach(([floor, targets]) => {
