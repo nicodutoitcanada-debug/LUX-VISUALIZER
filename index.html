@@ -1331,7 +1331,42 @@ confirmMenuCloseButton.addEventListener('click', closeConfirmMenu);
 confirmNoButton.addEventListener('click', closeConfirmMenu);
 confirmYesButton.addEventListener('click', () => location.reload());
 
-document.getElementById('generateImageButton').addEventListener('click', ()=>sendToUnreal('{"CreateScreenshot":true}'));
+function formatSliderValue(value){
+    const numericValue = Number(value);
+    if (Number.isNaN(numericValue)) return String(value);
+    return Number.isInteger(numericValue) ? String(numericValue) : String(numericValue).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
+}
+
+const cameraHeightSlider = document.getElementById('cameraHeightSlider');
+const cameraZoomSlider = document.getElementById('cameraZoomSlider');
+const cameraExposureSlider = document.getElementById('cameraExposureSlider');
+const cameraDofSlider = document.getElementById('cameraDofSlider');
+const generateImageButton = document.getElementById('generateImageButton');
+
+if (cameraHeightSlider) {
+    cameraHeightSlider.addEventListener('input', (event) => {
+        sendToUnreal({ camSetHeight: formatSliderValue(event.target.value) });
+    });
+}
+if (cameraZoomSlider) {
+    cameraZoomSlider.addEventListener('input', (event) => {
+        sendToUnreal({ camSetZoom: formatSliderValue(event.target.value) });
+    });
+}
+if (cameraExposureSlider) {
+    cameraExposureSlider.addEventListener('input', (event) => {
+        sendToUnreal({ camSetExposure: formatSliderValue(event.target.value) });
+    });
+}
+if (cameraDofSlider) {
+    cameraDofSlider.addEventListener('input', (event) => {
+        sendToUnreal({ camSetDof: formatSliderValue(event.target.value) });
+    });
+}
+if (generateImageButton) {
+    generateImageButton.addEventListener('click', () => sendToUnreal({ frontEnd: 'screenshot' }));
+}
+
 document.querySelectorAll('#buildingOptions .buildingCard')[0].addEventListener('click', ()=>selectBuild('Trad'));
 document.querySelectorAll('#buildingOptions .buildingCard')[1].addEventListener('click', ()=>selectBuild('Mod'));
 document.querySelectorAll('#buildingOptions .buildingCard')[2].addEventListener('click', ()=>selectBuild('Multi'));
@@ -1402,7 +1437,7 @@ document.querySelectorAll('#buildingOptions .buildingCard')[2].addEventListener(
     </div>
 </div>
 
-<div id="cameraMenuWrapper" class="uiInteractive"><div id="cameraOuterBox" class="glassPanel"><div id="cameraTopBar"><img id="cameraLogo" src="LOGO.png" alt="Logo"><button class="topIconButton" id="cameraMenuCloseButton" type="button" aria-label="Exit camera settings"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="cameraRedPlate"></div><div id="cameraInnerBoxWrapper"><div id="cameraInnerBoxFade"></div><div id="cameraInnerBox"><div id="cameraControls"><img class="cameraIcon" src="CAM_height.png" alt="Height"><img class="cameraIcon" src="CAM_zoom.png" alt="Zoom"><img class="cameraIcon" src="CAM_exposure.png" alt="Exposure"><img class="cameraIcon" src="CAM_dof.png" alt="Depth of Field"><div class="cameraSliderWrap"><div class="cameraTrack"></div><input class="cameraSlider" type="range" min="0" max="100" value="20" aria-label="Height slider"></div><div class="cameraSliderWrap"><div class="cameraTrack"></div><input class="cameraSlider" type="range" min="0" max="100" value="38" aria-label="Zoom slider"></div><div class="cameraSliderWrap"><div class="cameraTrack"></div><input class="cameraSlider" type="range" min="0" max="100" value="55" aria-label="Exposure slider"></div><div class="cameraSliderWrap"><div class="cameraTrack"></div><input class="cameraSlider" type="range" min="0" max="100" value="34" aria-label="Depth of field slider"></div></div></div></div><div id="generateImageButton">GENERATE IMAGE</div></div></div>
+<div id="cameraMenuWrapper" class="uiInteractive"><div id="cameraOuterBox" class="glassPanel"><div id="cameraTopBar"><img id="cameraLogo" src="LOGO.png" alt="Logo"><button class="topIconButton" id="cameraMenuCloseButton" type="button" aria-label="Exit camera settings"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="cameraRedPlate"></div><div id="cameraInnerBoxWrapper"><div id="cameraInnerBoxFade"></div><div id="cameraInnerBox"><div id="cameraControls"><img class="cameraIcon" src="CAM_height.png" alt="Height"><img class="cameraIcon" src="CAM_zoom.png" alt="Zoom"><img class="cameraIcon" src="CAM_exposure.png" alt="Exposure"><img class="cameraIcon" src="CAM_dof.png" alt="Depth of Field"><div class="cameraSliderWrap"><div class="cameraTrack"></div><input id="cameraHeightSlider" class="cameraSlider" type="range" min="-100" max="300" step="1" value="-50" aria-label="Height slider"></div><div class="cameraSliderWrap"><div class="cameraTrack"></div><input id="cameraZoomSlider" class="cameraSlider" type="range" min="12" max="110" step="1" value="40" aria-label="Zoom slider"></div><div class="cameraSliderWrap"><div class="cameraTrack"></div><input id="cameraExposureSlider" class="cameraSlider" type="range" min="0.1" max="3" step="0.1" value="1.5" aria-label="Exposure slider"></div><div class="cameraSliderWrap"><div class="cameraTrack"></div><input id="cameraDofSlider" class="cameraSlider" type="range" min="0.2" max="1.2" step="0.1" value="0.4" aria-label="Depth of field slider"></div></div></div></div><div id="generateImageButton">GENERATE IMAGE</div></div></div>
 
 <div id="teleportMenuWrapper" class="uiInteractive"><div id="teleportOuterBox" class="glassPanel"><div id="teleportTopBar"><img id="teleportLogo" src="LOGO.png" alt="Logo"><button class="topIconButton" id="teleportMenuCloseButton" type="button" aria-label="Exit teleport menu"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="teleportInnerBoxWrapper"><div id="teleportInnerBox"><div id="teleportMapTitle" aria-live="polite">GROUND FLOOR</div><div class="teleportMapStage" id="teleportMapStage"><img class="teleportPlanImage" id="teleportPlanBasement" src="PLAN_MODERN_BASEMENT.png" alt="Modern home basement floor plan"><img class="teleportPlanImage active" id="teleportPlanGround" src="PLAN_MODERN_GROUND_FLOOR.png" alt="Modern home ground floor plan"><img class="teleportPlanImage" id="teleportPlanFirst" src="PLAN_MODERN_FIRST_FLOOR.png" alt="Modern home first floor plan"><div id="teleportJumpTargetsLayer"></div></div></div></div><div id="teleportFloorButtons"><button class="teleportFloorButton" id="teleportBasementButton" type="button">BASEMENT</button><button class="teleportFloorButton active" id="teleportGroundButton" type="button">GROUND FLOOR</button><button class="teleportFloorButton" id="teleportFirstButton" type="button">FIRST FLOOR</button></div></div></div>
 
