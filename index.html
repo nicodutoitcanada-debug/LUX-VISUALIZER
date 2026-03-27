@@ -219,6 +219,16 @@ opacity:0;
 pointer-events:none;
 user-select:none;
 animation:menuFadeInLogo 1.2s ease 0.68s forwards;
+transition:opacity 0.55s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.menuCenterGroup.is-exiting{
+opacity:0;
+transform:translate(-50%, -50%) scale(0.9);
+transition:opacity 0.55s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#menuUnrealLogo.is-exiting{
+opacity:0 !important;
+transform:translateX(-50%) scale(0.92);
 }
 @keyframes menuFadeIn{0%{opacity:0;}100%{opacity:1;}}
 @keyframes menuFadeInLogo{0%{opacity:0;}100%{opacity:0.8;}}
@@ -280,6 +290,13 @@ width:22px;height:22px;border:2px solid rgba(255,255,255,0.28);border-top:2px so
 .levelLine.delay1{ animation-delay:0.72s; }
 .levelLine.delay2{ animation-delay:1.04s; }
 .levelLine.delay3{ animation-delay:1.36s; }
+.levelLoadingContent.is-waiting .levelLoadingIntro,
+.levelLoadingContent.is-waiting .levelBrandLogo,
+.levelLoadingContent.is-waiting .levelLine{
+opacity:0 !important;
+animation:none !important;
+transform:translateX(-56px) !important;
+}
 @keyframes slideInLeft{0%{opacity:0;transform:translateX(-56px);}100%{opacity:1;transform:translateX(0);}}
 
 /* ready */
@@ -411,7 +428,7 @@ touch-action:manipulation;
 
 
 .glassPanel{
-background:linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.035) 18%, rgba(255,255,255,0.01) 38%, rgba(8,12,18,0.24) 100%), rgba(20, 24, 30, 0.38);
+background:linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.035) 18%, rgba(255,255,255,0.01) 34%, rgba(12,16,22,0.12) 58%, rgba(6,8,12,0.42) 82%, rgba(0,0,0,0.68) 100%), rgba(18, 22, 28, 0.32);
 border-radius:24px;
 backdrop-filter:blur(14px) saturate(120%);
 -webkit-backdrop-filter:blur(14px) saturate(120%);
@@ -424,8 +441,8 @@ box-shadow:0 10px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px
 }
 .glassPanel::before{ content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.05) 24%, rgba(255,255,255,0.015) 46%, rgba(0,0,0,0.02) 100%); pointer-events:none; z-index:0; }
 .glassPanel::after{ content:""; position:absolute; inset:1px; border-radius:inherit; background:radial-gradient(ellipse at top left, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 24%, rgba(255,255,255,0.00) 54%); pointer-events:none; z-index:0; }
-#cameraOuterBox,#buildingOuterBox,#environmentOuterBox,#confirmOuterBox,#teleportOuterBox,#profileOuterBox{ background:transparent; border:none; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
-#cameraOuterBox::before,#cameraOuterBox::after,#buildingOuterBox::before,#buildingOuterBox::after,#environmentOuterBox::before,#environmentOuterBox::after,#confirmOuterBox::before,#confirmOuterBox::after,#teleportOuterBox::before,#teleportOuterBox::after,#profileOuterBox::before,#profileOuterBox::after{ display:none; }
+#outerBox,#cameraOuterBox,#buildingOuterBox,#environmentOuterBox,#confirmOuterBox,#teleportOuterBox,#profileOuterBox{ background:transparent; border:none; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
+#outerBox::before,#outerBox::after,#cameraOuterBox::before,#cameraOuterBox::after,#buildingOuterBox::before,#buildingOuterBox::after,#environmentOuterBox::before,#environmentOuterBox::after,#confirmOuterBox::before,#confirmOuterBox::after,#teleportOuterBox::before,#teleportOuterBox::after,#profileOuterBox::before,#profileOuterBox::after{ display:none; }
 
 #outerBox{ width:128px; }
 #cameraOuterBox{ width:240px; }
@@ -455,12 +472,12 @@ width:100%; height:34px; background:linear-gradient(to bottom, rgba(255,255,255,
 #innerBoxFade::before{ content:""; position:absolute; left:0; right:0; bottom:0; height:20%; border-radius:0 0 24px 24px; background:linear-gradient(to top, rgba(150, 0, 0, 0.60) 0%, rgba(150, 0, 0, 0.40) 18%, rgba(150, 0, 0, 0.30) 35%, rgba(150, 0, 0, 0.10) 56%, rgba(150, 0, 0, 0.2) 74%, rgba(150, 0, 0, 0.00) 100%); filter:blur(7px); transform:scaleY(1.06); transform-origin:bottom; }
 #cameraInnerBoxFade::before{ content:""; position:absolute; left:0; right:0; bottom:0; height:10%; border-radius:0 0 24px 24px; background:linear-gradient(to top, rgba(185, 1, 1, 0.6) 0%, rgba(150, 0, 0, 0.40) 18%, rgba(150, 0, 0, 0.30) 35%, rgba(150, 0, 0, 0.10) 56%, rgba(150, 0, 0, 0.2) 74%, rgba(150, 0, 0, 0.00) 100%); filter:blur(7px); transform:scaleY(1.06); transform-origin:bottom; }
 #innerBoxFade::after,#cameraInnerBoxFade::after{ content:""; position:absolute; left:50%; bottom:8px; transform:translateX(-50%); width:128%; height:122px; border-radius:50%; background:radial-gradient(ellipse at center, rgba(210, 35, 35, 0.44) 0%, rgba(185, 18, 18, 0.30) 28%, rgba(150, 0, 0, 0.17) 48%, rgba(130, 0, 0, 0.08) 62%, rgba(120, 0, 0, 0.00) 78%); filter:blur(22px); }
-#innerBox,#cameraInnerBox,#buildingInnerBox,#environmentInnerBox,#confirmInnerBox,#teleportInnerBox,#profileInnerBox{ background:linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 22%, rgba(255,255,255,0.02) 40%, rgba(10,10,10,0.07) 100%), rgba(18,22,28,0.34); border-radius:24px; backdrop-filter:blur(12px) saturate(118%); -webkit-backdrop-filter:blur(12px) saturate(118%); position:relative; z-index:2; border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 22px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -10px 20px rgba(0,0,0,0.06), inset 0 0 10px rgba(255,255,255,0.015); }
+#innerBox,#cameraInnerBox,#buildingInnerBox,#environmentInnerBox,#confirmInnerBox,#teleportInnerBox,#profileInnerBox{ background:linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 22%, rgba(255,255,255,0.02) 33%, rgba(18,22,28,0.06) 34%, rgba(9,12,18,0.22) 58%, rgba(3,5,8,0.50) 82%, rgba(0,0,0,0.74) 100%), rgba(18,22,28,0.34); border-radius:24px; backdrop-filter:blur(12px) saturate(118%); -webkit-backdrop-filter:blur(12px) saturate(118%); position:relative; z-index:2; border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 22px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -10px 20px rgba(0,0,0,0.10), inset 0 0 10px rgba(255,255,255,0.015); }
 #innerBox{ padding:20px 0 22px 0; }
 #cameraInnerBox{ padding:18px 12px 6px 12px; min-height:392px; }
 #buildingInnerBox,#environmentInnerBox{ padding:14px 12px 14px 12px; }
-#confirmInnerBox{ background:linear-gradient(to bottom, rgba(255,255,255,0.09), rgba(255,255,255,0.02) 24%, rgba(0,0,0,0.03) 100%), rgba(20,20,20,0.28); border-radius:24px; backdrop-filter:blur(12px) saturate(118%); -webkit-backdrop-filter:blur(12px) saturate(118%); position:relative; z-index:2; border:1px solid rgba(255,255,255,0.08); box-shadow:0 6px 18px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.12); padding:0px 6px 0px 6px; min-height:56px; display:flex; align-items:center; justify-content:center; }
-#teleportInnerBox,#profileInnerBox{ padding:8px 8px 4px 8px; background:linear-gradient(to bottom, rgba(255,255,255,0.085), rgba(255,255,255,0.02) 24%, rgba(0,0,0,0.04) 100%), rgba(16,20,26,0.32); border:1px solid rgba(255,255,255,0.07); box-shadow:0 8px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.12); }
+#confirmInnerBox{ background:linear-gradient(to bottom, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.02) 30%, rgba(18,22,28,0.10) 31%, rgba(8,10,14,0.28) 60%, rgba(2,3,5,0.58) 84%, rgba(0,0,0,0.78) 100%), rgba(20,20,20,0.28); border-radius:24px; backdrop-filter:blur(12px) saturate(118%); -webkit-backdrop-filter:blur(12px) saturate(118%); position:relative; z-index:2; border:1px solid rgba(255,255,255,0.08); box-shadow:0 6px 18px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.12); padding:0px 6px 0px 6px; min-height:56px; display:flex; align-items:center; justify-content:center; }
+#teleportInnerBox,#profileInnerBox{ padding:8px 8px 4px 8px; background:linear-gradient(to bottom, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.02) 30%, rgba(15,18,24,0.10) 31%, rgba(7,9,13,0.26) 60%, rgba(2,3,5,0.54) 84%, rgba(0,0,0,0.76) 100%), rgba(16,20,26,0.32); border:1px solid rgba(255,255,255,0.07); box-shadow:0 8px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.12); }
 .iconGrid{ width:102px; margin:0 auto; display:grid; grid-template-columns:repeat(2, 1fr); justify-items:center; column-gap:10px; row-gap:30px; }
 .iconButton{ appearance:none; border:0; background:transparent; padding:0; margin:0; width:40px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
 .iconButton img{ width:40px; height:34px; object-fit:contain; opacity:0.88; transition:opacity 0.2s ease, transform 0.2s ease; pointer-events:none; }
@@ -630,16 +647,19 @@ let appInAttentionState = false;
 let gameRevealed = false;
 let isRevealingGame = false;
 let inGameUiLoaded = false;
+let sendResolutionToUnreal = () => {};
+let revealGamePromise = null;
+
+function updateAppHeight() {
+    const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    document.documentElement.style.setProperty("--app-height", `${Math.round(viewportHeight)}px`);
+}
 
 import * as PixelStreamingWebSdk from "https://unpkg.com/@arcware-cloud/pixelstreaming-websdk@1.3.32/index.mjs";
 
 (() => {
 const { ArcwareInit } = PixelStreamingWebSdk;
 
-function updateAppHeight() {
-    const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    document.documentElement.style.setProperty("--app-height", `${Math.round(viewportHeight)}px`);
-}
 updateAppHeight();
 window.addEventListener("resize", updateAppHeight);
 window.addEventListener("orientationchange", () => {
@@ -711,13 +731,13 @@ setTimeout(()=>{
         const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
         return { width: Math.round(viewportWidth * pixelRatio), height: Math.round(viewportHeight * pixelRatio) };
     }
-    function sendResolutionToUnreal() {
+    sendResolutionToUnreal = function() {
         if (!Application) return;
         const { width, height } = getViewportSize();
         const consoleCommand = `r.SetRes ${width}x${height}w`;
         sendToUnreal({ console:true, Command:consoleCommand });
         console.log(`Sent resolution to Unreal: ${consoleCommand}`);
-    }
+    };
     window.addEventListener('resize', sendResolutionToUnreal);
     window.addEventListener('orientationchange', () => {
         setTimeout(sendResolutionToUnreal, 150);
@@ -755,7 +775,7 @@ document.getElementById("menuUnrealLogo").style.animation="menuFadeInLogo 1.2s e
 }
 function showInitialLoadingScreen(){ hideAllUiScreens(); const screen=document.getElementById("loadingScreen"); const video=document.getElementById("loadingBgVideo"); screen.classList.add("visible"); playLottie(); try{ video.currentTime=0; video.play().catch(()=>{}); }catch(e){} }
 function hideInitialLoadingScreen(){ const screen=document.getElementById("loadingScreen"); const video=document.getElementById("loadingBgVideo"); screen.classList.remove("visible"); stopLottie(); try{ video.pause(); }catch(e){} }
-function showBuildMenu(){ hideAllUiScreens(); hideInGameUi(); const screen=document.getElementById("buildMenu"); const video=document.getElementById("menuBgVideo"); screen.classList.add("visible"); restartMenuAnimations(); try{ video.currentTime=0; video.play().catch(()=>{}); }catch(e){} }
+function showBuildMenu(){ hideAllUiScreens(); hideInGameUi(); const screen=document.getElementById("buildMenu"); const video=document.getElementById("menuBgVideo"); resetBuildMenuExitState(); screen.classList.add("visible"); restartMenuAnimations(); try{ video.currentTime=0; video.play().catch(()=>{}); }catch(e){} }
 function hideBuildMenu(){ const screen=document.getElementById("buildMenu"); const video=document.getElementById("menuBgVideo"); screen.classList.remove("visible"); try{ video.pause(); }catch(e){} }
 function setLevelLoadingContent(buildName){
 const video=document.getElementById("levelLoadingVideo");
@@ -786,13 +806,123 @@ if(delayClass==="delay3") delay="1.36s";
 line.style.animation=`slideInLeft 1.9s cubic-bezier(0.22,1,0.36,1) ${delay} forwards`;
 });
 }
-function showLevelLoadingScreen(buildName){ hideAllUiScreens(); hideInGameUi(); setLevelLoadingContent(buildName); restartLevelLoadingAnimations(); const screen=document.getElementById("levelLoadingScreen"); const video=document.getElementById("levelLoadingVideo"); screen.classList.add("visible"); video.load(); try{ video.currentTime=0; video.play().catch(()=>{}); }catch(e){} }
+function waitForLevelLoadingVideoReady(video){
+return new Promise((resolve)=>{
+    if(!video) return resolve();
+    const ready = () => { cleanup(); resolve(); };
+    const cleanup = () => {
+        video.removeEventListener('canplay', ready);
+        video.removeEventListener('canplaythrough', ready);
+        video.removeEventListener('loadeddata', ready);
+        video.removeEventListener('error', ready);
+    };
+    if(video.readyState >= 2) return resolve();
+    video.addEventListener('canplay', ready, { once:true });
+    video.addEventListener('canplaythrough', ready, { once:true });
+    video.addEventListener('loadeddata', ready, { once:true });
+    video.addEventListener('error', ready, { once:true });
+    setTimeout(ready, 2500);
+});
+}
+async function animateBuildMenuExit(){
+    const screen=document.getElementById('buildMenu');
+    if(!screen.classList.contains('visible')) return;
+    const group=document.querySelector('#buildMenu .menuCenterGroup');
+    const unrealLogo=document.getElementById('menuUnrealLogo');
+    if(!group) return;
+    group.classList.add('is-exiting');
+    if(unrealLogo) unrealLogo.classList.add('is-exiting');
+    await new Promise(resolve=>setTimeout(resolve, 520));
+}
+function resetBuildMenuExitState(){
+    const group=document.querySelector('#buildMenu .menuCenterGroup');
+    const unrealLogo=document.getElementById('menuUnrealLogo');
+    if(group) group.classList.remove('is-exiting');
+    if(unrealLogo) unrealLogo.classList.remove('is-exiting');
+}
+function triggerViewportRefreshSequence(){
+    try{ updateAppHeight(); }catch(e){}
+    try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+    try{ if(window.visualViewport){ window.visualViewport.dispatchEvent(new Event('resize')); } }catch(e){}
+    try{ sendResolutionToUnreal(); }catch(e){}
+    [120, 320, 650].forEach((delay)=>{
+        setTimeout(()=>{
+            try{ updateAppHeight(); }catch(e){}
+            try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+            try{ if(window.visualViewport){ window.visualViewport.dispatchEvent(new Event('resize')); } }catch(e){}
+            try{ sendResolutionToUnreal(); }catch(e){}
+        }, delay);
+    });
+}
+function formatSliderValue(value){
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return String(value);
+    if (Number.isInteger(numericValue)) return String(numericValue);
+    return String(numericValue).replace(/(?:\.0+|(?:(\.\d*?)0+))$/, '$1');
+}
+function bindCameraSlider(slider, messageKey){
+    if (!slider) return;
+    const emitValue = (event) => sendToUnreal({ [messageKey]: formatSliderValue(event.target.value) });
+    slider.addEventListener('input', emitValue);
+}
+async function showLevelLoadingScreen(buildName){
+hideAllUiScreens();
+hideInGameUi();
+setLevelLoadingContent(buildName);
+const screen=document.getElementById("levelLoadingScreen");
+const video=document.getElementById("levelLoadingVideo");
+const content=document.querySelector('.levelLoadingContent');
+if(content) content.classList.add('is-waiting');
+screen.classList.add("visible");
+video.load();
+try{
+    video.currentTime=0;
+    await video.play().catch(()=>{});
+}catch(e){}
+await waitForLevelLoadingVideoReady(video);
+if(content) content.classList.remove('is-waiting');
+restartLevelLoadingAnimations();
+}
 function hideLevelLoadingScreen(){ const screen=document.getElementById("levelLoadingScreen"); const video=document.getElementById("levelLoadingVideo"); screen.classList.remove("visible"); try{ video.pause(); }catch(e){} }
 function fadeToBlack(duration=900){ return new Promise(resolve=>{ const fade=document.getElementById("transitionFade"); fade.style.transitionDuration=`${duration}ms`; requestAnimationFrame(()=>{ fade.classList.add("visible"); setTimeout(resolve,duration); }); }); }
 function fadeFromBlack(duration=900){ return new Promise(resolve=>{ const fade=document.getElementById("transitionFade"); fade.style.transitionDuration=`${duration}ms`; requestAnimationFrame(()=>{ fade.classList.remove("visible"); setTimeout(resolve,duration); }); }); }
 async function advanceToBuildMenuWithFade(){ await fadeToBlack(900); hideInitialLoadingScreen(); showBuildMenu(); await fadeFromBlack(900); }
-async function transitionToLevelLoading(buildName){ await fadeToBlack(700); hideBuildMenu(); showLevelLoadingScreen(buildName); await fadeFromBlack(900); }
-async function revealGameFromLevelLoading(){ if(gameRevealed || isRevealingGame) return; isRevealingGame=true; await fadeToBlack(800); hideLevelLoadingScreen(); await fadeFromBlack(2600); gameRevealed=true; isRevealingGame=false; }
+async function transitionToLevelLoading(buildName){
+await animateBuildMenuExit();
+await fadeToBlack(700);
+hideBuildMenu();
+await showLevelLoadingScreen(buildName);
+await fadeFromBlack(900);
+}
+function revealGameFromLevelLoading(){
+if (gameRevealed) return Promise.resolve();
+if (revealGamePromise) return revealGamePromise;
+
+isRevealingGame = true;
+revealGamePromise = (async () => {
+    await fadeToBlack(800);
+    triggerViewportRefreshSequence();
+    await new Promise(resolve=>setTimeout(resolve, 350));
+    hideLevelLoadingScreen();
+    triggerViewportRefreshSequence();
+    await new Promise(resolve=>setTimeout(resolve, 450));
+    await fadeFromBlack(2600);
+    gameRevealed = true;
+})().catch((error) => {
+    console.error('Failed to reveal game from loading screen:', error);
+    try { hideLevelLoadingScreen(); } catch(e) {}
+    try {
+        const fade = document.getElementById('transitionFade');
+        if (fade) fade.classList.remove('visible');
+    } catch(e) {}
+    throw error;
+}).finally(() => {
+    isRevealingGame = false;
+    revealGamePromise = null;
+});
+
+return revealGamePromise;
+}
 function showReadyMessage(){ clearTimeout(readyMessageTimer); const screen=document.getElementById("readyMessage"); const text=document.getElementById("readyText"); screen.classList.add("visible"); text.classList.remove("animate"); void text.offsetWidth; text.classList.add("animate"); readyMessageTimer=setTimeout(()=>{ screen.classList.remove("visible"); text.classList.remove("animate"); },3000); }
 function shouldSurfaceAttention(message){ if(!message) return false; const lower=String(message).toLowerCase(); if(lower.includes("xr-spatial-tracking")) return false; if(lower.includes("issessionsupported")) return false; if(lower.includes("securityerror") && lower.includes("xr")) return false; return lower.includes("failed") || lower.includes("timeout") || lower.includes("disconnected") || lower.includes("disconnect") || lower.includes("unable") || lower.includes("cannot send") || lower.includes("allocation") || lower.includes("runner resources") || lower.includes("connection failed"); }
 function brandMessage(message){ let branded=String(message || "Connection issue. Please retry."); branded=branded.replace(/arcware/gi,"Lux"); branded=branded.replace(/\s+/g," ").trim(); return branded; }
@@ -817,7 +947,18 @@ if(!sent) showAttentionScreen("Connection failed. Please retry.");
 return sent;
 }
 function startApp(){ document.getElementById("transitionFade").classList.remove("visible"); showInitialLoadingScreen(); }
-async function selectBuild(buildName){ if(appInAttentionState) return; selectedBuild=buildName; gameRevealed=false; isRevealingGame=false; inGameUiLoaded=false; hideInGameUi(); await transitionToLevelLoading(buildName); if(buildName==="Trad") sendToUnreal('{"LoadLevel":"Trad"}'); else if(buildName==="Mod") sendToUnreal('{"LoadLevel":"Mod"}'); else if(buildName==="Multi") sendToUnreal('{"LoadLevel":"Multi"}'); }
+async function selectBuild(buildName){
+if(appInAttentionState) return;
+selectedBuild=buildName;
+gameRevealed=false;
+isRevealingGame=false;
+inGameUiLoaded=false;
+hideInGameUi();
+await transitionToLevelLoading(buildName);
+if(buildName==="Trad") sendToUnreal('{"LoadLevel":"Trad"}');
+else if(buildName==="Mod") sendToUnreal('{"LoadLevel":"Mod"}');
+else if(buildName==="Multi") sendToUnreal('{"LoadLevel":"Multi"}');
+}
 function showOverlay(message){ document.getElementById("overlayText").innerText=message; document.getElementById("screenshotOverlay").style.display="flex"; }
 function hideOverlay(){ document.getElementById("screenshotOverlay").style.display="none"; }
 function createFile(file){
@@ -1265,6 +1406,10 @@ const confirmNoButton = document.getElementById('confirmNoButton');
 const confirmYesButton = document.getElementById('confirmYesButton');
 const teleportMenuButton = document.getElementById('teleportMenuButton');
 const teleportMenuCloseButton = document.getElementById('teleportMenuCloseButton');
+const cameraHeightSlider = document.getElementById('cameraHeightSlider');
+const cameraZoomSlider = document.getElementById('cameraZoomSlider');
+const cameraExposureSlider = document.getElementById('cameraExposureSlider');
+const cameraDofSlider = document.getElementById('cameraDofSlider');
 const editButton = document.getElementById('editButton');
 const profileMenuCloseButton = document.getElementById('profileMenuCloseButton');
 const profileTypeButtons = Array.from(document.querySelectorAll('.profileTypeButton'));
@@ -1298,6 +1443,10 @@ updateProfileColorTitle('KNOTTY_CHESTNUT');
 applyProfileButtonAvailability(currentProfileButtonMode);
 
 scaleSlider.addEventListener('input', () => setUIScale(scaleSlider.value));
+bindCameraSlider(cameraHeightSlider, 'camSetHeight');
+bindCameraSlider(cameraZoomSlider, 'camSetZoom');
+bindCameraSlider(cameraExposureSlider, 'camSetExposure');
+bindCameraSlider(cameraDofSlider, 'camSetDof');
 const engageSlider = ()=>sliderContainer.classList.add('engaged');
 const disengageSlider = ()=>sliderContainer.classList.remove('engaged');
 scaleSlider.addEventListener('pointerdown', engageSlider);
@@ -1331,42 +1480,7 @@ confirmMenuCloseButton.addEventListener('click', closeConfirmMenu);
 confirmNoButton.addEventListener('click', closeConfirmMenu);
 confirmYesButton.addEventListener('click', () => location.reload());
 
-function formatSliderValue(value){
-    const numericValue = Number(value);
-    if (Number.isNaN(numericValue)) return String(value);
-    return Number.isInteger(numericValue) ? String(numericValue) : String(numericValue).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
-}
-
-const cameraHeightSlider = document.getElementById('cameraHeightSlider');
-const cameraZoomSlider = document.getElementById('cameraZoomSlider');
-const cameraExposureSlider = document.getElementById('cameraExposureSlider');
-const cameraDofSlider = document.getElementById('cameraDofSlider');
-const generateImageButton = document.getElementById('generateImageButton');
-
-if (cameraHeightSlider) {
-    cameraHeightSlider.addEventListener('input', (event) => {
-        sendToUnreal({ camSetHeight: formatSliderValue(event.target.value) });
-    });
-}
-if (cameraZoomSlider) {
-    cameraZoomSlider.addEventListener('input', (event) => {
-        sendToUnreal({ camSetZoom: formatSliderValue(event.target.value) });
-    });
-}
-if (cameraExposureSlider) {
-    cameraExposureSlider.addEventListener('input', (event) => {
-        sendToUnreal({ camSetExposure: formatSliderValue(event.target.value) });
-    });
-}
-if (cameraDofSlider) {
-    cameraDofSlider.addEventListener('input', (event) => {
-        sendToUnreal({ camSetDof: formatSliderValue(event.target.value) });
-    });
-}
-if (generateImageButton) {
-    generateImageButton.addEventListener('click', () => sendToUnreal({ frontEnd: 'screenshot' }));
-}
-
+document.getElementById('generateImageButton').addEventListener('click', ()=>sendToUnreal({ frontEnd: 'screenshot' }));
 document.querySelectorAll('#buildingOptions .buildingCard')[0].addEventListener('click', ()=>selectBuild('Trad'));
 document.querySelectorAll('#buildingOptions .buildingCard')[1].addEventListener('click', ()=>selectBuild('Mod'));
 document.querySelectorAll('#buildingOptions .buildingCard')[2].addEventListener('click', ()=>selectBuild('Multi'));
