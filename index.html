@@ -695,6 +695,9 @@ width:100%; height:34px; background:linear-gradient(to bottom, rgba(255,255,255,
 .buildingCard img,.environmentCard img{ width:100%; height:auto; display:block; object-fit:contain; opacity:0.8; transition:opacity 0.2s ease, transform 0.2s ease; pointer-events:none; }
 .buildingCard:hover img,.buildingCard:active img,.environmentCard:hover img,.environmentCard:active img{ opacity:1; }
 .buildingCard:active img,.environmentCard:active img{ transform:scale(0.985); }
+.levelChoiceButton.is-disabled,.menuButton.is-disabled,.buildingCard.is-disabled{ cursor:default; pointer-events:none; }
+.levelChoiceButton.is-disabled img,.menuButton.is-disabled img,.buildingCard.is-disabled img{ opacity:0.42; filter:grayscale(1) saturate(0); transform:none !important; }
+.levelChoiceButton.is-disabled:hover img,.levelChoiceButton.is-disabled:active img,.menuButton.is-disabled:hover img,.menuButton.is-disabled:active img,.buildingCard.is-disabled:hover img,.buildingCard.is-disabled:active img{ opacity:0.42; transform:none !important; }
 #confirmButtons{ width:100%; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
 .confirmButton{ appearance:none; -webkit-appearance:none; border:1px solid rgba(255,255,255,0.08); height:40px; border-radius:999px; background:linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.02) 26%, rgba(0,0,0,0.14) 100%), rgba(0,0,0,0.16); color:rgba(255,255,255,0.82); font-size:9px; font-weight:700; letter-spacing:1px; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; box-shadow:0 4px 10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.10); }
 .confirmButton:hover,.confirmButton:active{ color:rgba(255,255,255,1); }
@@ -853,6 +856,10 @@ let revealGamePromise = null;
 let editModeIntroShown = false;
 let editModeIntroAutoHideTimer = null;
 let editModeIntroHideTimer = null;
+let suppressReconnect = false;
+let sessionEndedByUser = false;
+let sessionTeardownStarted = false;
+let endedSessionMessage = "Your session has ended.";
 
 function updateAppHeight() {
     const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
@@ -902,6 +909,7 @@ const parsed=JSON.parse(response);
 if(parsed.screenshot==="generating") showOverlay("Generating high resolution image");
 if(parsed.game==="loaded"){
     gameLoaded = true;
+    updateLevelButtonStates();
     if(!selectedBuild && !document.getElementById("buildMenu").classList.contains("visible") && !appInAttentionState){
         advanceToBuildMenuWithFade();
     }
@@ -958,6 +966,8 @@ setTimeout(()=>{
 
 initLottie();
 startApp();
+window.addEventListener('beforeunload', handleIntentionalPageExit);
+window.addEventListener('pagehide', handleIntentionalPageExit);
 window.file=Application.webRtcController.file;
 })();
 
@@ -981,6 +991,25 @@ function showInitialLoadingScreen(){ hideAllUiScreens(); const screen=document.g
 function hideInitialLoadingScreen(){ const screen=document.getElementById("loadingScreen"); const video=document.getElementById("loadingBgVideo"); screen.classList.remove("visible"); stopLottie(); try{ video.pause(); }catch(e){} }
 function showBuildMenu(){ hideAllUiScreens(); hideInGameUi(); const screen=document.getElementById("buildMenu"); const video=document.getElementById("menuBgVideo"); resetBuildMenuExitState(); screen.classList.add("visible"); restartMenuAnimations(); try{ video.currentTime=0; video.play().catch(()=>{}); }catch(e){} }
 function hideBuildMenu(){ const screen=document.getElementById("buildMenu"); const video=document.getElementById("menuBgVideo"); screen.classList.remove("visible"); try{ video.pause(); }catch(e){} }
+function getLevelButtonMap(){
+return {
+    Trad:[document.getElementById('btnTrad'), document.getElementById('buildingBtnTrad')],
+    Mod:[document.getElementById('btnMod'), document.getElementById('buildingBtnMod')],
+    Multi:[document.getElementById('btnMulti'), document.getElementById('buildingBtnMulti')]
+};
+}
+function updateLevelButtonStates(){
+const levelButtonMap = getLevelButtonMap();
+Object.entries(levelButtonMap).forEach(([buildName, buttons]) => {
+    const isDisabled = !!selectedBuild && selectedBuild === buildName;
+    buttons.forEach((button) => {
+        if (!button) return;
+        button.disabled = isDisabled;
+        button.classList.toggle('is-disabled', isDisabled);
+        button.setAttribute('aria-disabled', String(isDisabled));
+    });
+});
+}
 function setLevelLoadingContent(buildName){
 const video=document.getElementById("levelLoadingVideo");
 const title=document.getElementById("levelLoadingTitle");
@@ -1128,9 +1157,82 @@ revealGamePromise = (async () => {
 return revealGamePromise;
 }
 function showReadyMessage(){ clearTimeout(readyMessageTimer); const screen=document.getElementById("readyMessage"); const text=document.getElementById("readyText"); screen.classList.add("visible"); text.classList.remove("animate"); void text.offsetWidth; text.classList.add("animate"); readyMessageTimer=setTimeout(()=>{ screen.classList.remove("visible"); text.classList.remove("animate"); },3000); }
-function shouldSurfaceAttention(message){ if(!message) return false; const lower=String(message).toLowerCase(); if(lower.includes("xr-spatial-tracking")) return false; if(lower.includes("issessionsupported")) return false; if(lower.includes("securityerror") && lower.includes("xr")) return false; return lower.includes("failed") || lower.includes("timeout") || lower.includes("disconnected") || lower.includes("disconnect") || lower.includes("unable") || lower.includes("cannot send") || lower.includes("allocation") || lower.includes("runner resources") || lower.includes("connection failed"); }
+function disableReconnectAttempts(){
+if (suppressReconnect) return;
+suppressReconnect = true;
+try {
+    const appSettings = Application?.settings?.initialSettings;
+    if (appSettings && typeof appSettings === 'object') appSettings.AutoConnect = false;
+} catch(e){}
+const targets = [Application, Application?.webRtcController, Application?.stream];
+targets.forEach((target) => {
+    if (!target || typeof target !== 'object') return;
+    ['connect','reconnect','tryReconnect','start'].forEach((methodName) => {
+        if (typeof target[methodName] !== 'function') return;
+        const original = target[methodName].bind(target);
+        if (original.__luxReconnectBlocked) return;
+        const blocked = (...args) => {
+            if (suppressReconnect) {
+                console.log(`Reconnect blocked: ${methodName}`);
+                return false;
+            }
+            return original(...args);
+        };
+        blocked.__luxReconnectBlocked = true;
+        target[methodName] = blocked;
+    });
+});
+}
+function detachStreamingSession(){
+const tearDownTargets = [Application?.stream, Application?.webRtcController, Application];
+tearDownTargets.forEach((target) => {
+    if (!target) return;
+    ['disconnect','close','stop','destroy','teardown'].forEach((methodName) => {
+        try {
+            if (typeof target[methodName] === 'function') target[methodName]();
+        } catch(e){}
+    });
+});
+try {
+    const container = document.getElementById('video-container');
+    if (container) container.innerHTML = '';
+} catch(e){}
+}
+async function endSessionLocally(message = 'Your session has ended.') {
+    endedSessionMessage = message;
+    sessionEndedByUser = true;
+    appInAttentionState = true;
+    inGameUiLoaded = false;
+    hideAllUiScreens();
+    hideInGameUi();
+    disableReconnectAttempts();
+    await fadeToBlack(350);
+    const retryButton = document.getElementById('retryButton');
+    const attentionMessage = document.getElementById('attentionMessage');
+    if (retryButton) retryButton.style.display = 'none';
+    if (attentionMessage) attentionMessage.textContent = message;
+    document.getElementById('attentionScreen').classList.add('visible');
+    await fadeFromBlack(350);
+}
+async function endSessionByUser(message = 'Your session has ended.') {
+    if (sessionTeardownStarted) return;
+    sessionTeardownStarted = true;
+    disableReconnectAttempts();
+    sendToUnreal({ end:'session' });
+    await endSessionLocally(message);
+    detachStreamingSession();
+}
+function handleIntentionalPageExit(){
+    if (sessionTeardownStarted) return;
+    sessionTeardownStarted = true;
+    sessionEndedByUser = true;
+    appInAttentionState = true;
+    disableReconnectAttempts();
+    detachStreamingSession();
+}
+function shouldSurfaceAttention(message){ if(suppressReconnect || sessionEndedByUser) return false; if(!message) return false; const lower=String(message).toLowerCase(); if(lower.includes("xr-spatial-tracking")) return false; if(lower.includes("issessionsupported")) return false; if(lower.includes("securityerror") && lower.includes("xr")) return false; return lower.includes("failed") || lower.includes("timeout") || lower.includes("disconnected") || lower.includes("disconnect") || lower.includes("unable") || lower.includes("cannot send") || lower.includes("allocation") || lower.includes("runner resources") || lower.includes("connection failed"); }
 function brandMessage(message){ let branded=String(message || "Connection issue. Please retry."); branded=branded.replace(/arcware/gi,"Lux"); branded=branded.replace(/\s+/g," ").trim(); return branded; }
-async function showAttentionScreen(message){ if(appInAttentionState) return; appInAttentionState=true; const brandedMessage=brandMessage(message); document.getElementById("attentionMessage").textContent=brandedMessage; await fadeToBlack(500); hideAllUiScreens(); hideInGameUi(); document.getElementById("attentionScreen").classList.add("visible"); await fadeFromBlack(700); }
+async function showAttentionScreen(message){ if(suppressReconnect || sessionEndedByUser || appInAttentionState) return; appInAttentionState=true; const brandedMessage=brandMessage(message); const retryButton=document.getElementById("retryButton"); if(retryButton) retryButton.style.display=''; document.getElementById("attentionMessage").textContent=brandedMessage; await fadeToBlack(500); hideAllUiScreens(); hideInGameUi(); document.getElementById("attentionScreen").classList.add("visible"); await fadeFromBlack(700); }
 function registerArcwareAttentionHandlers(){
 if(typeof Application?.on==="function"){
 ["error","disconnect","close"].forEach(eventName=>{
@@ -1147,13 +1249,14 @@ try{ if(Application?.emitUIInteraction){ Application.emitUIInteraction(message);
 try{ if(!sent && Application?.webRtcController?.emitUIInteraction){ Application.webRtcController.emitUIInteraction(message); sent=true; } }catch(e){ if(shouldSurfaceAttention(e?.message)) showAttentionScreen(e.message); }
 try{ if(!sent && Application?.stream?.emitUIInteraction){ Application.stream.emitUIInteraction(message); sent=true; } }catch(e){ if(shouldSurfaceAttention(e?.message)) showAttentionScreen(e.message); }
 console.log(sent ? "Sent to Unreal:" : "Could not send to Unreal:", message);
-if(!sent) showAttentionScreen("Connection failed. Please retry.");
+if(!sent && !suppressReconnect && !sessionEndedByUser) showAttentionScreen("Connection failed. Please retry.");
 return sent;
 }
 function startApp(){ document.getElementById("transitionFade").classList.remove("visible"); showInitialLoadingScreen(); }
 async function selectBuild(buildName){
-if(appInAttentionState) return;
+if(appInAttentionState || suppressReconnect || sessionEndedByUser) return;
 selectedBuild=buildName;
+updateLevelButtonStates();
 gameRevealed=false;
 isRevealingGame=false;
 inGameUiLoaded=false;
@@ -1505,7 +1608,7 @@ function exitWalkMode(){
 }
 function openCameraMenu(){ switchPanel('camera'); }
 function closeCameraMenu(){ switchPanel('main'); }
-function openBuildingMenu(){ switchPanel('building'); }
+function openBuildingMenu(){ updateLevelButtonStates(); switchPanel('building'); }
 function closeBuildingMenu(){ switchPanel('main'); }
 function openEnvironmentMenu(){ switchPanel('environment'); }
 function closeEnvironmentMenu(){ switchPanel('main'); }
@@ -1772,6 +1875,7 @@ window.addEventListener("DOMContentLoaded",()=>{
 document.getElementById("btnTrad").addEventListener("click",()=>selectBuild("Trad"));
 document.getElementById("btnMod").addEventListener("click",()=>selectBuild("Mod"));
 document.getElementById("btnMulti").addEventListener("click",()=>selectBuild("Multi"));
+updateLevelButtonStates();
 document.getElementById("retryButton").addEventListener("click",()=>location.reload());
 
 const scaleSlider = document.getElementById('scaleSlider');
@@ -1867,7 +1971,7 @@ teleportFirstButton.addEventListener('click', () => setTeleportFloor('first'));
 endSessionButton.addEventListener('click', openConfirmMenu);
 confirmMenuCloseButton.addEventListener('click', closeConfirmMenu);
 confirmNoButton.addEventListener('click', closeConfirmMenu);
-confirmYesButton.addEventListener('click', () => location.reload());
+confirmYesButton.addEventListener('click', () => endSessionByUser('Your session has ended.'));
 
 function suppressPersistentUiFocus(event){
     const target = event.target;
@@ -1889,9 +1993,10 @@ document.addEventListener('keyup', (event) => {
 }, true);
 
 document.getElementById('generateImageButton').addEventListener('click', ()=>sendToUnreal({ frontEnd: 'screenshot' }));
-document.querySelectorAll('#buildingOptions .buildingCard')[0].addEventListener('click', ()=>selectBuild('Trad'));
-document.querySelectorAll('#buildingOptions .buildingCard')[1].addEventListener('click', ()=>selectBuild('Mod'));
-document.querySelectorAll('#buildingOptions .buildingCard')[2].addEventListener('click', ()=>selectBuild('Multi'));
+document.getElementById('buildingBtnTrad').addEventListener('click', ()=>selectBuild('Trad'));
+document.getElementById('buildingBtnMod').addEventListener('click', ()=>selectBuild('Mod'));
+document.getElementById('buildingBtnMulti').addEventListener('click', ()=>selectBuild('Multi'));
+updateLevelButtonStates();
 });
 </script>
 </head>
@@ -1965,7 +2070,7 @@ document.querySelectorAll('#buildingOptions .buildingCard')[2].addEventListener(
 
 <div id="profileMenuWrapper" class="uiInteractive"><div id="profileOuterBox" class="glassPanel"><div id="profileTopBar"><img id="profileLogo" src="LOGO.png" alt="Logo"><button class="topIconButton" id="profileMenuCloseButton" type="button" aria-label="Exit edit profile menu"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="profileInnerBoxWrapper"><div id="profileInnerBox"><div id="profileTopRow"><button class="profileTypeButton active" type="button" aria-label="Profile type B+B"><img src="PROFILE_BTN_B+B.png" alt="B+B"></button><button class="profileTypeButton" type="button" aria-label="Profile type Random Plank"><img src="PROFILE_BTN_RANDOM-PLANK.png" alt="Random Plank"></button><button class="profileTypeButton" type="button" aria-label="Profile type V Groove"><img src="PROFILE_BTN_V-GROOVE.png" alt="V Groove"></button><button class="profileTypeButton" type="button" aria-label="Profile type Folded Wall"><img src="PROFILE_BTN_FOLDED-WALL.png" alt="Folded Wall"></button><button class="profileTypeButton" type="button" aria-label="Profile type Double Seven"><img src="PROFILE_BTN_DOUBLE-SEVEN.png" alt="Double Seven"></button><button class="profileTypeButton" type="button" aria-label="Profile type V Groove Vented"><img src="PROFILE_BTN_V-GROOVE-VENTED.png" alt="V Groove Vented"></button></div><div id="profileInfoCard"><div class="profileInfoRow"><div class="profileTitleText">PROFILE TITLE</div><button class="profilePillButton" id="profileOptionsButton" type="button">OPTIONS</button></div></div><div class="profileColorRow"><div class="profileColorText">KNOTTY_CHESTNUT</div><button class="profilePillButton" id="profileColoursButton" type="button">COLOURS</button></div></div></div></div></div>
 
-<div id="buildingMenuWrapper" class="uiInteractive"><div id="buildingOuterBox" class="glassPanel"><div id="buildingTopBar"><div id="buildingTitle">CHOOSE BUILDING</div><button class="topIconButton" id="buildingMenuCloseButton" type="button" aria-label="Exit building menu"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="buildingInnerBoxWrapper"><div id="buildingInnerBox"><div id="buildingOptions"><button class="buildingCard" type="button" aria-label="Load Traditional Building"><img src="Load_Trad.png" alt="Traditional Building"></button><button class="buildingCard" type="button" aria-label="Load Modern Building"><img src="Load_Mod.png" alt="Modern Building"></button><button class="buildingCard" type="button" aria-label="Load Multi Building"><img src="Load_Multi.png" alt="Multi Building"></button></div></div></div></div></div>
+<div id="buildingMenuWrapper" class="uiInteractive"><div id="buildingOuterBox" class="glassPanel"><div id="buildingTopBar"><div id="buildingTitle">CHOOSE BUILDING</div><button class="topIconButton" id="buildingMenuCloseButton" type="button" aria-label="Exit building menu"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="buildingInnerBoxWrapper"><div id="buildingInnerBox"><div id="buildingOptions"><button class="buildingCard levelChoiceButton" id="buildingBtnTrad" type="button" aria-label="Load Traditional Building"><img src="Load_Trad.png" alt="Traditional Building"></button><button class="buildingCard levelChoiceButton" id="buildingBtnMod" type="button" aria-label="Load Modern Building"><img src="Load_Mod.png" alt="Modern Building"></button><button class="buildingCard levelChoiceButton" id="buildingBtnMulti" type="button" aria-label="Load Multi Building"><img src="Load_Multi.png" alt="Multi Building"></button></div></div></div></div></div>
 
 <div id="environmentMenuWrapper" class="uiInteractive"><div id="environmentOuterBox" class="glassPanel"><div id="environmentTopBar"><div id="environmentTitle">CHOOSE ENVIRONMENT</div><button class="topIconButton" id="environmentMenuCloseButton" type="button" aria-label="Exit environment menu"><img src="01 DOCK MENU.png" alt="Exit"></button></div><div id="environmentInnerBoxWrapper"><div id="environmentInnerBox"><div id="environmentOptions"><button class="environmentCard" type="button" aria-label="Environment 1"><img src="ENV01_Mod.png" alt="Environment 1"></button><button class="environmentCard" type="button" aria-label="Environment 2"><img src="ENV02_Mod.png" alt="Environment 2"></button><button class="environmentCard" type="button" aria-label="Environment 3"><img src="ENV03_Mod.png" alt="Environment 3"></button></div></div></div></div></div>
 
