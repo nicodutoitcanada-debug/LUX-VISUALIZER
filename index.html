@@ -327,6 +327,17 @@ transform:translateX(-56px) !important;
 
 /* screenshot */
 #screenshotOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:2000; pointer-events:none; }
+#preloadSpinner{
+position:fixed;
+inset:0;
+display:none;
+align-items:center;
+justify-content:center;
+z-index:8500;
+pointer-events:none;
+background:black;
+}
+#preloadSpinner.visible{ display:flex; }
 .overlayBox{ background:rgba(0,0,0,0.5); padding:24px 32px; border-radius:16px; color:white; font-size:16px; display:flex; align-items:center; gap:16px; }
 .spinner{ width:22px; height:22px; border:3px solid rgba(255,255,255,0.3); border-top:3px solid white; border-radius:50%; animation:spin 1s linear infinite; }
 @keyframes spin{ to{transform:rotate(360deg);} }
@@ -1101,6 +1112,7 @@ function bindCameraSlider(slider, messageKey){
 async function showLevelLoadingScreen(buildName){
 hideAllUiScreens();
 hideInGameUi();
+showPreloadSpinner();
 setLevelLoadingContent(buildName);
 const screen=document.getElementById("levelLoadingScreen");
 const video=document.getElementById("levelLoadingVideo");
@@ -1113,6 +1125,7 @@ try{
     await video.play().catch(()=>{});
 }catch(e){}
 await waitForLevelLoadingVideoReady(video);
+hidePreloadSpinner();
 if(content) content.classList.remove('is-waiting');
 restartLevelLoadingAnimations();
 }
@@ -1128,6 +1141,7 @@ await showLevelLoadingScreen(buildName);
 await fadeFromBlack(900);
 }
 function revealGameFromLevelLoading(){
+hidePreloadSpinner();
 if (gameRevealed) return Promise.resolve();
 if (revealGamePromise) return revealGamePromise;
 
@@ -1232,7 +1246,7 @@ function handleIntentionalPageExit(){
 }
 function shouldSurfaceAttention(message){ if(suppressReconnect || sessionEndedByUser) return false; if(!message) return false; const lower=String(message).toLowerCase(); if(lower.includes("xr-spatial-tracking")) return false; if(lower.includes("issessionsupported")) return false; if(lower.includes("securityerror") && lower.includes("xr")) return false; return lower.includes("failed") || lower.includes("timeout") || lower.includes("disconnected") || lower.includes("disconnect") || lower.includes("unable") || lower.includes("cannot send") || lower.includes("allocation") || lower.includes("runner resources") || lower.includes("connection failed"); }
 function brandMessage(message){ let branded=String(message || "Connection issue. Please retry."); branded=branded.replace(/arcware/gi,"Lux"); branded=branded.replace(/\s+/g," ").trim(); return branded; }
-async function showAttentionScreen(message){ if(suppressReconnect || sessionEndedByUser || appInAttentionState) return; appInAttentionState=true; const brandedMessage=brandMessage(message); const retryButton=document.getElementById("retryButton"); if(retryButton) retryButton.style.display=''; document.getElementById("attentionMessage").textContent=brandedMessage; await fadeToBlack(500); hideAllUiScreens(); hideInGameUi(); document.getElementById("attentionScreen").classList.add("visible"); await fadeFromBlack(700); }
+async function showAttentionScreen(message){ if(suppressReconnect || sessionEndedByUser || appInAttentionState) return; appInAttentionState=true; hidePreloadSpinner(); const brandedMessage=brandMessage(message); const retryButton=document.getElementById("retryButton"); if(retryButton) retryButton.style.display=''; document.getElementById("attentionMessage").textContent=brandedMessage; await fadeToBlack(500); hideAllUiScreens(); hideInGameUi(); document.getElementById("attentionScreen").classList.add("visible"); await fadeFromBlack(700); }
 function registerArcwareAttentionHandlers(){
 if(typeof Application?.on==="function"){
 ["error","disconnect","close"].forEach(eventName=>{
@@ -1268,6 +1282,8 @@ else if(buildName==="Multi") sendToUnreal('{"LoadLevel":"Multi"}');
 }
 function showOverlay(message){ document.getElementById("overlayText").innerText=message; document.getElementById("screenshotOverlay").style.display="flex"; }
 function hideOverlay(){ document.getElementById("screenshotOverlay").style.display="none"; }
+function showPreloadSpinner(){ document.getElementById("preloadSpinner").classList.add("visible"); }
+function hidePreloadSpinner(){ document.getElementById("preloadSpinner").classList.remove("visible"); }
 function createFile(file){
 const blob=new Blob(file.data,{type:file.mimetype});
 const counterString=String(screenshotCounter).padStart(2,"0");
@@ -1596,7 +1612,9 @@ function enterWalkMode(){
 function enterEditMode(){
     activeDockMode = 'edit';
     sendToUnreal('{"modern":"editMode"}');
-    showEditModeIntro();
+    if (!editModeIntroShown) {
+        showEditModeIntro();
+    }
     enterDockedMode('edit');
 }
 function exitWalkMode(){
@@ -2002,6 +2020,7 @@ updateLevelButtonStates();
 </head>
 <body>
 <div id="video-container"></div>
+<div id="preloadSpinner"><div class="spinner"></div></div>
 <div id="uiLayer">
 <div id="loadingScreen" class="uiScreen">
 <video id="loadingBgVideo" src="LOADING_BG.mp4" muted playsinline loop></video>
