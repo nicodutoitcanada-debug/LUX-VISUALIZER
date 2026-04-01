@@ -1320,20 +1320,36 @@ let treesAreVisible = true;
 let profileTitleEl;
 let profileColorEl;
 let profileOptionsButtonEl;
+const V_GROOVE_VARIANTS = {
+    family: 'V_GROOVE',
+    six: 'V_GROOVE_6_INCH',
+    four: 'V_GROOVE_4_INCH'
+};
 const profileVariantByAsset = {
     'PROFILE_BTN_B+B.png': 'BOARD_AND_BATTEN',
     'PROFILE_BTN_RANDOM-PLANK.png': 'RANDOM_PLANK',
-    'PROFILE_BTN_V-GROOVE.png': 'V_GROOVE_6_INCH',
+    'PROFILE_BTN_V-GROOVE.png': V_GROOVE_VARIANTS.six,
     'PROFILE_BTN_FOLDED-WALL.png': 'FOLDED_WALL',
     'PROFILE_BTN_DOUBLE-SEVEN.png': 'DOUBL7_VENTED',
     'PROFILE_BTN_V-GROOVE-VENTED.png': 'V_GROOVE_6INCH_VENTED'
 };
+const DOUBLE_SEVEN_VARIANTS = {
+    family: 'DOUBLE_SEVEN',
+    vented: 'DOUBL7_VENTED',
+    nonVented: 'DOUBL7_NON_VENTED'
+};
+const profileButtonVariantAliasMap = {
+    [V_GROOVE_VARIANTS.four]: V_GROOVE_VARIANTS.six,
+    [DOUBLE_SEVEN_VARIANTS.nonVented]: DOUBLE_SEVEN_VARIANTS.vented
+};
 const profileOptionLabelByVariant = {
     BOARD_AND_BATTEN: 'NO OPTIONS',
     RANDOM_PLANK: 'JOINER',
-    V_GROOVE_6_INCH: '4 INCH',
+    [V_GROOVE_VARIANTS.six]: '4 INCH',
+    [V_GROOVE_VARIANTS.four]: '6 INCH',
     FOLDED_WALL: 'NO OPTIONS',
-    DOUBL7_VENTED: 'NON VENTED',
+    [DOUBLE_SEVEN_VARIANTS.vented]: 'NON VENTED',
+    [DOUBLE_SEVEN_VARIANTS.nonVented]: 'VENTED',
     V_GROOVE_6INCH_VENTED: 'OPTIONS'
 };
 const profileModeEnabledVariants = {
@@ -1736,6 +1752,24 @@ if (transitionId !== teleportFloorTransitionId) return;
 teleportFloorButtons.forEach((button)=>{ button.disabled = false; });
 }
 function normalizeVariantToken(value){ return String(value || '').trim(); }
+function getProfileButtonVariant(variant){
+    const normalized = normalizeVariantToken(variant);
+    return profileButtonVariantAliasMap[normalized] || normalized;
+}
+function isVGrooveVariant(variant){
+    const normalized = normalizeVariantToken(variant);
+    return normalized === V_GROOVE_VARIANTS.six || normalized === V_GROOVE_VARIANTS.four;
+}
+function isDoubleSevenVariant(variant){
+    const normalized = normalizeVariantToken(variant);
+    return normalized === DOUBLE_SEVEN_VARIANTS.vented || normalized === DOUBLE_SEVEN_VARIANTS.nonVented;
+}
+function getToggledVGrooveVariant(variant){
+    return normalizeVariantToken(variant) === V_GROOVE_VARIANTS.four ? V_GROOVE_VARIANTS.six : V_GROOVE_VARIANTS.four;
+}
+function getToggledDoubleSevenVariant(variant){
+    return normalizeVariantToken(variant) === DOUBLE_SEVEN_VARIANTS.nonVented ? DOUBLE_SEVEN_VARIANTS.vented : DOUBLE_SEVEN_VARIANTS.nonVented;
+}
 function formatVariantLabel(value){ return normalizeVariantToken(value).replace(/_/g, ' '); }
 function animateProfileTitle(text, options={}){
 const { immediate=false } = options;
@@ -1771,7 +1805,8 @@ function mountAnimatedLetters(){
 }
 function setActiveProfileType(clickedButton){ document.querySelectorAll('.profileTypeButton').forEach(button=>button.classList.remove('active')); if(clickedButton) clickedButton.classList.add('active'); }
 function setActiveProfileTypeByVariant(variant){
-    const button = document.querySelector(`.profileTypeButton[data-variant="${variant}"]`);
+    const buttonVariant = getProfileButtonVariant(variant);
+    const button = document.querySelector(`.profileTypeButton[data-variant="${buttonVariant}"]`);
     setActiveProfileType(button || null);
 }
 function updateProfileOptionsText(variant){
@@ -1814,6 +1849,18 @@ function handleProfileTypeButtonClick(button){
     if (!variant || button.disabled || button.classList.contains('is-disabled')) return;
     if (currentProfileSet) sendToUnreal({ [currentProfileSet]: variant });
     updateProfileTitle(variant);
+}
+function handleProfileOptionsButtonClick(){
+    if (!profileOptionsButtonEl || !currentProfileSet) return;
+    let nextVariant = '';
+    if (isVGrooveVariant(currentProfileVariant)) {
+        nextVariant = getToggledVGrooveVariant(currentProfileVariant);
+    } else if (isDoubleSevenVariant(currentProfileVariant)) {
+        nextVariant = getToggledDoubleSevenVariant(currentProfileVariant);
+    }
+    if (!nextVariant) return;
+    sendToUnreal({ [currentProfileSet]: nextVariant });
+    updateProfileTitle(nextVariant);
 }
 function handleProfileBackendPayload(parsed){
     if (typeof parsed.profileSet === 'string') currentProfileSet = normalizeVariantToken(parsed.profileSet);
@@ -1983,6 +2030,7 @@ editButton.addEventListener('click', enterEditMode);
 if (editModeIntroOkButton) editModeIntroOkButton.addEventListener('click', () => hideEditModeIntro());
 profileMenuCloseButton.addEventListener('click', closeProfileMenu);
 profileTypeButtons.forEach((button) => button.addEventListener('click', () => handleProfileTypeButtonClick(button)));
+if (profileOptionsButtonEl) profileOptionsButtonEl.addEventListener('click', handleProfileOptionsButtonClick);
 teleportBasementButton.addEventListener('click', () => setTeleportFloor('basement'));
 teleportGroundButton.addEventListener('click', () => setTeleportFloor('ground'));
 teleportFirstButton.addEventListener('click', () => setTeleportFloor('first'));
