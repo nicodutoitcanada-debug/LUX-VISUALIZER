@@ -27,7 +27,7 @@
 --jump-stagger:80ms;
 --jump-enter-time:420ms;
 --jump-fade-time:260ms;
---edit-mode-intro-time:3500ms;
+--edit-mode-intro-time:5200ms;
 }
 
 html, body{
@@ -165,7 +165,7 @@ animation-delay:0.18s;
 display:flex;
 align-items:center;
 justify-content:center;
-gap:clamp(8px,1.3vw,14px);
+gap:clamp(6px,1vw,10px);
 flex-wrap:wrap;
 width:100%;
 max-width:min(460px,92%);
@@ -190,6 +190,14 @@ flex:0 1 auto;
 }
 .menuButton:hover,
 .menuButton:focus-visible{ transform:scale(1.03); opacity:1; }
+button:focus,
+button:focus-visible,
+input:focus,
+input:focus-visible{
+outline:none !important;
+box-shadow:none !important;
+}
+
 .menuButton:active{ transform:scale(0.98); opacity:1; }
 .menuButton img{
 display:block;
@@ -465,6 +473,13 @@ max-width:100%;
 max-height:100%;
 }
 
+.buttonRow .menuButton{
+min-width:0;
+min-height:0;
+padding:0;
+}
+
+
 #editModeIntroScreen{
 position:fixed;
 inset:0;
@@ -478,16 +493,16 @@ box-sizing:border-box;
 }
 #editModeIntroScreen.visible{
 display:flex;
-pointer-events:auto;
+pointer-events:none;
 }
 #editModeIntroBackdrop{
 position:absolute;
 inset:0;
-background:rgba(0,0,0,0.26);
-backdrop-filter:blur(6px);
--webkit-backdrop-filter:blur(6px);
+background:rgba(0,0,0,0.08);
+backdrop-filter:none;
+-webkit-backdrop-filter:none;
 opacity:0;
-transition:opacity 260ms ease;
+transition:opacity 420ms ease;
 }
 #editModeIntroScreen.visible #editModeIntroBackdrop{ opacity:1; }
 #editModeIntroScreen.is-hiding #editModeIntroBackdrop{ opacity:0; }
@@ -497,8 +512,8 @@ z-index:2;
 width:min(340px, 78vw);
 opacity:0;
 transform:translateY(14px) scale(0.96);
-transition:transform 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease;
-pointer-events:auto;
+transition:transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 320ms ease;
+pointer-events:none;
 }
 #editModeIntroScreen.visible #editModeIntroModal{
 opacity:1;
@@ -560,6 +575,7 @@ min-width:132px;
 height:42px;
 margin-top:2px;
 padding:0 18px;
+pointer-events:auto;
 }
 #editModeIntroScreen.is-auto-close #editModeIntroOkButton{
 opacity:0.82;
@@ -713,12 +729,13 @@ width:100%; height:34px; background:linear-gradient(to bottom, rgba(255,255,255,
 .profileTypeButton.is-disabled{ cursor:default; pointer-events:none; }
 .profileTypeButton.is-disabled img{ opacity:0.42; filter:grayscale(1) saturate(0); transform:none !important; }
 .profileTypeButton.is-disabled:hover img,.profileTypeButton.is-disabled:active img{ opacity:0.42; transform:none !important; }
-#profileInfoCard{ margin-top:-2px; width:calc(100% + 16px); margin-left:-8px; margin-right:-8px; background:linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.03) 24%, rgba(0,0,0,0.08) 100%), rgba(25,25,25,0.16); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:0.5px 2px 2px 4px; position:relative; z-index:2; box-shadow:0 6px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -6px 12px rgba(0,0,0,0.04); box-sizing:border-box; }
+#profileInfoCard{ margin-top:-2px; width:calc(100% + 16px); margin-left:-8px; margin-right:-8px; background:linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.03) 24%, rgba(0,0,0,0.08) 100%), rgba(25,25,25,0.16); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:8px 2px 8px 4px; position:relative; z-index:2; box-shadow:0 6px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -6px 12px rgba(0,0,0,0.04); box-sizing:border-box; }
 .profileTitleText,.profileColorText{ color:rgba(255,255,255,0.96); font-weight:700; font-size:13px; letter-spacing:0.8px; text-transform:uppercase; user-select:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .profileColorText{ font-weight:300; font-size:13px; color:rgba(255,255,255,0.94); }
-.profileInfoRow,.profileColorRow{ min-height:46px; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px; padding:0 12px; }
-.profileColorRow{ margin-top:6px; }
-.profilePillButton{ appearance:none; -webkit-appearance:none; border:1px solid rgba(255,255,255,0.08); min-width:118px; height:40px; padding:0 18px; border-radius:999px; background:linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.02) 28%, rgba(0, 0, 0, 0.14) 100%), rgba(255,255,255,0.03); color:rgba(255,255,255,0.78); font-size:10px; font-weight:300; letter-spacing:0.9px; text-transform:uppercase; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; box-shadow:0 4px 10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.10); }
+.profileInfoRow,.profileColorRow{ min-height:46px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 12px; }
+.profileInfoRow{ margin-top:0; }
+.profileColorRow{ margin-top:8px; }
+.profilePillButton{ appearance:none; -webkit-appearance:none; border:1px solid rgba(255,255,255,0.08); width:clamp(168px, 44vw, 206px); min-width:clamp(168px, 44vw, 206px); height:40px; padding:0 18px; border-radius:999px; background:linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.02) 28%, rgba(0, 0, 0, 0.14) 100%), rgba(255,255,255,0.03); color:rgba(255,255,255,0.78); font-size:10px; font-weight:300; letter-spacing:0.9px; text-transform:uppercase; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; box-shadow:0 4px 10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.10); }
 .profilePillButton:hover,.profilePillButton:active{ color:rgba(255,255,255,1); }
 body.walk-mode #editButton{ transform:translateY(-62px); opacity:0; }
 body.walk-mode #redPlate{ transform:translateY(-52px); opacity:0; }
@@ -792,7 +809,7 @@ pointer-events:none !important;
 :root{ --level-scale:0.5; --level-left-space:max(20px, env(safe-area-inset-left)); }
 .menuInner{ padding:max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom)) 14px; }
 .menuCenterGroup{ gap:10px; width:min(92%, 420px); }
-.buttonRow{ gap:8px; max-width:100%; }
+.buttonRow{ gap:6px; max-width:100%; }
 .menuButton img{ width:clamp(46px,16vw,68px); max-width:20vw; }
 #menuLogo{ width:clamp(58px,22vw,94px); max-width:42%; }
 .menuSubtitle{ font-size:10px; letter-spacing:0.14em; }
@@ -808,7 +825,7 @@ pointer-events:none !important;
 #soloDockButton img{ width:28px; height:28px; }
 }
 @media (max-width:480px){
-.buttonRow{ gap:6px; }
+.buttonRow{ gap:4px; }
 .menuButton img{ width:clamp(42px,17vw,60px); max-width:21vw; }
 #menuLogo{ width:clamp(54px,24vw,84px); max-width:38%; }
 .menuSubtitle{ font-size:9px; letter-spacing:0.12em; }
@@ -1180,6 +1197,7 @@ let currentProfileSet = '';
 let currentProfileVariant = 'BOARD_AND_BATTEN';
 let currentProfileButtonMode = 'profile';
 let profileTitleAnimationId = 0;
+let treesAreVisible = true;
 let profileTitleEl;
 let profileColorEl;
 let profileOptionsButtonEl;
@@ -1326,33 +1344,23 @@ function animateMainUiEntry(includeSlider = true){
     queueMenuCleanup();
 }
 function animateEditMenuReturn(includeSlider = false){
-    const editMenu = document.getElementById('uiWrapper');
     const currentScale = getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1';
-    const returnDuration = 2200;
-    if (editMenu) {
-        editMenu.style.transition = `transform ${returnDuration}ms cubic-bezier(0.12, 0.82, 0.18, 1), visibility 0s linear ${returnDuration}ms`;
-        editMenu.style.opacity = '1';
-        editMenu.style.visibility = 'visible';
-        editMenu.style.pointerEvents = 'none';
-        editMenu.style.transitionDelay = '0s, 0s';
-        editMenu.style.transform = `translate3d(420px, -50%, 0) scale(${currentScale})`;
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                editMenu.style.opacity = '1';
-                editMenu.style.transform = `translate3d(0, -50%, 0) scale(${currentScale})`;
-            });
+    const entries = [
+        {
+            el: document.getElementById('uiWrapper'),
+            enterTransform: `translate3d(260px, -50%, 0) scale(${currentScale})`,
+            restTransform: `translate3d(0, -50%, 0) scale(${currentScale})`
+        }
+    ];
+    if (includeSlider) {
+        entries.push({
+            el: document.getElementById('sliderContainer'),
+            enterTransform: 'translate3d(140px, -50%, 0)',
+            restTransform: 'translate3d(0, -50%, 0)'
         });
     }
-    if (includeSlider) {
-        animateElementsFromRight([
-            {
-                el: document.getElementById('sliderContainer'),
-                enterTransform: 'translate3d(140px, -50%, 0)',
-                restTransform: 'translate3d(0, -50%, 0)'
-            }
-        ]);
-    }
-    queueMenuCleanup(returnDuration + 140);
+    animateElementsFromRight(entries);
+    queueMenuCleanup();
 }
 function animateSoloDockEntry(){
     const soloDockButton = document.getElementById('soloDockButton');
@@ -1454,21 +1462,25 @@ function hideEditModeIntro(force = false){
     screen.classList.add('is-hiding');
     editModeIntroHideTimer = setTimeout(() => {
         screen.classList.remove('visible', 'is-hiding');
-    }, 320);
+    }, 430);
 }
 function showEditModeIntro(){
     const screen = document.getElementById('editModeIntroScreen');
-    if (!screen || editModeIntroShown) return;
+    if (!screen) return;
     editModeIntroShown = true;
     clearEditModeIntroTimers();
     screen.classList.remove('is-hiding', 'is-auto-close');
     screen.setAttribute('aria-hidden', 'false');
     screen.classList.add('visible');
+    const introTime = parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue('--edit-mode-intro-time'),
+        10
+    ) || 5200;
     editModeIntroAutoHideTimer = setTimeout(() => {
         if (!screen.classList.contains('visible')) return;
         screen.classList.add('is-auto-close');
         hideEditModeIntro();
-    }, 3500);
+    }, introTime);
 }
 function enterDockedMode(mode='walk'){
     activeDockMode = mode;
@@ -1499,6 +1511,10 @@ function openEnvironmentMenu(){ switchPanel('environment'); }
 function closeEnvironmentMenu(){ switchPanel('main'); }
 function openConfirmMenu(){ switchPanel('confirm'); }
 function closeConfirmMenu(){ switchPanel('main'); }
+function toggleTreesVisibility(){
+    treesAreVisible = !treesAreVisible;
+    sendToUnreal(treesAreVisible ? {'Trees':'Visable'} : {'Trees':'Invisable'});
+}
 function openProfileMenu(){ switchPanel('profile'); }
 function closeProfileMenu(){ switchPanel('main'); }
 function wait(ms){ return new Promise(resolve=>setTimeout(resolve, ms)); }
@@ -1773,6 +1789,7 @@ const confirmMenuCloseButton = document.getElementById('confirmMenuCloseButton')
 const confirmNoButton = document.getElementById('confirmNoButton');
 const confirmYesButton = document.getElementById('confirmYesButton');
 const teleportMenuButton = document.getElementById('teleportMenuButton');
+const treeToggleButton = document.getElementById('treeToggleButton');
 const teleportMenuCloseButton = document.getElementById('teleportMenuCloseButton');
 const cameraHeightSlider = document.getElementById('cameraHeightSlider');
 const cameraZoomSlider = document.getElementById('cameraZoomSlider');
@@ -1836,7 +1853,9 @@ homeMenuButton.addEventListener('click', openBuildingMenu);
 buildingMenuCloseButton.addEventListener('click', closeBuildingMenu);
 environmentMenuButton.addEventListener('click', openEnvironmentMenu);
 environmentMenuCloseButton.addEventListener('click', closeEnvironmentMenu);
-teleportMenuButton.addEventListener('click', openTeleportMenu);
+teleportMenuButton.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); openTeleportMenu(); });
+teleportMenuButton.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); });
+if (treeToggleButton) treeToggleButton.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); toggleTreesVisibility(); });
 teleportMenuCloseButton.addEventListener('click', closeTeleportMenu);
 editButton.addEventListener('click', enterEditMode);
 if (editModeIntroOkButton) editModeIntroOkButton.addEventListener('click', () => hideEditModeIntro());
@@ -1849,6 +1868,25 @@ endSessionButton.addEventListener('click', openConfirmMenu);
 confirmMenuCloseButton.addEventListener('click', closeConfirmMenu);
 confirmNoButton.addEventListener('click', closeConfirmMenu);
 confirmYesButton.addEventListener('click', () => location.reload());
+
+function suppressPersistentUiFocus(event){
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (!target.closest('#editUiRoot, #buildMenu')) return;
+    requestAnimationFrame(() => {
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    });
+}
+document.addEventListener('click', suppressPersistentUiFocus, true);
+document.addEventListener('pointerup', suppressPersistentUiFocus, true);
+document.addEventListener('keyup', (event) => {
+    if (!['w','a','s','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(String(event.key))) return;
+    requestAnimationFrame(() => {
+        if (document.activeElement instanceof HTMLElement && document.activeElement.closest('#editUiRoot, #buildMenu')) {
+            document.activeElement.blur();
+        }
+    });
+}, true);
 
 document.getElementById('generateImageButton').addEventListener('click', ()=>sendToUnreal({ frontEnd: 'screenshot' }));
 document.querySelectorAll('#buildingOptions .buildingCard')[0].addEventListener('click', ()=>selectBuild('Trad'));
@@ -1913,7 +1951,7 @@ document.querySelectorAll('#buildingOptions .buildingCard')[2].addEventListener(
                     <button class="iconButton" type="button" aria-label="Play"><img src="01 PLAY.png" alt="Play"></button>
                     <button class="iconButton" type="button" aria-label="How To"><img src="01 HOW TO.png" alt="How To"></button>
                     <button class="iconButton" id="teleportMenuButton" type="button" aria-label="Teleport"><img src="01 TELEPORT.png" alt="Teleport"></button>
-                    <button class="iconButton" type="button" aria-label="Tree"><img src="01 TREE.png" alt="Tree"></button>
+                    <button class="iconButton" id="treeToggleButton" type="button" aria-label="Toggle trees"><img src="01 TREE.png" alt="Tree"></button>
                 </div>
             </div>
         </div>
