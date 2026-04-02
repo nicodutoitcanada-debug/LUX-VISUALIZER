@@ -20,10 +20,15 @@
             --camera-x: 260px;
             --building-x: 260px;
             --environment-x: 260px;
+            --how-to-x: 260px;
             --confirm-x: 260px;
             --teleport-x: 260px;
             --profile-x: 260px;
             --finish-type-x: 260px;
+            --solid-colours-x: 260px;
+            --woodgrains-x: 260px;
+            --west-coast-naturals-x: 260px;
+            --textured-colours-x: 260px;
             --anim-time: 1.1s;
             --anim-ease: cubic-bezier(0.22, 1, 0.36, 1);
             --plate-side-inset: 10%;
@@ -578,7 +583,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 2000;
+            z-index: 10020;
             pointer-events: none;
         }
 
@@ -637,10 +642,15 @@
         #cameraMenuWrapper,
         #buildingMenuWrapper,
         #environmentMenuWrapper,
+        #howToMenuWrapper,
         #confirmMenuWrapper,
         #teleportMenuWrapper,
         #profileMenuWrapper,
-        #finishTypeMenuWrapper {
+        #finishTypeMenuWrapper,
+        #solidColoursMenuWrapper,
+        #woodgrainsMenuWrapper,
+        #westCoastNaturalsMenuWrapper,
+        #texturedColoursMenuWrapper {
             position: absolute;
             right: 120px;
             top: 50%;
@@ -673,6 +683,10 @@
             background: rgba(14, 18, 24, 0.02);
         }
 
+        #howToMenuWrapper {
+            background: rgba(14, 18, 24, 0.02);
+        }
+
         #confirmMenuWrapper {
             background: rgba(14, 18, 24, 0.02);
         }
@@ -686,6 +700,22 @@
         }
 
         #finishTypeMenuWrapper {
+            background: rgba(14, 18, 24, 0.02);
+        }
+
+        #solidColoursMenuWrapper {
+            background: rgba(14, 18, 24, 0.02);
+        }
+
+        #woodgrainsMenuWrapper {
+            background: rgba(14, 18, 24, 0.02);
+        }
+
+        #westCoastNaturalsMenuWrapper {
+            background: rgba(14, 18, 24, 0.02);
+        }
+
+        #texturedColoursMenuWrapper {
             background: rgba(14, 18, 24, 0.02);
         }
 
@@ -705,6 +735,10 @@
             transform: translate3d(var(--environment-x), -50%, 0) scale(var(--ui-scale));
         }
 
+        #howToMenuWrapper {
+            transform: translate3d(var(--how-to-x), -50%, 0) scale(var(--ui-scale));
+        }
+
         #confirmMenuWrapper {
             transform: translate3d(var(--confirm-x), -50%, 0) scale(var(--ui-scale));
         }
@@ -721,15 +755,36 @@
             transform: translate3d(var(--finish-type-x), -50%, 0) scale(var(--ui-scale));
         }
 
+        #solidColoursMenuWrapper {
+            transform: translate3d(var(--solid-colours-x), -50%, 0) scale(var(--ui-scale));
+        }
+
+        #woodgrainsMenuWrapper {
+            transform: translate3d(var(--woodgrains-x), -50%, 0) scale(var(--ui-scale));
+        }
+
+        #westCoastNaturalsMenuWrapper {
+            transform: translate3d(var(--west-coast-naturals-x), -50%, 0) scale(var(--ui-scale));
+        }
+
+        #texturedColoursMenuWrapper {
+            transform: translate3d(var(--textured-colours-x), -50%, 0) scale(var(--ui-scale));
+        }
+
         /* hidden until backend says load_ui modern */
         body:not(.inGameUiVisible) #uiWrapper,
         body:not(.inGameUiVisible) #cameraMenuWrapper,
         body:not(.inGameUiVisible) #buildingMenuWrapper,
         body:not(.inGameUiVisible) #environmentMenuWrapper,
+        body:not(.inGameUiVisible) #howToMenuWrapper,
         body:not(.inGameUiVisible) #confirmMenuWrapper,
         body:not(.inGameUiVisible) #teleportMenuWrapper,
         body:not(.inGameUiVisible) #profileMenuWrapper,
-        body:not(.inGameUiVisible) #finishTypeMenuWrapper {
+        body:not(.inGameUiVisible) #finishTypeMenuWrapper,
+        body:not(.inGameUiVisible) #solidColoursMenuWrapper,
+        body:not(.inGameUiVisible) #woodgrainsMenuWrapper,
+        body:not(.inGameUiVisible) #westCoastNaturalsMenuWrapper,
+        body:not(.inGameUiVisible) #texturedColoursMenuWrapper {
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
@@ -776,10 +831,15 @@
         body.inGameUiVisible #cameraMenuWrapper,
         body.inGameUiVisible #buildingMenuWrapper,
         body.inGameUiVisible #environmentMenuWrapper,
+        body.inGameUiVisible #howToMenuWrapper,
         body.inGameUiVisible #confirmMenuWrapper,
         body.inGameUiVisible #teleportMenuWrapper,
         body.inGameUiVisible #profileMenuWrapper,
         body.inGameUiVisible #finishTypeMenuWrapper,
+        body.inGameUiVisible #solidColoursMenuWrapper,
+        body.inGameUiVisible #woodgrainsMenuWrapper,
+        body.inGameUiVisible #westCoastNaturalsMenuWrapper,
+        body.inGameUiVisible #texturedColoursMenuWrapper,
         body.inGameUiVisible #sliderContainer,
         body.inGameUiVisible #soloDockButton {
             pointer-events: auto;
@@ -1080,7 +1140,8 @@
         }
 
         #buildingOuterBox,
-        #environmentOuterBox {
+        #environmentOuterBox,
+        #howToOuterBox {
             width: 420px;
         }
 
@@ -1090,27 +1151,41 @@
 
         #teleportOuterBox,
         #profileOuterBox,
-        #finishTypeOuterBox {
+        #finishTypeOuterBox,
+        #solidColoursOuterBox,
+        #woodgrainsOuterBox,
+        #westCoastNaturalsOuterBox,
+        #texturedColoursOuterBox {
             width: 420px;
         }
 
         #cameraOuterBox,
         #buildingOuterBox,
         #environmentOuterBox,
+        #howToOuterBox,
         #confirmOuterBox,
         #teleportOuterBox,
         #profileOuterBox,
-        #finishTypeOuterBox {
+        #finishTypeOuterBox,
+        #solidColoursOuterBox,
+        #woodgrainsOuterBox,
+        #westCoastNaturalsOuterBox,
+        #texturedColoursOuterBox {
             background: linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.018) 18%, rgba(255, 255, 255, 0.004) 38%, rgba(14, 18, 24, 0.025) 46%, rgba(10, 12, 16, 0.055) 66%, rgba(4, 6, 9, 0.10) 84%, rgba(0, 0, 0, 0.16) 100%), rgba(20, 24, 30, 0.08);
         }
 
         #cameraOuterBox::before,
         #buildingOuterBox::before,
         #environmentOuterBox::before,
+        #howToOuterBox::before,
         #confirmOuterBox::before,
         #teleportOuterBox::before,
         #profileOuterBox::before,
-        #finishTypeOuterBox::before {
+        #finishTypeOuterBox::before,
+        #solidColoursOuterBox::before,
+        #woodgrainsOuterBox::before,
+        #westCoastNaturalsOuterBox::before,
+        #texturedColoursOuterBox::before {
             content: "";
             position: absolute;
             inset: 0;
@@ -1123,10 +1198,15 @@
         #cameraOuterBox::after,
         #buildingOuterBox::after,
         #environmentOuterBox::after,
+        #howToOuterBox::after,
         #confirmOuterBox::after,
         #teleportOuterBox::after,
         #profileOuterBox::after,
-        #finishTypeOuterBox::after {
+        #finishTypeOuterBox::after,
+        #solidColoursOuterBox::after,
+        #woodgrainsOuterBox::after,
+        #westCoastNaturalsOuterBox::after,
+        #texturedColoursOuterBox::after {
             content: "";
             position: absolute;
             inset: 1px;
@@ -1164,9 +1244,14 @@
         #cameraTopBar,
         #buildingTopBar,
         #environmentTopBar,
+        #howToTopBar,
         #teleportTopBar,
         #profileTopBar,
-        #finishTypeTopBar {
+        #finishTypeTopBar,
+        #solidColoursTopBar,
+        #woodgrainsTopBar,
+        #westCoastNaturalsTopBar,
+        #texturedColoursTopBar {
             height: 42px;
             margin-bottom: 5px;
             display: flex;
@@ -1187,6 +1272,26 @@
             margin-bottom: 4px;
         }
 
+        #solidColoursTopBar {
+            height: 42px;
+            margin-bottom: 4px;
+        }
+
+        #woodgrainsTopBar {
+            height: 42px;
+            margin-bottom: 4px;
+        }
+
+        #westCoastNaturalsTopBar {
+            height: 42px;
+            margin-bottom: 4px;
+        }
+
+        #texturedColoursTopBar {
+            height: 42px;
+            margin-bottom: 4px;
+        }
+
         #confirmTopBar {
             height: 40px;
             margin-bottom: 4px;
@@ -1199,9 +1304,14 @@
         }
 
         #cameraLogo,
+        #howToLogo,
         #teleportLogo,
         #profileLogo,
-        #finishTypeLogo {
+        #finishTypeLogo,
+        #solidColoursLogo,
+        #woodgrainsLogo,
+        #westCoastNaturalsLogo,
+        #texturedColoursLogo {
             height: 28px;
             width: auto;
             object-fit: contain;
@@ -1212,6 +1322,7 @@
 
         #buildingTitle,
         #environmentTitle,
+        #howToTitle,
         #confirmTitle {
             color: rgba(255, 255, 255, 0.78);
             font-weight: 700;
@@ -1221,7 +1332,8 @@
         }
 
         #buildingTitle,
-        #environmentTitle {
+        #environmentTitle,
+        #howToTitle {
             font-size: 18px;
             max-width: 190px;
         }
@@ -1298,10 +1410,15 @@
         #cameraInnerBoxWrapper,
         #buildingInnerBoxWrapper,
         #environmentInnerBoxWrapper,
+        #howToInnerBoxWrapper,
         #confirmInnerBoxWrapper,
         #teleportInnerBoxWrapper,
         #profileInnerBoxWrapper,
-        #finishTypeInnerBoxWrapper {
+        #finishTypeInnerBoxWrapper,
+        #solidColoursInnerBoxWrapper,
+        #woodgrainsInnerBoxWrapper,
+        #westCoastNaturalsInnerBoxWrapper,
+        #texturedColoursInnerBoxWrapper {
             position: relative;
             z-index: 3;
         }
@@ -1362,10 +1479,15 @@
         #cameraInnerBox,
         #buildingInnerBox,
         #environmentInnerBox,
+        #howToInnerBox,
         #confirmInnerBox,
         #teleportInnerBox,
         #profileInnerBox,
-        #finishTypeInnerBox {
+        #finishTypeInnerBox,
+        #solidColoursInnerBox,
+        #woodgrainsInnerBox,
+        #westCoastNaturalsInnerBox,
+        #texturedColoursInnerBox {
             background: linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.06) 22%, rgba(255, 255, 255, 0.02) 40%, rgba(10, 10, 10, 0.07) 100%), rgba(18, 22, 28, 0.34);
             border-radius: 24px;
             backdrop-filter: blur(12px) saturate(118%);
@@ -1394,7 +1516,8 @@
         }
 
         #buildingInnerBox,
-        #environmentInnerBox {
+        #environmentInnerBox,
+        #howToInnerBox {
             padding: 14px 12px 14px 12px;
         }
 
@@ -1416,7 +1539,11 @@
 
         #teleportInnerBox,
         #profileInnerBox,
-        #finishTypeInnerBox {
+        #finishTypeInnerBox,
+        #solidColoursInnerBox,
+        #woodgrainsInnerBox,
+        #westCoastNaturalsInnerBox,
+        #texturedColoursInnerBox {
             padding: 8px 8px 4px 8px;
             border: 1px solid rgba(255, 255, 255, 0.07);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.12);
@@ -1431,6 +1558,22 @@
         }
 
         #finishTypeInnerBox {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+        }
+
+        #solidColoursInnerBox {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+        }
+
+        #woodgrainsInnerBox {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+        }
+
+        #westCoastNaturalsInnerBox {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+        }
+
+        #texturedColoursInnerBox {
             background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
         }
 
@@ -1610,14 +1753,16 @@
 
         .levelChoiceButton.is-disabled,
         .menuButton.is-disabled,
-        .buildingCard.is-disabled {
+        .buildingCard.is-disabled,
+        .environmentCard.is-disabled {
             cursor: default;
             pointer-events: none;
         }
 
         .levelChoiceButton.is-disabled img,
         .menuButton.is-disabled img,
-        .buildingCard.is-disabled img {
+        .buildingCard.is-disabled img,
+        .environmentCard.is-disabled img {
             opacity: 0.42;
             filter: grayscale(1) saturate(0);
             transform: none !important;
@@ -1628,9 +1773,33 @@
         .menuButton.is-disabled:hover img,
         .menuButton.is-disabled:active img,
         .buildingCard.is-disabled:hover img,
-        .buildingCard.is-disabled:active img {
+        .buildingCard.is-disabled:active img,
+        .environmentCard.is-disabled:hover img,
+        .environmentCard.is-disabled:active img {
             opacity: 0.42;
             transform: none !important;
+        }
+
+
+        #howToInfoWrap {
+            min-height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        #howToInfoImage {
+            width: 100%;
+            max-width: 360px;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            opacity: 0.96;
+            pointer-events: none;
+            user-select: none;
         }
 
         #confirmButtons {
@@ -1891,6 +2060,14 @@
             padding: 12px 12px 16px 12px;
         }
 
+        #solidColoursInnerBox {
+            padding: 12px 12px 16px 12px;
+        }
+
+        #woodgrainsInnerBox {
+            padding: 12px 12px 16px 12px;
+        }
+
         #profileTopRow {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -2129,6 +2306,344 @@
             }
         }
 
+        #solidColoursTitle {
+            color: rgba(255, 255, 255, 0.96);
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            user-select: none;
+            pointer-events: none;
+            min-height: 18px;
+            margin: 4px 0 14px 8px;
+            position: relative;
+            z-index: 3;
+        }
+
+        #solidColoursButtonGrid {
+            display: grid;
+            grid-template-columns: repeat(10, minmax(0, 1fr));
+            gap: 10px;
+            padding: 4px 4px 8px 4px;
+            align-items: start;
+        }
+
+        .solidColourButton {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .solidColourButton img {
+            width: 100%;
+            max-width: 52px;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            opacity: 0.9;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .solidColourButton:hover img,
+        .solidColourButton:focus-visible img,
+        .solidColourButton:active img {
+            opacity: 1;
+        }
+
+        .solidColourButton:active img {
+            transform: scale(0.98);
+        }
+
+        @media (max-width:1024px) {
+            #solidColoursButtonGrid {
+                gap: 8px;
+            }
+
+            .solidColourButton img {
+                max-width: 44px;
+            }
+        }
+
+        @media (max-width:680px) {
+            #solidColoursButtonGrid {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .solidColourButton img {
+                max-width: 48px;
+            }
+        }
+
+
+        #woodgrainsTitle {
+            color: rgba(255, 255, 255, 0.96);
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            user-select: none;
+            pointer-events: none;
+            min-height: 18px;
+            margin: 4px 0 14px 8px;
+            position: relative;
+            z-index: 3;
+        }
+
+        #woodgrainsButtonRows {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 4px 4px 8px 4px;
+        }
+
+        .woodgrainsButtonRow {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+            justify-items: center;
+            align-items: start;
+        }
+
+        .woodgrainsButtonRow--knotty {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            max-width: 210px;
+            margin: 0 auto;
+        }
+
+        .woodgrainButton {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .woodgrainButton img {
+            width: 100%;
+            max-width: 76px;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            opacity: 0.9;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .woodgrainButton:hover img,
+        .woodgrainButton:focus-visible img,
+        .woodgrainButton:active img {
+            opacity: 1;
+        }
+
+        .woodgrainButton:active img {
+            transform: scale(0.98);
+        }
+
+        @media (max-width:1024px) {
+            .woodgrainsButtonRow {
+                gap: 8px;
+            }
+
+            .woodgrainButton img {
+                max-width: 64px;
+            }
+        }
+
+        @media (max-width:680px) {
+            .woodgrainsButtonRow {
+                gap: 8px;
+            }
+
+            .woodgrainButton img {
+                max-width: 60px;
+            }
+        }
+
+
+        #westCoastNaturalsTitle {
+            color: rgba(255, 255, 255, 0.96);
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            user-select: none;
+            pointer-events: none;
+            min-height: 18px;
+            margin: 4px 0 14px 8px;
+            position: relative;
+            z-index: 3;
+        }
+
+        #westCoastNaturalsButtonGrid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+            padding: 4px 4px 8px 4px;
+            align-items: start;
+            justify-items: center;
+        }
+
+        .westCoastNaturalsButton {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .westCoastNaturalsButton img {
+            width: 100%;
+            max-width: 76px;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            opacity: 0.9;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .westCoastNaturalsButton:hover img,
+        .westCoastNaturalsButton:focus-visible img,
+        .westCoastNaturalsButton:active img {
+            opacity: 1;
+        }
+
+        .westCoastNaturalsButton:active img {
+            transform: scale(0.98);
+        }
+
+        @media (max-width:1024px) {
+            #westCoastNaturalsButtonGrid {
+                gap: 8px;
+            }
+
+            .westCoastNaturalsButton img {
+                max-width: 64px;
+            }
+        }
+
+        @media (max-width:680px) {
+            #westCoastNaturalsButtonGrid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .westCoastNaturalsButton img {
+                max-width: 60px;
+            }
+        }
+
+
+        #texturedColoursTitle {
+            color: rgba(255, 255, 255, 0.96);
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            user-select: none;
+            pointer-events: none;
+            min-height: 18px;
+            margin: 4px 0 14px 8px;
+            position: relative;
+            z-index: 3;
+        }
+
+        #texturedColoursButtonGrid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+            padding: 4px 4px 8px 4px;
+            align-items: start;
+            justify-items: center;
+        }
+
+        .texturedColoursButton {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .texturedColoursButton img {
+            width: 100%;
+            max-width: 76px;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            opacity: 0.9;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .texturedColoursButton:hover img,
+        .texturedColoursButton:focus-visible img,
+        .texturedColoursButton:active img {
+            opacity: 1;
+        }
+
+        .texturedColoursButton:active img {
+            transform: scale(0.98);
+        }
+
+        @media (max-width:1024px) {
+            #texturedColoursButtonGrid {
+                gap: 8px;
+            }
+
+            .texturedColoursButton img {
+                max-width: 64px;
+            }
+        }
+
+        @media (max-width:680px) {
+            #texturedColoursButtonGrid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .texturedColoursButton img {
+                max-width: 60px;
+            }
+        }
+
+
         body.walk-mode #editButton {
             transform: translateY(-62px);
             opacity: 0;
@@ -2272,6 +2787,234 @@
             transform: scaleX(-1) scale(0.96);
         }
 
+        #moviePlaybackOverlay,
+        #movieExitOverlay {
+            position: fixed;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 9600;
+            transition: opacity 1600ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 1600ms;
+            background: black;
+        }
+
+        #moviePlaybackOverlay.visible,
+        #movieExitOverlay.visible {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 1600ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0s;
+        }
+
+        #moviePlaybackVideo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: black;
+        }
+
+        #moviePlaybackShade,
+        #movieExitShade {
+            position: absolute;
+            inset: 0;
+            background: black;
+        }
+
+        #moviePlaybackShade {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        #moviePlaybackLogo,
+        #moviePlaybackUnrealLogo,
+        #movieExitLogo {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            transform-origin: center center;
+            opacity: 0;
+            pointer-events: none;
+            user-select: none;
+            will-change: opacity, transform;
+            backface-visibility: hidden;
+            transition: opacity 9000ms cubic-bezier(0.22, 1, 0.36, 1);
+            max-width: min(24vw, 240px);
+            width: auto;
+            height: auto;
+        }
+
+        #moviePlaybackLogo.visible,
+        #moviePlaybackUnrealLogo.visible,
+        #movieExitLogo.visible {
+            opacity: 1;
+            animation: movieLogoEaseIn 2600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        #moviePlaybackUnrealLogo {
+            max-width: min(18vw, 180px);
+        }
+
+
+        @keyframes movieLogoEaseIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        #movieControlMenu {
+            position: fixed;
+            right: 22px;
+            top: 50%;
+            transform: translate3d(170px, -50%, 0);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 9700;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1), opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 1400ms;
+        }
+
+        #movieControlMenu.visible {
+            transform: translate3d(0, -50%, 0);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1), opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0s;
+        }
+
+        .movieControlButton {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .movieControlButton img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0.9;
+            transition: transform 0.18s ease, opacity 0.18s ease;
+            pointer-events: none;
+        }
+
+        .movieControlButton:hover img,
+        .movieControlButton:focus-visible img {
+            opacity: 1;
+            transform: scale(1.04);
+        }
+
+        .movieControlButton:active img {
+            opacity: 1;
+            transform: scale(0.96);
+        }
+
+        body.movie-ui-hidden #uiWrapper,
+        body.movie-ui-hidden #cameraMenuWrapper,
+        body.movie-ui-hidden #buildingMenuWrapper,
+        body.movie-ui-hidden #environmentMenuWrapper,
+        body.movie-ui-hidden #howToMenuWrapper,
+        body.movie-ui-hidden #confirmMenuWrapper,
+        body.movie-ui-hidden #teleportMenuWrapper,
+        body.movie-ui-hidden #profileMenuWrapper,
+        body.movie-ui-hidden #finishTypeMenuWrapper,
+        body.movie-ui-hidden #solidColoursMenuWrapper,
+        body.movie-ui-hidden #woodgrainsMenuWrapper,
+        body.movie-ui-hidden #westCoastNaturalsMenuWrapper,
+        body.movie-ui-hidden #texturedColoursMenuWrapper,
+        body.movie-ui-hidden #sliderContainer,
+        body.movie-ui-hidden #soloDockButton {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        body.movie-ui-hidden #uiWrapper,
+        body.movie-ui-hidden #cameraMenuWrapper,
+        body.movie-ui-hidden #buildingMenuWrapper,
+        body.movie-ui-hidden #environmentMenuWrapper,
+        body.movie-ui-hidden #howToMenuWrapper,
+        body.movie-ui-hidden #confirmMenuWrapper,
+        body.movie-ui-hidden #teleportMenuWrapper,
+        body.movie-ui-hidden #profileMenuWrapper,
+        body.movie-ui-hidden #finishTypeMenuWrapper,
+        body.movie-ui-hidden #solidColoursMenuWrapper,
+        body.movie-ui-hidden #woodgrainsMenuWrapper,
+        body.movie-ui-hidden #westCoastNaturalsMenuWrapper,
+        body.movie-ui-hidden #texturedColoursMenuWrapper {
+            transform: translate3d(260px, -50%, 0) scale(var(--ui-scale)) !important;
+        }
+
+        body.movie-ui-hidden #sliderContainer {
+            transform: translate3d(140px, -50%, 0) !important;
+        }
+
+        body.movie-ui-hidden #soloDockButton {
+            transform: translate3d(140px, -50%, 0) rotate(90deg) !important;
+        }
+
+        body.movie-ui-restoring #uiWrapper,
+        body.movie-ui-restoring #cameraMenuWrapper,
+        body.movie-ui-restoring #buildingMenuWrapper,
+        body.movie-ui-restoring #environmentMenuWrapper,
+        body.movie-ui-restoring #howToMenuWrapper,
+        body.movie-ui-restoring #confirmMenuWrapper,
+        body.movie-ui-restoring #teleportMenuWrapper,
+        body.movie-ui-restoring #profileMenuWrapper,
+        body.movie-ui-restoring #finishTypeMenuWrapper,
+        body.movie-ui-restoring #solidColoursMenuWrapper,
+        body.movie-ui-restoring #woodgrainsMenuWrapper,
+        body.movie-ui-restoring #westCoastNaturalsMenuWrapper,
+        body.movie-ui-restoring #texturedColoursMenuWrapper,
+        body.movie-ui-restoring #sliderContainer {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: none !important;
+        }
+
+        body.movie-ui-restoring #uiWrapper,
+        body.movie-ui-restoring #cameraMenuWrapper,
+        body.movie-ui-restoring #buildingMenuWrapper,
+        body.movie-ui-restoring #environmentMenuWrapper,
+        body.movie-ui-restoring #howToMenuWrapper,
+        body.movie-ui-restoring #confirmMenuWrapper,
+        body.movie-ui-restoring #teleportMenuWrapper,
+        body.movie-ui-restoring #profileMenuWrapper,
+        body.movie-ui-restoring #finishTypeMenuWrapper,
+        body.movie-ui-restoring #solidColoursMenuWrapper,
+        body.movie-ui-restoring #woodgrainsMenuWrapper,
+        body.movie-ui-restoring #westCoastNaturalsMenuWrapper,
+        body.movie-ui-restoring #texturedColoursMenuWrapper {
+            transform: translate3d(260px, -50%, 0) scale(var(--ui-scale)) !important;
+        }
+
+        body.movie-ui-restoring #sliderContainer {
+            transform: translate3d(140px, -50%, 0) !important;
+        }
+
+        body.walk-mode.movie-ui-hidden #soloDockButton {
+            transform: translate3d(140px, -50%, 0) rotate(90deg) !important;
+        }
+
         body.walk-mode {
             --main-x: 260px;
             --slider-x: 140px;
@@ -2299,6 +3042,7 @@
             --camera-x: 0px;
             --building-x: 260px;
             --environment-x: 260px;
+            --how-to-x: 260px;
             --confirm-x: 260px;
             --teleport-x: 260px;
             --profile-x: 260px;
@@ -2327,6 +3071,7 @@
             --camera-x: 260px;
             --building-x: 0px;
             --environment-x: 260px;
+            --how-to-x: 260px;
             --confirm-x: 260px;
             --teleport-x: 260px;
             --profile-x: 260px;
@@ -2378,6 +3123,46 @@
             transition-delay: 0s, 0s, 0s;
         }
 
+        body.how-to-mode {
+            --main-x: 260px;
+            --camera-x: 260px;
+            --building-x: 260px;
+            --environment-x: 260px;
+            --how-to-x: 0px;
+            --confirm-x: 260px;
+            --teleport-x: 260px;
+            --profile-x: 260px;
+            --finish-type-x: 260px;
+            --solid-colours-x: 260px;
+            --woodgrains-x: 260px;
+            --west-coast-naturals-x: 260px;
+            --textured-colours-x: 260px;
+        }
+
+        body.how-to-mode #uiWrapper,
+        body.how-to-mode #cameraMenuWrapper,
+        body.how-to-mode #buildingMenuWrapper,
+        body.how-to-mode #environmentMenuWrapper,
+        body.how-to-mode #confirmMenuWrapper,
+        body.how-to-mode #teleportMenuWrapper,
+        body.how-to-mode #profileMenuWrapper,
+        body.how-to-mode #finishTypeMenuWrapper,
+        body.how-to-mode #solidColoursMenuWrapper,
+        body.how-to-mode #woodgrainsMenuWrapper,
+        body.how-to-mode #westCoastNaturalsMenuWrapper,
+        body.how-to-mode #texturedColoursMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        body.how-to-mode #howToMenuWrapper {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition-delay: 0s, 0s, 0s;
+        }
+
         body.confirm-mode {
             --main-x: 260px;
             --camera-x: 260px;
@@ -2411,10 +3196,15 @@
             --camera-x: 260px;
             --building-x: 260px;
             --environment-x: 260px;
+            --how-to-x: 260px;
             --confirm-x: 260px;
             --teleport-x: 0px;
             --profile-x: 260px;
             --finish-type-x: 260px;
+            --solid-colours-x: 260px;
+            --woodgrains-x: 260px;
+            --west-coast-naturals-x: 260px;
+            --textured-colours-x: 260px;
         }
 
         body.teleport-mode #uiWrapper,
@@ -2423,7 +3213,11 @@
         body.teleport-mode #environmentMenuWrapper,
         body.teleport-mode #confirmMenuWrapper,
         body.teleport-mode #profileMenuWrapper,
-        body.teleport-mode #finishTypeMenuWrapper {
+        body.teleport-mode #finishTypeMenuWrapper,
+        body.teleport-mode #solidColoursMenuWrapper,
+        body.teleport-mode #woodgrainsMenuWrapper,
+        body.teleport-mode #westCoastNaturalsMenuWrapper,
+        body.teleport-mode #texturedColoursMenuWrapper {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
@@ -2441,10 +3235,13 @@
             --camera-x: 260px;
             --building-x: 260px;
             --environment-x: 260px;
+            --how-to-x: 260px;
             --confirm-x: 260px;
             --teleport-x: 260px;
             --profile-x: 0px;
             --finish-type-x: 260px;
+            --solid-colours-x: 260px;
+            --woodgrains-x: 260px;
         }
 
         body.profile-mode #uiWrapper,
@@ -2453,7 +3250,11 @@
         body.profile-mode #environmentMenuWrapper,
         body.profile-mode #confirmMenuWrapper,
         body.profile-mode #teleportMenuWrapper,
-        body.profile-mode #finishTypeMenuWrapper {
+        body.profile-mode #finishTypeMenuWrapper,
+        body.profile-mode #solidColoursMenuWrapper,
+        body.profile-mode #woodgrainsMenuWrapper,
+        body.profile-mode #westCoastNaturalsMenuWrapper,
+        body.profile-mode #texturedColoursMenuWrapper {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
@@ -2471,10 +3272,15 @@
             --camera-x: 260px;
             --building-x: 260px;
             --environment-x: 260px;
+            --how-to-x: 260px;
             --confirm-x: 260px;
             --teleport-x: 260px;
             --profile-x: 260px;
             --finish-type-x: 0px;
+            --solid-colours-x: 260px;
+            --woodgrains-x: 260px;
+            --west-coast-naturals-x: 260px;
+            --textured-colours-x: 260px;
         }
 
         body.finish-type-mode #uiWrapper,
@@ -2483,13 +3289,175 @@
         body.finish-type-mode #environmentMenuWrapper,
         body.finish-type-mode #confirmMenuWrapper,
         body.finish-type-mode #teleportMenuWrapper,
-        body.finish-type-mode #profileMenuWrapper {
+        body.finish-type-mode #profileMenuWrapper,
+        body.finish-type-mode #solidColoursMenuWrapper,
+        body.finish-type-mode #woodgrainsMenuWrapper,
+        body.finish-type-mode #westCoastNaturalsMenuWrapper,
+        body.finish-type-mode #texturedColoursMenuWrapper {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
 
         body.finish-type-mode #finishTypeMenuWrapper {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition-delay: 0s, 0s, 0s;
+        }
+
+
+        body.solid-colours-mode {
+            --main-x: 260px;
+            --camera-x: 260px;
+            --building-x: 260px;
+            --environment-x: 260px;
+            --how-to-x: 260px;
+            --confirm-x: 260px;
+            --teleport-x: 260px;
+            --profile-x: 260px;
+            --finish-type-x: 260px;
+            --solid-colours-x: 0px;
+            --woodgrains-x: 260px;
+            --west-coast-naturals-x: 260px;
+            --textured-colours-x: 260px;
+        }
+
+        body.solid-colours-mode #uiWrapper,
+        body.solid-colours-mode #cameraMenuWrapper,
+        body.solid-colours-mode #buildingMenuWrapper,
+        body.solid-colours-mode #environmentMenuWrapper,
+        body.solid-colours-mode #confirmMenuWrapper,
+        body.solid-colours-mode #teleportMenuWrapper,
+        body.solid-colours-mode #profileMenuWrapper,
+        body.solid-colours-mode #finishTypeMenuWrapper,
+        body.solid-colours-mode #woodgrainsMenuWrapper,
+        body.solid-colours-mode #westCoastNaturalsMenuWrapper,
+        body.solid-colours-mode #texturedColoursMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        body.solid-colours-mode #solidColoursMenuWrapper {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition-delay: 0s, 0s, 0s;
+        }
+
+        body.woodgrains-mode {
+            --main-x: 260px;
+            --camera-x: 260px;
+            --building-x: 260px;
+            --environment-x: 260px;
+            --how-to-x: 260px;
+            --confirm-x: 260px;
+            --teleport-x: 260px;
+            --profile-x: 260px;
+            --finish-type-x: 260px;
+            --solid-colours-x: 260px;
+            --woodgrains-x: 0px;
+            --west-coast-naturals-x: 260px;
+            --textured-colours-x: 260px;
+        }
+
+        body.woodgrains-mode #uiWrapper,
+        body.woodgrains-mode #cameraMenuWrapper,
+        body.woodgrains-mode #buildingMenuWrapper,
+        body.woodgrains-mode #environmentMenuWrapper,
+        body.woodgrains-mode #confirmMenuWrapper,
+        body.woodgrains-mode #teleportMenuWrapper,
+        body.woodgrains-mode #profileMenuWrapper,
+        body.woodgrains-mode #finishTypeMenuWrapper,
+        body.woodgrains-mode #solidColoursMenuWrapper,
+        body.woodgrains-mode #westCoastNaturalsMenuWrapper,
+        body.woodgrains-mode #texturedColoursMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        body.woodgrains-mode #woodgrainsMenuWrapper {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition-delay: 0s, 0s, 0s;
+        }
+
+        body.west-coast-naturals-mode {
+            --main-x: 260px;
+            --camera-x: 260px;
+            --building-x: 260px;
+            --environment-x: 260px;
+            --how-to-x: 260px;
+            --confirm-x: 260px;
+            --teleport-x: 260px;
+            --profile-x: 260px;
+            --finish-type-x: 260px;
+            --solid-colours-x: 260px;
+            --woodgrains-x: 260px;
+            --west-coast-naturals-x: 0px;
+            --textured-colours-x: 260px;
+        }
+
+        body.west-coast-naturals-mode #uiWrapper,
+        body.west-coast-naturals-mode #cameraMenuWrapper,
+        body.west-coast-naturals-mode #buildingMenuWrapper,
+        body.west-coast-naturals-mode #environmentMenuWrapper,
+        body.west-coast-naturals-mode #confirmMenuWrapper,
+        body.west-coast-naturals-mode #teleportMenuWrapper,
+        body.west-coast-naturals-mode #profileMenuWrapper,
+        body.west-coast-naturals-mode #finishTypeMenuWrapper,
+        body.west-coast-naturals-mode #solidColoursMenuWrapper,
+        body.west-coast-naturals-mode #woodgrainsMenuWrapper,
+        body.west-coast-naturals-mode #texturedColoursMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        body.west-coast-naturals-mode #westCoastNaturalsMenuWrapper {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition-delay: 0s, 0s, 0s;
+        }
+
+
+        body.textured-colours-mode {
+            --main-x: 260px;
+            --camera-x: 260px;
+            --building-x: 260px;
+            --environment-x: 260px;
+            --how-to-x: 260px;
+            --confirm-x: 260px;
+            --teleport-x: 260px;
+            --profile-x: 260px;
+            --finish-type-x: 260px;
+            --solid-colours-x: 260px;
+            --woodgrains-x: 260px;
+            --west-coast-naturals-x: 260px;
+            --textured-colours-x: 0px;
+        }
+
+        body.textured-colours-mode #uiWrapper,
+        body.textured-colours-mode #cameraMenuWrapper,
+        body.textured-colours-mode #buildingMenuWrapper,
+        body.textured-colours-mode #environmentMenuWrapper,
+        body.textured-colours-mode #confirmMenuWrapper,
+        body.textured-colours-mode #teleportMenuWrapper,
+        body.textured-colours-mode #profileMenuWrapper,
+        body.textured-colours-mode #finishTypeMenuWrapper,
+        body.textured-colours-mode #solidColoursMenuWrapper,
+        body.textured-colours-mode #woodgrainsMenuWrapper,
+        body.textured-colours-mode #westCoastNaturalsMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        body.textured-colours-mode #texturedColoursMenuWrapper {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
@@ -2503,7 +3471,11 @@
         body.menu-switching #confirmMenuWrapper,
         body.menu-switching #teleportMenuWrapper,
         body.menu-switching #profileMenuWrapper,
-        body.menu-switching #finishTypeMenuWrapper {
+        body.menu-switching #finishTypeMenuWrapper,
+        body.menu-switching #solidColoursMenuWrapper,
+        body.menu-switching #woodgrainsMenuWrapper,
+        body.menu-switching #westCoastNaturalsMenuWrapper,
+        body.menu-switching #texturedColoursMenuWrapper {
             pointer-events: none !important;
         }
 
@@ -2541,7 +3513,11 @@
             #confirmMenuWrapper,
             #teleportMenuWrapper,
             #profileMenuWrapper,
-            #finishTypeMenuWrapper {
+            #finishTypeMenuWrapper,
+            #solidColoursMenuWrapper,
+            #woodgrainsMenuWrapper,
+            #westCoastNaturalsMenuWrapper,
+            #texturedColoursMenuWrapper {
                 right: 112px;
             }
 
@@ -2647,7 +3623,11 @@
             #confirmMenuWrapper,
             #teleportMenuWrapper,
             #profileMenuWrapper,
-            #finishTypeMenuWrapper {
+            #finishTypeMenuWrapper,
+            #solidColoursMenuWrapper,
+            #woodgrainsMenuWrapper,
+            #westCoastNaturalsMenuWrapper,
+            #texturedColoursMenuWrapper {
                 right: 72px;
                 transform-origin: right center;
             }
@@ -2729,7 +3709,11 @@
             #confirmMenuWrapper,
             #teleportMenuWrapper,
             #profileMenuWrapper,
-            #finishTypeMenuWrapper {
+            #finishTypeMenuWrapper,
+            #solidColoursMenuWrapper,
+            #woodgrainsMenuWrapper,
+            #westCoastNaturalsMenuWrapper,
+            #texturedColoursMenuWrapper {
                 right: 62px;
             }
 
@@ -2737,7 +3721,11 @@
             #environmentOuterBox,
             #teleportOuterBox,
             #profileOuterBox,
-            #finishTypeOuterBox {
+            #finishTypeOuterBox,
+            #solidColoursOuterBox,
+            #woodgrainsOuterBox,
+            #westCoastNaturalsOuterBox,
+            #texturedColoursOuterBox {
                 width: min(88vw, 420px);
             }
 
@@ -2752,6 +3740,16 @@
         let screenshotCounter = 1;
         let gameLoaded = false;
         let selectedBuild = null;
+        let movieSequenceActive = false;
+        let movieControlsVisible = false;
+        let movieExitRequested = false;
+        let movieStartSignalTimer = null;
+        let movieSequenceToken = 0;
+        let activeEnvironmentByBuild = {
+            Trad: "01",
+            Mod: "03",
+            Multi: "01"
+        };
         let lottieInstance = null;
         let readyMessageTimer = null;
         let appInAttentionState = false;
@@ -2829,6 +3827,9 @@
                             showReadyMessage();
                             showInGameUiAnimated();
                         });
+                    }
+                    if (parsed.movie === 'ended') {
+                        handleMovieEndedMessage();
                     }
                     handleProfileBackendPayload(parsed);
                 } catch (e) { }
@@ -2916,6 +3917,68 @@
                     button.setAttribute('aria-disabled', String(isDisabled));
                 });
             });
+        }
+        function getEnvironmentButtons() {
+            return Array.from(document.querySelectorAll('#environmentOptions .environmentCard'));
+        }
+        function getEnvironmentMessageKey(buildName) {
+            if (buildName === 'Mod') return 'envMod';
+            if (buildName === 'Trad') return 'envTrad';
+            if (buildName === 'Multi') return 'envMulti';
+            return null;
+        }
+        function getDefaultEnvironmentForBuild(buildName) {
+            if (buildName === 'Mod') return '03';
+            if (buildName === 'Trad') return '01';
+            if (buildName === 'Multi') return '01';
+            return '01';
+        }
+        function updateEnvironmentButtonImages(buildName) {
+            const suffixByBuild = {
+                Trad: 'Trad',
+                Mod: 'Mod',
+                Multi: 'Multi'
+            };
+            const suffix = suffixByBuild[buildName] || 'Mod';
+            getEnvironmentButtons().forEach((button, index) => {
+                const envNumber = String(index + 1).padStart(2, '0');
+                const image = button.querySelector('img');
+                if (!image) return;
+                image.src = `ENV${envNumber}_${suffix}.png`;
+                image.alt = `Environment ${index + 1}`;
+            });
+        }
+        function updateEnvironmentButtonStates() {
+            const activeBuild = selectedBuild;
+            const activeEnvironment = activeBuild ? activeEnvironmentByBuild[activeBuild] : null;
+            getEnvironmentButtons().forEach((button, index) => {
+                const envNumber = String(index + 1).padStart(2, '0');
+                const isDisabled = !activeBuild || envNumber === activeEnvironment;
+                button.disabled = isDisabled;
+                button.classList.toggle('is-disabled', isDisabled);
+                button.setAttribute('aria-disabled', String(isDisabled));
+            });
+        }
+        function setActiveEnvironment(buildName, envNumber, options = {}) {
+            if (!buildName || !envNumber) return;
+            activeEnvironmentByBuild[buildName] = envNumber;
+            updateEnvironmentButtonStates();
+            if (options.sendToBackend === false) return;
+            const messageKey = getEnvironmentMessageKey(buildName);
+            if (!messageKey) return;
+            sendToUnreal({ [messageKey]: envNumber });
+            showTimedOverlay('Loading environment', 2500);
+        }
+        function syncEnvironmentMenuForBuild(buildName) {
+            if (!buildName) {
+                updateEnvironmentButtonStates();
+                return;
+            }
+            if (!activeEnvironmentByBuild[buildName]) {
+                activeEnvironmentByBuild[buildName] = getDefaultEnvironmentForBuild(buildName);
+            }
+            updateEnvironmentButtonImages(buildName);
+            updateEnvironmentButtonStates();
         }
         function setLevelLoadingContent(buildName) {
             const video = document.getElementById("levelLoadingVideo");
@@ -3166,7 +4229,9 @@
         async function selectBuild(buildName) {
             if (appInAttentionState || suppressReconnect || sessionEndedByUser) return;
             selectedBuild = buildName;
+            activeEnvironmentByBuild[buildName] = getDefaultEnvironmentForBuild(buildName);
             updateLevelButtonStates();
+            syncEnvironmentMenuForBuild(buildName);
             gameRevealed = false;
             isRevealingGame = false;
             inGameUiLoaded = false;
@@ -3176,8 +4241,10 @@
             else if (buildName === "Mod") sendToUnreal('{"LoadLevel":"Mod"}');
             else if (buildName === "Multi") sendToUnreal('{"LoadLevel":"Multi"}');
         }
-        function showOverlay(message) { document.getElementById("overlayText").innerText = message; document.getElementById("screenshotOverlay").style.display = "flex"; }
-        function hideOverlay() { document.getElementById("screenshotOverlay").style.display = "none"; }
+        let overlayHideTimer = null;
+        function showOverlay(message) { clearTimeout(overlayHideTimer); document.getElementById("overlayText").innerText = message; document.getElementById("screenshotOverlay").style.display = "flex"; }
+        function hideOverlay() { clearTimeout(overlayHideTimer); document.getElementById("screenshotOverlay").style.display = "none"; }
+        function showTimedOverlay(message, duration = 2500) { showOverlay(message); overlayHideTimer = setTimeout(hideOverlay, duration); }
         function showPreloadSpinner() { document.getElementById("preloadSpinner").classList.add("visible"); }
         function hidePreloadSpinner() { document.getElementById("preloadSpinner").classList.remove("visible"); }
         function createFile(file) {
@@ -3209,6 +4276,7 @@
 
         let activeDockMode = 'walk';
         let currentProfileSet = '';
+        let currentColorSet = '';
         let currentProfileVariant = 'BOARD_AND_BATTEN';
         let currentProfileButtonMode = 'profile';
         let profileTitleAnimationId = 0;
@@ -3216,6 +4284,10 @@
         let profileTitleEl;
         let profileColorEl;
         let profileOptionsButtonEl;
+        let solidColoursTitleEl;
+        let woodgrainsTitleEl;
+        let westCoastNaturalsTitleEl;
+        let texturedColoursTitleEl;
         const V_GROOVE_VARIANTS = {
             family: 'V_GROOVE',
             six: 'V_GROOVE_6_INCH',
@@ -3248,6 +4320,67 @@
             [DOUBLE_SEVEN_VARIANTS.nonVented]: 'VENTED',
             V_GROOVE_6INCH_VENTED: 'OPTIONS'
         };
+        const solidColourOptions = [
+            'BRONZE',
+            'COLONIAL_RED',
+            'DARK_BRONZE',
+            'FOREST_GREEN',
+            'GLACIER_WHITE',
+            'HARTFORD_GREEN',
+            'HEMLOCK_GREEN',
+            'MOCHA',
+            'OBSIDIAN',
+            'OLD_TOWN_GREY',
+            'OLD_ZINC_GREY',
+            'PARCHMENT',
+            'REGAL_BLUE',
+            'RETRO_RED',
+            'SIERRATAN',
+            'SLATE_GREY',
+            'TERRACOTTA',
+            'TWILIGHT_BLUE',
+            'WEATHERED_COPPER'
+        ];
+
+        const woodgrainOptions = [
+            'CEDAR',
+            'CLASSIC_CHERRY',
+            'CYPRESS',
+            'DRIFTWOOD',
+            'FIR',
+            'KNOTTY_CHESTNUT',
+            'KNOTTY_DESERT_OAK',
+            'KNOTTY_TEAK',
+            'KONA',
+            'PECAN',
+            'SUEDE',
+            'WALNUT',
+            'WHITE_OAK'
+        ];
+
+        const westCoastNaturalsOptions = [
+            'CHARWOOD',
+            'COASTAL_SAND',
+            'FAWN',
+            'HEARTWOOD',
+            'HEMLOCK',
+            'HICKORY',
+            'IRONWOOD',
+            'MAHOGANY',
+            'TOBACCO'
+        ];
+
+        const texturedColourOptions = [
+            'BRUSHED_CARBON',
+            'BRUSHED_GRAPHITE',
+            'CHAMPAGNE_WAVE',
+            'COPPER_WAVE',
+            'SILVER_WAVE',
+            'STARLIGHT',
+            'TEXTURED_BLACK_ONYX',
+            'TEXTURED_COFFEE'
+        ];
+
         const profileModeEnabledVariants = {
             profile: new Set(['BOARD_AND_BATTEN', 'RANDOM_PLANK', 'V_GROOVE_6_INCH', 'FOLDED_WALL']),
             soffit: new Set(['DOUBL7_VENTED', 'V_GROOVE_6INCH_VENTED'])
@@ -3263,17 +4396,22 @@
             const responsiveScale = userScale * getResponsiveUiScaleMultiplier();
             root.style.setProperty('--ui-scale', responsiveScale.toFixed(3));
         }
-        const uiModeClasses = ['walk-mode', 'camera-mode', 'building-mode', 'environment-mode', 'confirm-mode', 'teleport-mode', 'profile-mode', 'finish-type-mode'];
+        const uiModeClasses = ['walk-mode', 'camera-mode', 'building-mode', 'environment-mode', 'how-to-mode', 'confirm-mode', 'teleport-mode', 'profile-mode', 'finish-type-mode', 'solid-colours-mode', 'woodgrains-mode', 'west-coast-naturals-mode', 'textured-colours-mode'];
         const panelWrapperMap = {
             main: 'uiWrapper',
             walk: null,
             camera: 'cameraMenuWrapper',
             building: 'buildingMenuWrapper',
             environment: 'environmentMenuWrapper',
+            'how-to': 'howToMenuWrapper',
             confirm: 'confirmMenuWrapper',
             teleport: 'teleportMenuWrapper',
             profile: 'profileMenuWrapper',
-            'finish-type': 'finishTypeMenuWrapper'
+            'finish-type': 'finishTypeMenuWrapper',
+            'solid-colours': 'solidColoursMenuWrapper',
+            'woodgrains': 'woodgrainsMenuWrapper',
+            'west-coast-naturals': 'westCoastNaturalsMenuWrapper',
+            'textured-colours': 'texturedColoursMenuWrapper'
         };
         let menuSwitchTimer = null;
         let menuCleanupTimer = null;
@@ -3283,10 +4421,15 @@
             if (bodyEl.classList.contains('camera-mode')) return 'camera';
             if (bodyEl.classList.contains('building-mode')) return 'building';
             if (bodyEl.classList.contains('environment-mode')) return 'environment';
+            if (bodyEl.classList.contains('how-to-mode')) return 'how-to';
             if (bodyEl.classList.contains('confirm-mode')) return 'confirm';
             if (bodyEl.classList.contains('teleport-mode')) return 'teleport';
             if (bodyEl.classList.contains('profile-mode')) return 'profile';
             if (bodyEl.classList.contains('finish-type-mode')) return 'finish-type';
+            if (bodyEl.classList.contains('solid-colours-mode')) return 'solid-colours';
+            if (bodyEl.classList.contains('woodgrains-mode')) return 'woodgrains';
+            if (bodyEl.classList.contains('west-coast-naturals-mode')) return 'west-coast-naturals';
+            if (bodyEl.classList.contains('textured-colours-mode')) return 'textured-colours';
             if (bodyEl.classList.contains('walk-mode')) return 'walk';
             return 'main';
         }
@@ -3544,6 +4687,8 @@
         function closeBuildingMenu() { switchPanel('main'); }
         function openEnvironmentMenu() { switchPanel('environment'); }
         function closeEnvironmentMenu() { switchPanel('main'); }
+        function openHowToMenu() { switchPanel('how-to'); }
+        function closeHowToMenu() { switchPanel('main'); }
         function openConfirmMenu() { switchPanel('confirm'); }
         function closeConfirmMenu() { switchPanel('main'); }
         function toggleTreesVisibility() {
@@ -3554,6 +4699,54 @@
         function closeProfileMenu() { switchPanel('main'); }
         function openFinishTypeMenu() { switchPanel('finish-type'); }
         function closeFinishTypeMenu() { switchPanel('profile'); }
+        function openSolidColoursMenu() {
+            updateSolidColoursTitle(profileColorEl ? profileColorEl.textContent : '');
+            switchPanel('solid-colours');
+        }
+        function closeSolidColoursMenu() { switchPanel('profile'); }
+        function openWoodgrainsMenu() {
+            updateWoodgrainsTitle(profileColorEl ? profileColorEl.textContent : '');
+            switchPanel('woodgrains');
+        }
+        function closeWoodgrainsMenu() { switchPanel('profile'); }
+        function openWestCoastNaturalsMenu() {
+            updateWestCoastNaturalsTitle(profileColorEl ? profileColorEl.textContent : '');
+            switchPanel('west-coast-naturals');
+        }
+        function closeWestCoastNaturalsMenu() { switchPanel('profile'); }
+        function openTexturedColoursMenu() {
+            updateTexturedColoursTitle(profileColorEl ? profileColorEl.textContent : '');
+            switchPanel('textured-colours');
+        }
+        function closeTexturedColoursMenu() { switchPanel('profile'); }
+        function handleSolidColourButtonClick(button) {
+            const colourName = button?.dataset?.colourName || '';
+            if (!colourName || !currentColorSet) return;
+            sendToUnreal({ [currentColorSet]: colourName });
+            updateProfileColorTitle(colourName);
+            updateSolidColoursTitle(colourName);
+        }
+        function handleWoodgrainButtonClick(button) {
+            const colourName = button?.dataset?.colourName || '';
+            if (!colourName || !currentColorSet) return;
+            sendToUnreal({ [currentColorSet]: colourName });
+            updateProfileColorTitle(colourName);
+            updateWoodgrainsTitle(colourName);
+        }
+        function handleWestCoastNaturalsButtonClick(button) {
+            const colourName = button?.dataset?.colourName || '';
+            if (!colourName || !currentColorSet) return;
+            sendToUnreal({ [currentColorSet]: colourName });
+            updateProfileColorTitle(colourName);
+            updateWestCoastNaturalsTitle(colourName);
+        }
+        function handleTexturedColoursButtonClick(button) {
+            const colourName = button?.dataset?.colourName || '';
+            if (!colourName || !currentColorSet) return;
+            sendToUnreal({ [currentColorSet]: colourName });
+            updateProfileColorTitle(colourName);
+            updateTexturedColoursTitle(colourName);
+        }
         function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
         function getButtonsForFloor(floor) { return Array.from(document.querySelectorAll(`.teleportJumpTarget[data-floor="${floor}"]`)); }
         function getTargetSequenceDuration(floor) { const count = jumpTargetData[floor]?.length || 0; if (count === 0) return 0; return 420 + ((count - 1) * 80); }
@@ -3721,9 +4914,28 @@
             updateProfileOptionsText(normalized);
             setActiveProfileTypeByVariant(normalized);
         }
+        function formatColourTitle(value) {
+            return String(value || '').replace(/_/g, ' ');
+        }
         function updateProfileColorTitle(value) {
             if (!profileColorEl) return;
-            profileColorEl.textContent = formatVariantLabel(value);
+            profileColorEl.textContent = formatColourTitle(value);
+        }
+        function updateSolidColoursTitle(value) {
+            if (!solidColoursTitleEl) return;
+            solidColoursTitleEl.textContent = formatColourTitle(value);
+        }
+        function updateWoodgrainsTitle(value) {
+            if (!woodgrainsTitleEl) return;
+            woodgrainsTitleEl.textContent = formatColourTitle(value);
+        }
+        function updateWestCoastNaturalsTitle(value) {
+            if (!westCoastNaturalsTitleEl) return;
+            westCoastNaturalsTitleEl.textContent = formatColourTitle(value);
+        }
+        function updateTexturedColoursTitle(value) {
+            if (!texturedColoursTitleEl) return;
+            texturedColoursTitleEl.textContent = formatColourTitle(value);
         }
         function applyProfileButtonAvailability(mode) {
             const normalizedMode = normalizeVariantToken(mode).toLowerCase();
@@ -3764,8 +4976,15 @@
         }
         function handleProfileBackendPayload(parsed) {
             if (typeof parsed.profileSet === 'string') currentProfileSet = normalizeVariantToken(parsed.profileSet);
+            if (typeof parsed.colorSet === 'string') currentColorSet = parsed.colorSet;
             if (typeof parsed.profileTitle === 'string') updateProfileTitle(parsed.profileTitle, { immediate: true });
-            if (typeof parsed.colorTitle === 'string') updateProfileColorTitle(parsed.colorTitle);
+            if (typeof parsed.colorTitle === 'string') {
+                updateProfileColorTitle(parsed.colorTitle);
+                updateSolidColoursTitle(parsed.colorTitle);
+                updateWoodgrainsTitle(parsed.colorTitle);
+                updateWestCoastNaturalsTitle(parsed.colorTitle);
+                updateTexturedColoursTitle(parsed.colorTitle);
+            }
             if (typeof parsed.showButtons === 'string') applyProfileButtonAvailability(parsed.showButtons);
             if (parsed.open === 'editProfiles') openProfileMenu();
         }
@@ -3836,12 +5055,156 @@
         const teleportFloorTitles = { basement: 'BASEMENT', ground: 'GROUND FLOOR', first: 'FIRST FLOOR' };
         const teleportFloorButtons = [];
 
+        function getMovieBuildKey() {
+            if (selectedBuild === 'Trad') return 'Trad';
+            if (selectedBuild === 'Multi') return 'Multi';
+            return 'Mod';
+        }
+        function clearMovieStartSignalTimer() {
+            if (movieStartSignalTimer) {
+                clearTimeout(movieStartSignalTimer);
+                movieStartSignalTimer = null;
+            }
+        }
+        function waitForMs(duration) {
+            return new Promise((resolve) => setTimeout(resolve, duration));
+        }
+        function setMovieUiHidden(hidden) {
+            document.body.classList.toggle('movie-ui-hidden', !!hidden);
+        }
+        function animateMovieUiBackIn() {
+            document.body.classList.remove('movie-ui-hidden');
+            document.body.classList.add('movie-ui-restoring');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    document.body.classList.remove('movie-ui-restoring');
+                });
+            });
+        }
+        function setMovieControlMenuVisible(visible) {
+            movieControlsVisible = !!visible;
+            const menu = document.getElementById('movieControlMenu');
+            if (!menu) return;
+            menu.classList.toggle('visible', !!visible);
+            menu.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        }
+        function setMoviePlaybackOverlayVisible(visible) {
+            const overlay = document.getElementById('moviePlaybackOverlay');
+            if (!overlay) return;
+            overlay.classList.toggle('visible', !!visible);
+            overlay.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        }
+        function setMovieExitOverlayVisible(visible) {
+            const overlay = document.getElementById('movieExitOverlay');
+            if (!overlay) return;
+            overlay.classList.toggle('visible', !!visible);
+            overlay.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        }
+        function setMovieLogoVisible(elementId, visible) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            element.classList.toggle('visible', !!visible);
+        }
+        function stopMoviePlaybackVideo() {
+            const video = document.getElementById('moviePlaybackVideo');
+            if (!video) return;
+            try {
+                video.pause();
+                video.currentTime = 0;
+            } catch (e) { }
+        }
+        function resetMoviePlaybackOverlay() {
+            clearMovieStartSignalTimer();
+            setMovieLogoVisible('moviePlaybackLogo', false);
+            setMovieLogoVisible('moviePlaybackUnrealLogo', false);
+            setMoviePlaybackOverlayVisible(false);
+            stopMoviePlaybackVideo();
+        }
+        async function playMovieFromEditMenu() {
+            if (movieSequenceActive || !selectedBuild || appInAttentionState || suppressReconnect || sessionEndedByUser) return;
+            movieSequenceActive = true;
+            movieExitRequested = false;
+            movieSequenceToken += 1;
+            const sequenceToken = movieSequenceToken;
+            const playbackVideo = document.getElementById('moviePlaybackVideo');
+            setMovieControlMenuVisible(false);
+            setMovieExitOverlayVisible(false);
+            setMovieLogoVisible('movieExitLogo', false);
+            setMovieUiHidden(true);
+            sendToUnreal({ playMovie: getMovieBuildKey() });
+            setMoviePlaybackOverlayVisible(true);
+            if (playbackVideo) {
+                try {
+                    playbackVideo.currentTime = 0;
+                    const playbackPromise = playbackVideo.play();
+                    if (playbackPromise && typeof playbackPromise.catch === 'function') playbackPromise.catch(() => { });
+                } catch (e) { }
+            }
+            await waitForMs(450);
+            if (sequenceToken !== movieSequenceToken) return;
+            setMovieLogoVisible('moviePlaybackLogo', true);
+            await waitForMs(2400);
+            if (sequenceToken !== movieSequenceToken) return;
+            setMovieLogoVisible('moviePlaybackLogo', false);
+            await waitForMs(1150);
+            if (sequenceToken !== movieSequenceToken) return;
+            setMovieLogoVisible('moviePlaybackUnrealLogo', true);
+            clearMovieStartSignalTimer();
+            movieStartSignalTimer = setTimeout(() => {
+                sendToUnreal({ playMovie: 'start' });
+                movieStartSignalTimer = null;
+            }, 2900);
+            await waitForMs(4200);
+            if (sequenceToken !== movieSequenceToken) return;
+            setMovieLogoVisible('moviePlaybackUnrealLogo', false);
+            await waitForMs(320);
+            if (sequenceToken !== movieSequenceToken) return;
+            setMoviePlaybackOverlayVisible(false);
+            await waitForMs(500);
+            if (sequenceToken !== movieSequenceToken) return;
+            setMovieControlMenuVisible(true);
+            movieSequenceActive = false;
+        }
+        async function beginMovieExitFlow() {
+            if (movieExitRequested) return;
+            movieExitRequested = true;
+            movieSequenceToken += 1;
+            clearMovieStartSignalTimer();
+            resetMoviePlaybackOverlay();
+            setMovieControlMenuVisible(false);
+            setMovieExitOverlayVisible(true);
+            await waitForMs(1500);
+            setMovieLogoVisible('movieExitLogo', true);
+            await waitForMs(450);
+            sendToUnreal({ playMovie: 'exit' });
+            movieSequenceActive = false;
+        }
+        async function handleMovieEndedMessage() {
+            movieSequenceToken += 1;
+            clearMovieStartSignalTimer();
+            resetMoviePlaybackOverlay();
+            setMovieControlMenuVisible(false);
+            setMovieExitOverlayVisible(true);
+            await waitForMs(1200);
+            setMovieLogoVisible('movieExitLogo', true);
+            await waitForMs(movieExitRequested ? 1200 : 2550);
+            setMovieLogoVisible('movieExitLogo', false);
+            await waitForMs(1400);
+            setMovieExitOverlayVisible(false);
+            await waitForMs(1800);
+            animateMovieUiBackIn();
+            movieExitRequested = false;
+            movieSequenceActive = false;
+        }
+
         window.addEventListener("DOMContentLoaded", () => {
             document.getElementById("btnTrad").addEventListener("click", () => selectBuild("Trad"));
             document.getElementById("btnMod").addEventListener("click", () => selectBuild("Mod"));
             document.getElementById("btnMulti").addEventListener("click", () => selectBuild("Multi"));
             updateLevelButtonStates();
+            syncEnvironmentMenuForBuild(selectedBuild || 'Mod');
             document.getElementById("retryButton").addEventListener("click", () => location.reload());
+
 
             const scaleSlider = document.getElementById('scaleSlider');
             const sliderContainer = document.getElementById('sliderContainer');
@@ -3853,12 +5216,18 @@
             const buildingMenuCloseButton = document.getElementById('buildingMenuCloseButton');
             const environmentMenuButton = document.getElementById('environmentMenuButton');
             const environmentMenuCloseButton = document.getElementById('environmentMenuCloseButton');
+            const howToMenuButton = document.getElementById('howToMenuButton');
+            const howToMenuCloseButton = document.getElementById('howToMenuCloseButton');
             const endSessionButton = document.getElementById('endSession');
             const confirmMenuCloseButton = document.getElementById('confirmMenuCloseButton');
             const confirmNoButton = document.getElementById('confirmNoButton');
             const confirmYesButton = document.getElementById('confirmYesButton');
             const teleportMenuButton = document.getElementById('teleportMenuButton');
             const treeToggleButton = document.getElementById('treeToggleButton');
+            const playMovieButton = document.getElementById('playMovieButton');
+            const moviePauseButton = document.getElementById('moviePauseButton');
+            const movieResumeButton = document.getElementById('movieResumeButton');
+            const movieExitButton = document.getElementById('movieExitButton');
             const teleportMenuCloseButton = document.getElementById('teleportMenuCloseButton');
             const cameraHeightSlider = document.getElementById('cameraHeightSlider');
             const cameraZoomSlider = document.getElementById('cameraZoomSlider');
@@ -3867,12 +5236,21 @@
             const editButton = document.getElementById('editButton');
             const profileMenuCloseButton = document.getElementById('profileMenuCloseButton');
             const finishTypeMenuCloseButton = document.getElementById('finishTypeMenuCloseButton');
+            const solidColoursMenuCloseButton = document.getElementById('solidColoursMenuCloseButton');
+            const woodgrainsMenuCloseButton = document.getElementById('woodgrainsMenuCloseButton');
+            const westCoastNaturalsMenuCloseButton = document.getElementById('westCoastNaturalsMenuCloseButton');
+            const texturedColoursMenuCloseButton = document.getElementById('texturedColoursMenuCloseButton');
             const profileColoursButton = document.getElementById('profileColoursButton');
             const editModeIntroOkButton = document.getElementById('editModeIntroOkButton');
             const profileTypeButtons = Array.from(document.querySelectorAll('.profileTypeButton'));
+            const environmentButtons = getEnvironmentButtons();
             profileTitleEl = document.querySelector('.profileTitleText');
             profileColorEl = document.querySelector('.profileColorText');
             profileOptionsButtonEl = document.getElementById('profileOptionsButton');
+            solidColoursTitleEl = document.getElementById('solidColoursTitle');
+            woodgrainsTitleEl = document.getElementById('woodgrainsTitle');
+            westCoastNaturalsTitleEl = document.getElementById('westCoastNaturalsTitle');
+            texturedColoursTitleEl = document.getElementById('texturedColoursTitle');
             teleportMapTitle = document.getElementById('teleportMapTitle');
             teleportJumpTargetsLayer = document.getElementById('teleportJumpTargetsLayer');
             teleportBasementButton = document.getElementById('teleportBasementButton');
@@ -3924,21 +5302,68 @@
             buildingMenuCloseButton.addEventListener('click', closeBuildingMenu);
             environmentMenuButton.addEventListener('click', openEnvironmentMenu);
             environmentMenuCloseButton.addEventListener('click', closeEnvironmentMenu);
+            if (howToMenuButton) howToMenuButton.addEventListener('click', openHowToMenu);
+            if (howToMenuCloseButton) howToMenuCloseButton.addEventListener('click', closeHowToMenu);
             teleportMenuButton.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); openTeleportMenu(); });
             teleportMenuButton.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); });
             if (treeToggleButton) treeToggleButton.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); toggleTreesVisibility(); });
+            if (playMovieButton) {
+                playMovieButton.addEventListener('click', () => playMovieFromEditMenu());
+            }
+            if (moviePauseButton) {
+                moviePauseButton.addEventListener('click', () => sendToUnreal({ playMovie: 'pause' }));
+            }
+            if (movieResumeButton) {
+                movieResumeButton.addEventListener('click', () => sendToUnreal({ playMovie: 'play' }));
+            }
+            if (movieExitButton) {
+                movieExitButton.addEventListener('click', () => beginMovieExitFlow());
+            }
             teleportMenuCloseButton.addEventListener('click', closeTeleportMenu);
             editButton.addEventListener('click', enterEditMode);
             if (editModeIntroOkButton) editModeIntroOkButton.addEventListener('click', () => hideEditModeIntro());
             profileMenuCloseButton.addEventListener('click', closeProfileMenu);
             if (finishTypeMenuCloseButton) finishTypeMenuCloseButton.addEventListener('click', closeFinishTypeMenu);
+            if (solidColoursMenuCloseButton) solidColoursMenuCloseButton.addEventListener('click', closeSolidColoursMenu);
+            if (woodgrainsMenuCloseButton) woodgrainsMenuCloseButton.addEventListener('click', closeWoodgrainsMenu);
+            if (westCoastNaturalsMenuCloseButton) westCoastNaturalsMenuCloseButton.addEventListener('click', closeWestCoastNaturalsMenu);
+            if (texturedColoursMenuCloseButton) texturedColoursMenuCloseButton.addEventListener('click', closeTexturedColoursMenu);
             if (profileColoursButton) profileColoursButton.addEventListener('click', openFinishTypeMenu);
             profileTypeButtons.forEach((button) => button.addEventListener('click', () => handleProfileTypeButtonClick(button)));
             if (profileOptionsButtonEl) profileOptionsButtonEl.addEventListener('click', handleProfileOptionsButtonClick);
             document.querySelectorAll('.finishTypeButton').forEach((button) => {
                 button.addEventListener('click', () => {
-                    console.log(`Finish type selected: ${button.dataset.finishMenu || ''}`);
+                    const finishMenu = button.dataset.finishMenu || '';
+                    if (finishMenu === 'SOLID_COLOURS') {
+                        openSolidColoursMenu();
+                        return;
+                    }
+                    if (finishMenu === 'WOODGRAINS') {
+                        openWoodgrainsMenu();
+                        return;
+                    }
+                    if (finishMenu === 'WEST_COAST_NATURALS') {
+                        openWestCoastNaturalsMenu();
+                        return;
+                    }
+                    if (finishMenu === 'TEXTURED_COLOURS') {
+                        openTexturedColoursMenu();
+                        return;
+                    }
+                    console.log(`Finish type selected: ${finishMenu}`);
                 });
+            });
+            document.querySelectorAll('.solidColourButton').forEach((button) => {
+                button.addEventListener('click', () => handleSolidColourButtonClick(button));
+            });
+            document.querySelectorAll('.woodgrainButton').forEach((button) => {
+                button.addEventListener('click', () => handleWoodgrainButtonClick(button));
+            });
+            document.querySelectorAll('.westCoastNaturalsButton').forEach((button) => {
+                button.addEventListener('click', () => handleWestCoastNaturalsButtonClick(button));
+            });
+            document.querySelectorAll('.texturedColoursButton').forEach((button) => {
+                button.addEventListener('click', () => handleTexturedColoursButtonClick(button));
             });
             teleportBasementButton.addEventListener('click', () => setTeleportFloor('basement'));
             teleportGroundButton.addEventListener('click', () => setTeleportFloor('ground'));
@@ -3971,7 +5396,16 @@
             document.getElementById('buildingBtnTrad').addEventListener('click', () => selectBuild('Trad'));
             document.getElementById('buildingBtnMod').addEventListener('click', () => selectBuild('Mod'));
             document.getElementById('buildingBtnMulti').addEventListener('click', () => selectBuild('Multi'));
+            environmentButtons.forEach((button, index) => {
+                const envNumber = String(index + 1).padStart(2, '0');
+                button.addEventListener('click', () => {
+                    if (!selectedBuild) return;
+                    if (button.disabled || button.classList.contains('is-disabled')) return;
+                    setActiveEnvironment(selectedBuild, envNumber, { sendToBackend: true });
+                });
+            });
             updateLevelButtonStates();
+            syncEnvironmentMenuForBuild(selectedBuild || 'Mod');
         });
     </script>
 </head>
@@ -4062,9 +5496,9 @@
                                     alt="Environment"></button>
                             <button class="iconButton" id="homeMenuButton" type="button"
                                 aria-label="Choose Building"><img src="01 HOME.png" alt="Home"></button>
-                            <button class="iconButton" type="button" aria-label="Play"><img src="01 PLAY.png"
+                            <button class="iconButton" id="playMovieButton" type="button" aria-label="Play"><img src="01 PLAY.png"
                                     alt="Play"></button>
-                            <button class="iconButton" type="button" aria-label="How To"><img src="01 HOW TO.png"
+                            <button class="iconButton" id="howToMenuButton" type="button" aria-label="How To"><img src="01 HOW TO.png"
                                     alt="How To"></button>
                             <button class="iconButton" id="teleportMenuButton" type="button" aria-label="Teleport"><img
                                     src="01 TELEPORT.png" alt="Teleport"></button>
@@ -4112,6 +5546,19 @@
                     </div>
                 </div>
                 <div id="generateImageButton">GENERATE IMAGE</div>
+            </div>
+        </div>
+
+        <div id="howToMenuWrapper" class="uiInteractive">
+            <div id="howToOuterBox" class="glassPanel">
+                <div id="howToTopBar"><img id="howToLogo" src="LOGO.png" alt="Logo"><button class="topIconButton"
+                        id="howToMenuCloseButton" type="button" aria-label="Exit how to menu"><img
+                            src="01 DOCK MENU.png" alt="Exit"></button></div>
+                <div id="howToInnerBoxWrapper">
+                    <div id="howToInnerBox">
+                        <div id="howToInfoWrap"><img id="howToInfoImage" src="info.png" alt="How to information"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -4184,14 +5631,14 @@
                     <div id="finishTypeInnerBox">
                         <div id="finishTypeTitle">CHOOSE FINISH TYPE</div>
                         <div id="finishTypeButtonRow"><button class="finishTypeButton" type="button"
-                                data-finish-menu="WEST_COAST_NATURAL" aria-label="Open West Coast Natural colours menu">
+                                data-finish-menu="WEST_COAST_NATURALS" aria-label="Open West Coast Natural colours menu">
                                 <div>
                                     <div class="finishTypeButtonStack"><img
                                             class="finishTypeButtonLayer finishTypeButtonLayer--bottom" src="wcn01.png"
                                             alt=""><img class="finishTypeButtonLayer finishTypeButtonLayer--middle"
                                             src="wcn02.png" alt=""><img
                                             class="finishTypeButtonLayer finishTypeButtonLayer--top" src="wcn03.png"
-                                            alt=""></div><span class="finishTypeButtonLabel">WEST COAST NATURAL</span>
+                                            alt=""></div><span class="finishTypeButtonLabel">WEST COAST NATURALS</span>
                                 </div>
                             </button><button class="finishTypeButton" type="button" data-finish-menu="WOODGRAINS"
                                 aria-label="Open woodgrains colours menu">
@@ -4229,6 +5676,101 @@
             </div>
         </div>
 
+        <div id="solidColoursMenuWrapper" class="uiInteractive">
+            <div id="solidColoursOuterBox" class="glassPanel">
+                <div id="solidColoursTopBar"><img id="solidColoursLogo" src="LOGO.png" alt="Logo"><button
+                        class="topIconButton" id="solidColoursMenuCloseButton" type="button"
+                        aria-label="Back to profile menu"><img src="01 DOCK MENU.png" alt="Back"></button></div>
+                <div id="solidColoursInnerBoxWrapper">
+                    <div id="solidColoursInnerBox">
+                        <div id="solidColoursTitle">KNOTTY CHESTNUT</div>
+                        <div id="solidColoursButtonGrid"><button class="solidColourButton" type="button" data-colour-name="BRONZE" aria-label="Select BRONZE"><img src="sc_swatches/BRONZE.png" alt="BRONZE"></button><button class="solidColourButton" type="button" data-colour-name="COLONIAL_RED" aria-label="Select COLONIAL RED"><img src="sc_swatches/COLONIAL_RED.png" alt="COLONIAL_RED"></button><button class="solidColourButton" type="button" data-colour-name="DARK_BRONZE" aria-label="Select DARK BRONZE"><img src="sc_swatches/DARK_BRONZE.png" alt="DARK_BRONZE"></button><button class="solidColourButton" type="button" data-colour-name="FOREST_GREEN" aria-label="Select FOREST GREEN"><img src="sc_swatches/FOREST_GREEN.png" alt="FOREST_GREEN"></button><button class="solidColourButton" type="button" data-colour-name="GLACIER_WHITE" aria-label="Select GLACIER WHITE"><img src="sc_swatches/GLACIER_WHITE.png" alt="GLACIER_WHITE"></button><button class="solidColourButton" type="button" data-colour-name="HARTFORD_GREEN" aria-label="Select HARTFORD GREEN"><img src="sc_swatches/HARTFORD_GREEN.png" alt="HARTFORD_GREEN"></button><button class="solidColourButton" type="button" data-colour-name="HEMLOCK_GREEN" aria-label="Select HEMLOCK GREEN"><img src="sc_swatches/HEMLOCK_GREEN.png" alt="HEMLOCK_GREEN"></button><button class="solidColourButton" type="button" data-colour-name="MOCHA" aria-label="Select MOCHA"><img src="sc_swatches/MOCHA.png" alt="MOCHA"></button><button class="solidColourButton" type="button" data-colour-name="OBSIDIAN" aria-label="Select OBSIDIAN"><img src="sc_swatches/OBSIDIAN.png" alt="OBSIDIAN"></button><button class="solidColourButton" type="button" data-colour-name="OLD_TOWN_GREY" aria-label="Select OLD TOWN GREY"><img src="sc_swatches/OLD_TOWN_GREY.png" alt="OLD_TOWN_GREY"></button><button class="solidColourButton" type="button" data-colour-name="OLD_ZINC_GREY" aria-label="Select OLD ZINC GREY"><img src="sc_swatches/OLD_ZINC_GREY.png" alt="OLD_ZINC_GREY"></button><button class="solidColourButton" type="button" data-colour-name="PARCHMENT" aria-label="Select PARCHMENT"><img src="sc_swatches/PARCHMENT.png" alt="PARCHMENT"></button><button class="solidColourButton" type="button" data-colour-name="REGAL_BLUE" aria-label="Select REGAL BLUE"><img src="sc_swatches/REGAL_BLUE.png" alt="REGAL_BLUE"></button><button class="solidColourButton" type="button" data-colour-name="RETRO_RED" aria-label="Select RETRO RED"><img src="sc_swatches/RETRO_RED.png" alt="RETRO_RED"></button><button class="solidColourButton" type="button" data-colour-name="SIERRATAN" aria-label="Select SIERRATAN"><img src="sc_swatches/SIERRATAN.png" alt="SIERRATAN"></button><button class="solidColourButton" type="button" data-colour-name="SLATE_GREY" aria-label="Select SLATE GREY"><img src="sc_swatches/SLATE_GREY.png" alt="SLATE_GREY"></button><button class="solidColourButton" type="button" data-colour-name="TERRACOTTA" aria-label="Select TERRACOTTA"><img src="sc_swatches/TERRACOTTA.png" alt="TERRACOTTA"></button><button class="solidColourButton" type="button" data-colour-name="TWILIGHT_BLUE" aria-label="Select TWILIGHT BLUE"><img src="sc_swatches/TWILIGHT_BLUE.png" alt="TWILIGHT_BLUE"></button><button class="solidColourButton" type="button" data-colour-name="WEATHERED_COPPER" aria-label="Select WEATHERED COPPER"><img src="sc_swatches/WEATHERED_COPPER.png" alt="WEATHERED_COPPER"></button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="woodgrainsMenuWrapper" class="uiInteractive">
+            <div id="woodgrainsOuterBox" class="glassPanel">
+                <div id="woodgrainsTopBar"><img id="woodgrainsLogo" src="LOGO.png" alt="Logo"><button
+                        class="topIconButton" id="woodgrainsMenuCloseButton" type="button"
+                        aria-label="Back to profile menu"><img src="01 DOCK MENU.png" alt="Back"></button></div>
+                <div id="woodgrainsInnerBoxWrapper">
+                    <div id="woodgrainsInnerBox">
+                        <div id="woodgrainsTitle">WHITE OAK</div>
+                        <div id="woodgrainsButtonRows">
+                            <div class="woodgrainsButtonRow">
+                                <button class="woodgrainButton" type="button" data-colour-name="CEDAR" aria-label="Select CEDAR"><img src="wg_swatches/CEDAR.jpg" alt="CEDAR"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="CLASSIC_CHERRY" aria-label="Select CLASSIC CHERRY"><img src="wg_swatches/CLASSIC_CHERRY.jpg" alt="CLASSIC_CHERRY"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="CYPRESS" aria-label="Select CYPRESS"><img src="wg_swatches/CYPRESS.jpg" alt="CYPRESS"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="DRIFTWOOD" aria-label="Select DRIFTWOOD"><img src="wg_swatches/DRIFTWOOD.jpg" alt="DRIFTWOOD"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="FIR" aria-label="Select FIR"><img src="wg_swatches/FIR.jpg" alt="FIR"></button>
+                            </div>
+                            <div class="woodgrainsButtonRow woodgrainsButtonRow--knotty">
+                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_CHESTNUT" aria-label="Select KNOTTY CHESTNUT"><img src="wg_swatches/KNOTTY_CHESTNUT.jpg" alt="KNOTTY_CHESTNUT"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_DESERT_OAK" aria-label="Select KNOTTY DESERT OAK"><img src="wg_swatches/KNOTTY_DESERT_OAK.jpg" alt="KNOTTY_DESERT_OAK"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_TEAK" aria-label="Select KNOTTY TEAK"><img src="wg_swatches/KNOTTY_TEAK.jpg" alt="KNOTTY_TEAK"></button>
+                            </div>
+                            <div class="woodgrainsButtonRow">
+                                <button class="woodgrainButton" type="button" data-colour-name="KONA" aria-label="Select KONA"><img src="wg_swatches/KONA.jpg" alt="KONA"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="PECAN" aria-label="Select PECAN"><img src="wg_swatches/PECAN.jpg" alt="PECAN"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="SUEDE" aria-label="Select SUEDE"><img src="wg_swatches/SUEDE.jpg" alt="SUEDE"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="WALNUT" aria-label="Select WALNUT"><img src="wg_swatches/WALNUT.jpg" alt="WALNUT"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="WHITE_OAK" aria-label="Select WHITE OAK"><img src="wg_swatches/WHITE_OAK.jpg" alt="WHITE_OAK"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="westCoastNaturalsMenuWrapper" class="uiInteractive">
+            <div id="westCoastNaturalsOuterBox" class="glassPanel">
+                <div id="westCoastNaturalsTopBar"><img id="westCoastNaturalsLogo" src="LOGO.png" alt="Logo"><button
+                        class="topIconButton" id="westCoastNaturalsMenuCloseButton" type="button"
+                        aria-label="Back to profile menu"><img src="01 DOCK MENU.png" alt="Back"></button></div>
+                <div id="westCoastNaturalsInnerBoxWrapper">
+                    <div id="westCoastNaturalsInnerBox">
+                        <div id="westCoastNaturalsTitle">HEMLOCK</div>
+                        <div id="westCoastNaturalsButtonGrid">
+                            <button class="westCoastNaturalsButton" type="button" data-colour-name="CHARWOOD" aria-label="Select CHARWOOD"><img src="wcn_swatches/CHARWOOD.jpg" alt="CHARWOOD"></button>
+                            <button class="westCoastNaturalsButton" type="button" data-colour-name="COASTAL_SAND" aria-label="Select COASTAL SAND"><img src="wcn_swatches/COASTAL_SAND.jpg" alt="COASTAL_SAND"></button>
+                            <button class="westCoastNaturalsButton" type="button" data-colour-name="FAWN" aria-label="Select FAWN"><img src="wcn_swatches/FAWN.jpg" alt="FAWN"></button>
+                            <button class="westCoastNaturalsButton" type="button" data-colour-name="HEARTWOOD" aria-label="Select HEARTWOOD"><img src="wcn_swatches/HEARTWOOD.jpg" alt="HEARTWOOD"></button>
+                            <button class="westCoastNaturalsButton" type="button" data-colour-name="HEMLOCK" aria-label="Select HEMLOCK"><img src="wcn_swatches/HEMLOCK.jpg" alt="HEMLOCK"></button>
+                            <button class="westCoastNaturalsButton" type="button" data-colour-name="HICKORY" aria-label="Select HICKORY"><img src="wcn_swatches/HICKORY.jpg" alt="HICKORY"></button>
+                            <button class="westCoastNaturalsButton" type="button" data-colour-name="IRONWOOD" aria-label="Select IRONWOOD"><img src="wcn_swatches/IRONWOOD.jpg" alt="IRONWOOD"></button>
+                            <button class="westCoastNaturalsButton" type="button" data-colour-name="MAHOGANY" aria-label="Select MAHOGANY"><img src="wcn_swatches/MAHOGANY.jpg" alt="MAHOGANY"></button>
+                            <button class="westCoastNaturalsButton" type="button" data-colour-name="TOBACCO" aria-label="Select TOBACCO"><img src="wcn_swatches/TOBACCO.jpg" alt="TOBACCO"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="texturedColoursMenuWrapper" class="uiInteractive">
+            <div id="texturedColoursOuterBox" class="glassPanel">
+                <div id="texturedColoursTopBar"><img id="texturedColoursLogo" src="LOGO.png" alt="Logo"><button
+                        class="topIconButton" id="texturedColoursMenuCloseButton" type="button"
+                        aria-label="Back to profile menu"><img src="01 DOCK MENU.png" alt="Back"></button></div>
+                <div id="texturedColoursInnerBoxWrapper">
+                    <div id="texturedColoursInnerBox">
+                        <div id="texturedColoursTitle">SILVER WAVE</div>
+                        <div id="texturedColoursButtonGrid">
+                            <button class="texturedColoursButton" type="button" data-colour-name="BRUSHED_CARBON" aria-label="Select BRUSHED CARBON"><img src="tx_swatches/BRUSHED_CARBON.png" alt="BRUSHED_CARBON"></button>
+                            <button class="texturedColoursButton" type="button" data-colour-name="BRUSHED_GRAPHITE" aria-label="Select BRUSHED GRAPHITE"><img src="tx_swatches/BRUSHED_GRAPHITE.png" alt="BRUSHED_GRAPHITE"></button>
+                            <button class="texturedColoursButton" type="button" data-colour-name="CHAMPAGNE_WAVE" aria-label="Select CHAMPAGNE WAVE"><img src="tx_swatches/CHAMPAGNE_WAVE.png" alt="CHAMPAGNE_WAVE"></button>
+                            <button class="texturedColoursButton" type="button" data-colour-name="COPPER_WAVE" aria-label="Select COPPER WAVE"><img src="tx_swatches/COPPER_WAVE.png" alt="COPPER_WAVE"></button>
+                            <button class="texturedColoursButton" type="button" data-colour-name="SILVER_WAVE" aria-label="Select SILVER WAVE"><img src="tx_swatches/SILVER_WAVE.png" alt="SILVER_WAVE"></button>
+                            <button class="texturedColoursButton" type="button" data-colour-name="STARLIGHT" aria-label="Select STARLIGHT"><img src="tx_swatches/STARLIGHT.png" alt="STARLIGHT"></button>
+                            <button class="texturedColoursButton" type="button" data-colour-name="TEXTURED_BLACK_ONYX" aria-label="Select TEXTURED BLACK ONYX"><img src="tx_swatches/TEXTURED_BLACK_ONYX.png" alt="TEXTURED_BLACK_ONYX"></button>
+                            <button class="texturedColoursButton" type="button" data-colour-name="TEXTURED_COFFEE" aria-label="Select TEXTURED COFFEE"><img src="tx_swatches/TEXTURED_COFFEE.png" alt="TEXTURED_COFFEE"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="buildingMenuWrapper" class="uiInteractive">
             <div id="buildingOuterBox" class="glassPanel">
                 <div id="buildingTopBar">
@@ -4260,11 +5802,11 @@
                 </div>
                 <div id="environmentInnerBoxWrapper">
                     <div id="environmentInnerBox">
-                        <div id="environmentOptions"><button class="environmentCard" type="button"
-                                aria-label="Environment 1"><img src="ENV01_Mod.png" alt="Environment 1"></button><button
-                                class="environmentCard" type="button" aria-label="Environment 2"><img
+                        <div id="environmentOptions"><button class="environmentCard" id="environmentBtn01" type="button"
+                                data-environment="01" aria-label="Environment 1"><img src="ENV01_Mod.png" alt="Environment 1"></button><button
+                                class="environmentCard" id="environmentBtn02" type="button" data-environment="02" aria-label="Environment 2"><img
                                     src="ENV02_Mod.png" alt="Environment 2"></button><button class="environmentCard"
-                                type="button" aria-label="Environment 3"><img src="ENV03_Mod.png"
+                                id="environmentBtn03" type="button" data-environment="03" aria-label="Environment 3"><img src="ENV03_Mod.png"
                                     alt="Environment 3"></button></div>
                     </div>
                 </div>
@@ -4308,6 +5850,27 @@
         </div>
     </div>
 
+    <div id="moviePlaybackOverlay" aria-hidden="true">
+        <video id="moviePlaybackVideo" src="LOADING_BG.mp4" muted playsinline preload="auto"></video>
+        <div id="moviePlaybackShade"></div>
+        <img id="moviePlaybackLogo" src="LOGO.png" alt="Logo">
+        <img id="moviePlaybackUnrealLogo" src="UNREAL LOGO.png" alt="Unreal Logo">
+    </div>
+
+    <div id="movieControlMenu" aria-hidden="true">
+        <button class="movieControlButton" id="moviePauseButton" type="button" aria-label="Pause movie"><img
+                src="01 pause.png" alt="Pause"></button>
+        <button class="movieControlButton" id="movieResumeButton" type="button" aria-label="Play movie"><img
+                src="01 PLAY.png" alt="Play"></button>
+        <button class="movieControlButton" id="movieExitButton" type="button" aria-label="Exit movie"><img
+                src="01 DOCK MENU.png" alt="Exit"></button>
+    </div>
+
+    <div id="movieExitOverlay" aria-hidden="true">
+        <div id="movieExitShade"></div>
+        <img id="movieExitLogo" src="LOGO.png" alt="Logo">
+    </div>
+
     <div id="transitionFade"></div>
     <div id="screenshotOverlay">
         <div class="overlayBox">
@@ -4318,3 +5881,4 @@
 </body>
 
 </html>
+
