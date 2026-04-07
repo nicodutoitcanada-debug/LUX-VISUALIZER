@@ -4242,21 +4242,68 @@
             else if (buildName === "Multi") sendToUnreal('{"LoadLevel":"Multi"}');
         }
         let overlayHideTimer = null;
+        let pendingScreenshotSaveHandle = null;
+        let screenshotRequestInFlight = false;
         function showOverlay(message) { clearTimeout(overlayHideTimer); document.getElementById("overlayText").innerText = message; document.getElementById("screenshotOverlay").style.display = "flex"; }
         function hideOverlay() { clearTimeout(overlayHideTimer); document.getElementById("screenshotOverlay").style.display = "none"; }
         function showTimedOverlay(message, duration = 2500) { showOverlay(message); overlayHideTimer = setTimeout(hideOverlay, duration); }
         function showPreloadSpinner() { document.getElementById("preloadSpinner").classList.add("visible"); }
         function hidePreloadSpinner() { document.getElementById("preloadSpinner").classList.remove("visible"); }
-        function createFile(file) {
-            const blob = new Blob(file.data, { type: file.mimetype });
+        function getScreenshotFileName(fileExtension = '.png') {
             const counterString = String(screenshotCounter).padStart(2, "0");
-            const fileName = `screenshot${counterString}${file.extension}`;
+            return `screenshot${counterString}${fileExtension}`;
+        }
+        function fallbackDownloadBlob(blob, fileName) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 3000);
+            document.getElementById("overlayText").innerText = "Your image has been saved";
+            overlayHideTimer = setTimeout(hideOverlay, 2000);
+        }
+        async function beginScreenshotRequest() {
+            if (screenshotRequestInFlight) return;
+            pendingScreenshotSaveHandle = null;
             if (window.showSaveFilePicker) {
-                (async () => { try { const handle = await window.showSaveFilePicker({ suggestedName: fileName, types: [{ description: "PNG Image", accept: { "image/png": [".png"] } }] }); hideOverlay(); const writable = await handle.createWritable(); await writable.write(blob); await writable.close(); } catch (err) { hideOverlay(); } })();
-            } else {
-                const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); document.getElementById("overlayText").innerText = "Your image has been saved"; setTimeout(hideOverlay, 2000);
+                try {
+                    pendingScreenshotSaveHandle = await window.showSaveFilePicker({
+                        suggestedName: getScreenshotFileName('.png'),
+                        types: [{ description: "PNG Image", accept: { "image/png": [".png"] } }]
+                    });
+                } catch (err) {
+                    hideOverlay();
+                    return;
+                }
             }
-            screenshotCounter++;
+            screenshotRequestInFlight = true;
+            showOverlay("Generating high resolution image");
+            sendToUnreal({ frontEnd: 'screenshot' });
+        }
+        async function createFile(file) {
+            const blob = new Blob(file.data, { type: file.mimetype });
+            const fileName = getScreenshotFileName(file.extension || '.png');
+            const saveHandle = pendingScreenshotSaveHandle;
+            pendingScreenshotSaveHandle = null;
+            try {
+                if (saveHandle) {
+                    const writable = await saveHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    document.getElementById("overlayText").innerText = "Your image has been saved";
+                    overlayHideTimer = setTimeout(hideOverlay, 2000);
+                } else {
+                    fallbackDownloadBlob(blob, fileName);
+                }
+                screenshotCounter++;
+            } catch (err) {
+                if (blob) fallbackDownloadBlob(blob, fileName);
+            } finally {
+                screenshotRequestInFlight = false;
+            }
         }
 
         /* ===============================
@@ -5392,7 +5439,7 @@
                 });
             }, true);
 
-            document.getElementById('generateImageButton').addEventListener('click', () => sendToUnreal({ frontEnd: 'screenshot' }));
+            document.getElementById('generateImageButton').addEventListener('click', () => { beginScreenshotRequest(); });
             document.getElementById('buildingBtnTrad').addEventListener('click', () => selectBuild('Trad'));
             document.getElementById('buildingBtnMod').addEventListener('click', () => selectBuild('Mod'));
             document.getElementById('buildingBtnMulti').addEventListener('click', () => selectBuild('Multi'));
@@ -5881,4 +5928,3 @@
 </body>
 
 </html>
-
