@@ -53,6 +53,27 @@
         body {
             height: var(--app-height);
             touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        #video-container,
+        #editUiRoot,
+        #editUiRoot *,
+        .uiInteractive,
+        .uiInteractive *,
+        button,
+        img {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        img,
+        button {
+            -webkit-user-drag: none;
+            user-drag: none;
         }
 
         #video-container {
@@ -1863,14 +1884,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 2px 4px 0 4px;
             position: relative;
             z-index: 2;
         }
 
         #howToInfoImage {
             width: 100%;
-            max-width: 360px;
+            max-width: 396px;
+            max-height: 348px;
             height: auto;
             display: block;
             object-fit: contain;
@@ -2781,6 +2803,7 @@
 
         .archesOptionThumb {
             width: 100%;
+            aspect-ratio: 1 / 1;
             border-radius: 18px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2790,10 +2813,10 @@
 
         .archesOptionButton img {
             width: 100%;
-            aspect-ratio: 1 / 1;
+            height: 100%;
             display: block;
             object-fit: cover;
-            opacity: 0.82;
+            opacity: 0.9;
             transition: opacity 0.2s ease, transform 0.2s ease;
             pointer-events: none;
             user-select: none;
@@ -3937,6 +3960,7 @@
             #cameraMenuWrapper,
             #buildingMenuWrapper,
             #environmentMenuWrapper,
+            #howToMenuWrapper,
             #confirmMenuWrapper,
             #teleportMenuWrapper,
             #profileMenuWrapper,
@@ -3944,8 +3968,13 @@
             #solidColoursMenuWrapper,
             #woodgrainsMenuWrapper,
             #westCoastNaturalsMenuWrapper,
-            #texturedColoursMenuWrapper {
-                right: 62px;
+            #texturedColoursMenuWrapper,
+            #archesMenuWrapper {
+                right: 50px;
+            }
+
+            #sliderContainer {
+                right: 6px;
             }
 
             #buildingOuterBox,
@@ -3992,6 +4021,7 @@
         let revealGamePromise = null;
         let editModeIntroShown = false;
         let archesMenuAvailable = false;
+        let awaitingTraditionalProfilePayload = false;
         let confirmMenuVariant = 'end-session';
         let awaitingArchesProfilePayload = false;
         let editModeIntroAutoHideTimer = null;
@@ -4210,7 +4240,7 @@
             const messageKey = getEnvironmentMessageKey(buildName);
             if (!messageKey) return;
             sendToUnreal({ [messageKey]: envNumber });
-            showTimedOverlay('Loading environment', 2500);
+            showTimedOverlay('Loading environment', 2500, true);
         }
         function syncEnvironmentMenuForBuild(buildName) {
             if (!buildName) {
@@ -4344,8 +4374,42 @@
         }
         function bindCameraSlider(slider, messageKey) {
             if (!slider) return;
-            const emitValue = (event) => sendToUnreal({ [messageKey]: formatSliderValue(event.target.value) });
+            const emitValue = (event) => {
+                if (slider.disabled) return;
+                sendToUnreal({ [messageKey]: formatSliderValue(event.target.value) });
+            };
             slider.addEventListener('input', emitValue);
+        }
+        function getCameraSliderElements() {
+            return [
+                document.getElementById('cameraHeightSlider'),
+                document.getElementById('cameraZoomSlider'),
+                document.getElementById('cameraExposureSlider'),
+                document.getElementById('cameraDofSlider')
+            ].filter(Boolean);
+        }
+        function setCameraSlidersInteractive(enabled) {
+            const cameraMenuWrapper = document.getElementById('cameraMenuWrapper');
+            getCameraSliderElements().forEach((slider) => {
+                slider.disabled = !enabled;
+                slider.tabIndex = enabled ? 0 : -1;
+                slider.blur();
+            });
+            if (cameraMenuWrapper) cameraMenuWrapper.style.pointerEvents = enabled ? 'auto' : 'none';
+        }
+        function startTraditionalProfileSelectionTransition(profileInfo) {
+            if (!profileInfo) return;
+            awaitingTraditionalProfilePayload = true;
+            const confirmWrapper = document.getElementById('confirmMenuWrapper');
+            if (confirmWrapper) {
+                confirmWrapper.style.pointerEvents = 'none';
+                animateElementOut(
+                    confirmWrapper,
+                    'translate3d(260px, -50%, 0) scale(1)',
+                    'translate3d(0, -50%, 0) scale(1)'
+                );
+            }
+            sendToUnreal({ profile_info: profileInfo });
         }
         async function showLevelLoadingScreen(buildName) {
             hideAllUiScreens();
@@ -4539,7 +4603,7 @@
         }
         function showOverlay(message) { setScreenshotOverlayState({ message, showSpinner: true, showActions: false }); }
         function hideOverlay() { clearTimeout(overlayHideTimer); document.getElementById("screenshotOverlay").style.display = "none"; }
-        function showTimedOverlay(message, duration = 2500) { setScreenshotOverlayState({ message, showSpinner: false, showActions: false }); overlayHideTimer = setTimeout(hideOverlay, duration); }
+        function showTimedOverlay(message, duration = 2500, showSpinner = false) { setScreenshotOverlayState({ message, showSpinner, showActions: false }); overlayHideTimer = setTimeout(hideOverlay, duration); }
         function showPreloadSpinner() { document.getElementById("preloadSpinner").classList.add("visible"); }
         function hidePreloadSpinner() { document.getElementById("preloadSpinner").classList.remove("visible"); }
         function getScreenshotFileName(fileExtension = '.png') {
@@ -4946,6 +5010,8 @@
             if (!bodyEl.classList.contains('inGameUiVisible')) return;
             const currentPanel = getCurrentPanelName();
             if (currentPanel === panelName) return;
+            if (currentPanel === 'camera' && panelName !== 'camera') setCameraSlidersInteractive(false);
+            if (panelName === 'camera') setCameraSlidersInteractive(true);
             clearTimeout(menuSwitchTimer);
             clearTimeout(menuCleanupTimer);
             bodyEl.classList.add('menu-switching');
@@ -5079,8 +5145,8 @@
             activeDockMode = 'walk';
             switchPanel('main');
         }
-        function openCameraMenu() { switchPanel('camera'); }
-        function closeCameraMenu() { switchPanel('main'); }
+        function openCameraMenu() { setCameraSlidersInteractive(true); switchPanel('camera'); }
+        function closeCameraMenu() { setCameraSlidersInteractive(false); switchPanel('main'); }
         function openBuildingMenu() { updateLevelButtonStates(); switchPanel('building'); }
         function closeBuildingMenu() { switchPanel('main'); }
         function openEnvironmentMenu() { switchPanel('environment'); }
@@ -5443,6 +5509,10 @@
                 if (awaitingArchesProfilePayload) {
                     awaitingArchesProfilePayload = false;
                     archesMenuAvailable = false;
+                    switchPanel('profile');
+                } else if (awaitingTraditionalProfilePayload) {
+                    awaitingTraditionalProfilePayload = false;
+                    setConfirmMenuVariant('end-session');
                     switchPanel('profile');
                 } else {
                     openProfileMenu();
@@ -5822,6 +5892,7 @@
             syncTeleportMenuForBuild(selectedBuild || 'Mod');
             syncMainMenuIconsForBuild(selectedBuild || 'Mod');
             setConfirmMenuVariant('end-session');
+            setCameraSlidersInteractive(false);
 
             setUIScale(scaleSlider.value);
             window.addEventListener('resize', () => setUIScale(scaleSlider.value));
@@ -5938,16 +6009,14 @@
             confirmMenuCloseButton.addEventListener('click', closeConfirmMenu);
             confirmNoButton.addEventListener('click', () => {
                 if (confirmMenuVariant === 'trad-edit') {
-                    closeConfirmMenu();
-                    sendToUnreal({ profile_info: 'Trad_Soffit' });
+                    startTraditionalProfileSelectionTransition('Trad_Soffit');
                     return;
                 }
                 closeConfirmMenu();
             });
             confirmYesButton.addEventListener('click', () => {
                 if (confirmMenuVariant === 'trad-edit') {
-                    closeConfirmMenu();
-                    sendToUnreal({ profile_info: 'Trad_Walls' });
+                    startTraditionalProfileSelectionTransition('Trad_Walls');
                     return;
                 }
                 endSessionByUser('Your session has ended.');
@@ -5961,8 +6030,19 @@
                     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
                 });
             }
+            function preventUiSelection(event) {
+                const target = event.target;
+                if (!(target instanceof Node)) return;
+                if (target instanceof HTMLElement && target.closest('input, textarea')) return;
+                const element = target instanceof HTMLElement ? target : target.parentElement;
+                if (element && element.closest('#editUiRoot, #buildMenu, #video-container')) {
+                    event.preventDefault();
+                }
+            }
             document.addEventListener('click', suppressPersistentUiFocus, true);
             document.addEventListener('pointerup', suppressPersistentUiFocus, true);
+            document.addEventListener('selectstart', preventUiSelection, true);
+            document.addEventListener('dragstart', preventUiSelection, true);
             document.addEventListener('keyup', (event) => {
                 if (!['w', 'a', 's', 'd', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(String(event.key))) return;
                 requestAnimationFrame(() => {
