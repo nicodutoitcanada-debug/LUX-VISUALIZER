@@ -4009,7 +4009,10 @@
                     }
                     handleProfileBackendPayload(parsed);
                 } catch (e) { }
-                if (response.startsWith("CreateScreenshot")) createFile(window.file);
+                if (response.startsWith("CreateScreenshot")) {
+                    const latestScreenshotFile = Application?.webRtcController?.file || window.file;
+                    createFile(latestScreenshotFile);
+                }
             });
 
             setTimeout(() => {
@@ -4052,7 +4055,11 @@
             startApp();
             window.addEventListener('beforeunload', handleIntentionalPageExit);
             window.addEventListener('pagehide', handleIntentionalPageExit);
-            window.file = Application.webRtcController.file;
+            try {
+                window.file = Application?.webRtcController?.file || null;
+            } catch (e) {
+                window.file = null;
+            }
         })();
 
         function initLottie() {
@@ -4497,8 +4504,16 @@
             sendToUnreal({ frontEnd: 'screenshot' });
         }
         async function createFile(file) {
-            const blob = new Blob(file.data, { type: file.mimetype });
-            const fileName = getScreenshotFileName(file.extension || '.png');
+            const latestFile = file || Application?.webRtcController?.file || window.file;
+            if (!latestFile || !latestFile.data) {
+                showTimedOverlay("Image generated, but the file was not ready to save yet", 2800);
+                screenshotRequestInFlight = false;
+                pendingScreenshotSaveHandle = null;
+                return;
+            }
+            window.file = latestFile;
+            const blob = new Blob(latestFile.data, { type: latestFile.mimetype || 'image/png' });
+            const fileName = getScreenshotFileName(latestFile.extension || '.png');
             const saveHandle = pendingScreenshotSaveHandle;
             pendingScreenshotSaveHandle = null;
             try {
@@ -4513,7 +4528,11 @@
                 }
                 screenshotCounter++;
             } catch (err) {
-                if (blob) fallbackDownloadBlob(blob, fileName);
+                try {
+                    fallbackDownloadBlob(blob, fileName);
+                } catch (downloadError) {
+                    showTimedOverlay("Image generated successfully", 2400);
+                }
             } finally {
                 screenshotRequestInFlight = false;
             }
