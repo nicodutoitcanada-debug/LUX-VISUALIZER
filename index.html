@@ -2738,28 +2738,16 @@
         .archesOptionGrid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
+            gap: 12px;
             padding: 6px 4px 4px 4px;
             align-items: start;
         }
 
-        .archesOptionButton {
-            appearance: none;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.10)), rgba(0, 0, 0, 0.10);
-            border-radius: 18px;
-            overflow: hidden;
-            padding: 10px 8px 8px 8px;
-            margin: 0;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+        .archesOptionItem {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            gap: 10px;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+            gap: 8px;
         }
 
         .archesOptionLabel {
@@ -2774,15 +2762,38 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
+            padding: 0 4px;
+        }
+
+        .archesOptionButton {
+            appearance: none;
+            width: 100%;
+            min-height: 0;
+            padding: 0;
+            margin: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: block;
+        }
+
+        .archesOptionThumb {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.025) 26%, rgba(0, 0, 0, 0.14) 100%), rgba(18, 22, 28, 0.24);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.10);
         }
 
         .archesOptionButton img {
             width: 100%;
-            max-width: 108px;
-            height: auto;
+            aspect-ratio: 1 / 1;
             display: block;
-            object-fit: contain;
-            opacity: 0.8;
+            object-fit: cover;
+            opacity: 0.82;
             transition: opacity 0.2s ease, transform 0.2s ease;
             pointer-events: none;
             user-select: none;
@@ -2806,10 +2817,6 @@
             .archesOptionLabel {
                 font-size: 8px;
                 min-height: 24px;
-            }
-
-            .archesOptionButton img {
-                max-width: 84px;
             }
         }
 
@@ -5038,7 +5045,7 @@
             const confirmNoButton = document.getElementById('confirmNoButton');
             const confirmMenuCloseButton = document.getElementById('confirmMenuCloseButton');
             if (confirmMenuVariant === 'trad-edit') {
-                if (confirmTitle) confirmTitle.textContent = 'WHAT WOULD YOU LIKE TO EDIT';
+                if (confirmTitle) confirmTitle.textContent = 'WOULD YOU LIKE TO EDIT THE WALLS OR SOFFIT?';
                 if (confirmYesButton) confirmYesButton.textContent = 'WALLS';
                 if (confirmNoButton) confirmNoButton.textContent = 'SOFFIT';
                 if (confirmMenuCloseButton) confirmMenuCloseButton.setAttribute('aria-label', 'Cancel traditional profile selection');
@@ -6354,18 +6361,24 @@
                 <div id="archesInnerBoxWrapper">
                     <div id="archesInnerBox">
                         <div class="archesOptionGrid">
-                            <button class="archesOptionButton" type="button" data-large-small="protrusions" aria-label="Edit protrusions">
+                            <div class="archesOptionItem">
                                 <div class="archesOptionLabel">EDIT PROTRUSIONS</div>
-                                <img src="multi protrusions.png" alt="Edit protrusions">
-                            </button>
-                            <button class="archesOptionButton" type="button" data-large-small="recess" aria-label="Edit recess">
+                                <button class="archesOptionButton" type="button" data-large-small="protrusions" aria-label="Edit protrusions">
+                                    <div class="archesOptionThumb"><img src="multi protrusions.png" alt="Edit protrusions"></div>
+                                </button>
+                            </div>
+                            <div class="archesOptionItem">
                                 <div class="archesOptionLabel">EDIT RECESS</div>
-                                <img src="multi recess.png" alt="Edit recess">
-                            </button>
-                            <button class="archesOptionButton" type="button" data-large-small="both" aria-label="Edit both">
+                                <button class="archesOptionButton" type="button" data-large-small="recess" aria-label="Edit recess">
+                                    <div class="archesOptionThumb"><img src="multi recess.png" alt="Edit recess"></div>
+                                </button>
+                            </div>
+                            <div class="archesOptionItem">
                                 <div class="archesOptionLabel">EDIT BOTH</div>
-                                <img src="multi both.png" alt="Edit both">
-                            </button>
+                                <button class="archesOptionButton" type="button" data-large-small="both" aria-label="Edit both">
+                                    <div class="archesOptionThumb"><img src="multi both.png" alt="Edit both"></div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
