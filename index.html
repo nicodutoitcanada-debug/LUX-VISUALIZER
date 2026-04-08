@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>LAST WORKING SCREENSHOT BUTTON</title>
+    <title>LUX VISUALIZER</title>
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no" />
     <style>
@@ -1712,8 +1712,19 @@
             gap: 7px;
         }
 
+        #archesOptions {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+        }
+
+        #archesOptions.visible {
+            display: grid;
+        }
+
         .buildingCard,
-        .environmentCard {
+        .environmentCard,
+        .archesCard {
             appearance: none;
             border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 0;
@@ -1729,7 +1740,8 @@
         }
 
         .buildingCard img,
-        .environmentCard img {
+        .environmentCard img,
+        .archesCard img {
             width: 100%;
             height: auto;
             display: block;
@@ -1742,19 +1754,23 @@
         .buildingCard:hover img,
         .buildingCard:active img,
         .environmentCard:hover img,
-        .environmentCard:active img {
+        .environmentCard:active img,
+        .archesCard:hover img,
+        .archesCard:active img {
             opacity: 1;
         }
 
         .buildingCard:active img,
-        .environmentCard:active img {
+        .environmentCard:active img,
+        .archesCard:active img {
             transform: scale(0.985);
         }
 
         .levelChoiceButton.is-disabled,
         .menuButton.is-disabled,
         .buildingCard.is-disabled,
-        .environmentCard.is-disabled {
+        .environmentCard.is-disabled,
+        .archesCard.is-disabled {
             cursor: default;
             pointer-events: none;
         }
@@ -1762,7 +1778,8 @@
         .levelChoiceButton.is-disabled img,
         .menuButton.is-disabled img,
         .buildingCard.is-disabled img,
-        .environmentCard.is-disabled img {
+        .environmentCard.is-disabled img,
+        .archesCard.is-disabled img {
             opacity: 0.42;
             filter: grayscale(1) saturate(0);
             transform: none !important;
@@ -1775,7 +1792,9 @@
         .buildingCard.is-disabled:hover img,
         .buildingCard.is-disabled:active img,
         .environmentCard.is-disabled:hover img,
-        .environmentCard.is-disabled:active img {
+        .environmentCard.is-disabled:active img,
+        .archesCard.is-disabled:hover img,
+        .archesCard.is-disabled:active img {
             opacity: 0.42;
             transform: none !important;
         }
@@ -1800,6 +1819,35 @@
             opacity: 0.96;
             pointer-events: none;
             user-select: none;
+        }
+
+
+        .archesCard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            padding: 10px 8px 12px 8px;
+        }
+
+        .archesCard img {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .archesLabel {
+            min-height: 30px;
+            color: rgba(255, 255, 255, 0.84);
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            line-height: 1.2;
+            text-align: center;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #confirmButtons {
@@ -1933,6 +1981,12 @@
             margin-top: 0;
         }
 
+        #teleportMapStage[data-teleport-build="Multi"] {
+            width: min(232px, calc(100% - 16px));
+            aspect-ratio: 1194 / 2048;
+            margin: 2px auto 18px auto;
+        }
+
         .teleportPlanImage {
             position: absolute;
             inset: -2% -2%;
@@ -1942,6 +1996,14 @@
             opacity: 0;
             transition: opacity 0.7s ease;
             pointer-events: none;
+        }
+
+        #teleportMapStage[data-teleport-build="Multi"] .teleportPlanImage {
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform: scale(1.045);
+            transform-origin: center center;
         }
 
         .teleportPlanImage.active {
@@ -3740,6 +3802,8 @@
         let screenshotCounter = 1;
         let gameLoaded = false;
         let selectedBuild = null;
+        let environmentMenuVariant = 'environment';
+        let archesAwaitingProfilePayload = false;
         let movieSequenceActive = false;
         let movieControlsVisible = false;
         let movieExitRequested = false;
@@ -3822,7 +3886,7 @@
                     if (parsed.modern === "loaded") {
                         revealGameFromLevelLoading();
                     }
-                    if (parsed.load_ui === "modern") {
+                    if (['modern', 'multi', 'trad'].includes(parsed.load_ui)) {
                         revealGameFromLevelLoading().finally(() => {
                             showReadyMessage();
                             showInGameUiAnimated();
@@ -3830,6 +3894,9 @@
                     }
                     if (parsed.movie === 'ended') {
                         handleMovieEndedMessage();
+                    }
+                    if (parsed.create === 'archesMenu' && selectedBuild === 'Multi' && activeDockMode === 'edit') {
+                        openArchesMenu();
                     }
                     handleProfileBackendPayload(parsed);
                 } catch (e) { }
@@ -3934,19 +4001,37 @@
             return '01';
         }
         function updateEnvironmentButtonImages(buildName) {
-            const suffixByBuild = {
-                Trad: 'Trad',
-                Mod: 'Mod',
-                Multi: 'Multi'
+            const imageNamesByBuild = {
+                Trad: ['ENV01_Trad01.png', 'ENV01_Trad02.png', 'ENV01_Trad03.png'],
+                Mod: ['ENV01_Mod.png', 'ENV02_Mod.png', 'ENV03_Mod.png'],
+                Multi: ['ENV01_Multi.png', 'ENV02_Multi.png', 'ENV03_Multi.png']
             };
-            const suffix = suffixByBuild[buildName] || 'Mod';
+            const imageNames = imageNamesByBuild[buildName] || imageNamesByBuild.Mod;
             getEnvironmentButtons().forEach((button, index) => {
-                const envNumber = String(index + 1).padStart(2, '0');
                 const image = button.querySelector('img');
                 if (!image) return;
-                image.src = `ENV${envNumber}_${suffix}.png`;
+                image.src = imageNames[index] || imageNamesByBuild.Mod[index] || '';
                 image.alt = `Environment ${index + 1}`;
             });
+        }
+        function syncHowToMenuForBuild(buildName) {
+            const howToImage = document.getElementById('howToInfoImage');
+            if (!howToImage) return;
+            const isTraditionalBuild = buildName === 'Trad';
+            howToImage.src = isTraditionalBuild ? 'info 02.png' : 'info.png';
+            howToImage.alt = isTraditionalBuild ? 'Traditional level information' : 'How to information';
+        }
+        function setEnvironmentMenuVariant(variant = 'environment') {
+            environmentMenuVariant = variant === 'arches' ? 'arches' : 'environment';
+            const titleEl = document.getElementById('environmentTitle');
+            const logoEl = document.getElementById('environmentLogo');
+            const environmentOptionsEl = document.getElementById('environmentOptions');
+            const archesOptionsEl = document.getElementById('archesOptions');
+            const isArches = environmentMenuVariant === 'arches';
+            if (titleEl) titleEl.style.display = isArches ? 'none' : '';
+            if (logoEl) logoEl.style.display = isArches ? 'block' : 'none';
+            if (environmentOptionsEl) environmentOptionsEl.style.display = isArches ? 'none' : 'grid';
+            if (archesOptionsEl) archesOptionsEl.classList.toggle('visible', isArches);
         }
         function updateEnvironmentButtonStates() {
             const activeBuild = selectedBuild;
@@ -3979,6 +4064,36 @@
             }
             updateEnvironmentButtonImages(buildName);
             updateEnvironmentButtonStates();
+        }
+
+        function syncMainMenuIconsForBuild(buildName) {
+            const teleportButtonImage = document.querySelector('#teleportMenuButton img');
+            const treeToggleButtonImage = document.querySelector('#treeToggleButton img');
+            const isTraditionalBuild = buildName === 'Trad';
+            if (teleportButtonImage) {
+                teleportButtonImage.src = isTraditionalBuild ? '01 SCREENS.png' : '01 TELEPORT.png';
+                teleportButtonImage.alt = isTraditionalBuild ? 'Screens' : 'Teleport';
+            }
+            if (treeToggleButtonImage) {
+                treeToggleButtonImage.src = isTraditionalBuild ? '01 FENCE.png' : '01 TREE.png';
+                treeToggleButtonImage.alt = isTraditionalBuild ? 'Fence' : 'Tree';
+            }
+            const teleportButton = document.getElementById('teleportMenuButton');
+            const treeButton = document.getElementById('treeToggleButton');
+            if (teleportButton) teleportButton.setAttribute('aria-label', isTraditionalBuild ? 'Screens' : 'Teleport');
+            if (treeButton) treeButton.setAttribute('aria-label', isTraditionalBuild ? 'Fence' : 'Toggle trees');
+        }
+        function handleSecondaryLeftButton(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (selectedBuild === 'Trad') return;
+            openTeleportMenu();
+        }
+        function handleSecondaryRightButton(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (selectedBuild === 'Trad') return;
+            toggleTreesVisibility();
         }
         function setLevelLoadingContent(buildName) {
             const video = document.getElementById("levelLoadingVideo");
@@ -4232,6 +4347,10 @@
             activeEnvironmentByBuild[buildName] = getDefaultEnvironmentForBuild(buildName);
             updateLevelButtonStates();
             syncEnvironmentMenuForBuild(buildName);
+            syncHowToMenuForBuild(buildName);
+            syncMainMenuIconsForBuild(buildName);
+            setEnvironmentMenuVariant('environment');
+            archesAwaitingProfilePayload = false;
             gameRevealed = false;
             isRevealingGame = false;
             inGameUiLoaded = false;
@@ -4314,6 +4433,7 @@
         const bodyEl = document.body;
         let teleportTitleAnimationId = 0;
         let currentTeleportFloor = 'ground';
+        let currentTeleportBuild = 'Mod';
         let teleportFloorTransitionId = 0;
         let teleportMapTitle;
         let teleportJumpTargetsLayer;
@@ -4324,6 +4444,8 @@
         let activeDockMode = 'walk';
         let currentProfileSet = '';
         let currentColorSet = '';
+        let currentJoinerSet = '';
+        let currentFinishTypeSource = 'profile';
         let currentProfileVariant = 'BOARD_AND_BATTEN';
         let currentProfileButtonMode = 'profile';
         let profileTitleAnimationId = 0;
@@ -4715,7 +4837,10 @@
         }
         function enterEditMode() {
             activeDockMode = 'edit';
-            sendToUnreal('{"modern":"editMode"}');
+            const editModePayload = selectedBuild === 'Multi'
+                ? { multi: 'editMode' }
+                : { modern: 'editMode' };
+            sendToUnreal(editModePayload);
             if (!editModeIntroShown) {
                 showEditModeIntro();
             }
@@ -4732,8 +4857,55 @@
         function closeCameraMenu() { switchPanel('main'); }
         function openBuildingMenu() { updateLevelButtonStates(); switchPanel('building'); }
         function closeBuildingMenu() { switchPanel('main'); }
-        function openEnvironmentMenu() { switchPanel('environment'); }
-        function closeEnvironmentMenu() { switchPanel('main'); }
+        function openEnvironmentMenu() {
+            archesAwaitingProfilePayload = false;
+            setEnvironmentMenuVariant('environment');
+            switchPanel('environment');
+        }
+        function switchPanelFromWalkWithSlider(panelName) {
+            if (!bodyEl.classList.contains('inGameUiVisible')) return;
+            const currentPanel = getCurrentPanelName();
+            if (currentPanel !== 'walk') {
+                switchPanel(panelName);
+                return;
+            }
+            clearTimeout(menuSwitchTimer);
+            clearTimeout(menuCleanupTimer);
+            bodyEl.classList.add('menu-switching');
+            animateElementOut(
+                document.getElementById('soloDockButton'),
+                'translate3d(140px, -50%, 0) rotate(90deg)',
+                'translate3d(0, -50%, 0) rotate(0deg)'
+            );
+            menuSwitchTimer = setTimeout(() => {
+                clearModes();
+                applyPanelMode(panelName);
+                const currentScale = getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1';
+                animateElementsFromRight([
+                    {
+                        el: getWrapperByPanelName(panelName),
+                        enterTransform: `translate3d(260px, -50%, 0) scale(${currentScale})`,
+                        restTransform: `translate3d(0, -50%, 0) scale(${currentScale})`
+                    },
+                    {
+                        el: document.getElementById('sliderContainer'),
+                        enterTransform: 'translate3d(140px, -50%, 0)',
+                        restTransform: 'translate3d(0, -50%, 0)'
+                    }
+                ]);
+                queueMenuCleanup();
+            }, 80);
+        }
+        function openArchesMenu() {
+            archesAwaitingProfilePayload = false;
+            setEnvironmentMenuVariant('arches');
+            switchPanelFromWalkWithSlider('environment');
+        }
+        function closeEnvironmentMenu() {
+            archesAwaitingProfilePayload = false;
+            setEnvironmentMenuVariant('environment');
+            switchPanel('main');
+        }
         function openHowToMenu() { switchPanel('how-to'); }
         function closeHowToMenu() { switchPanel('main'); }
         function openConfirmMenu() { switchPanel('confirm'); }
@@ -4766,44 +4938,69 @@
             switchPanel('textured-colours');
         }
         function closeTexturedColoursMenu() { switchPanel('profile'); }
+        function getActiveFinishSelectionSet() {
+            if (currentFinishTypeSource === 'joiner' && currentJoinerSet) return currentJoinerSet;
+            return currentColorSet;
+        }
         function handleSolidColourButtonClick(button) {
             const colourName = button?.dataset?.colourName || '';
-            if (!colourName || !currentColorSet) return;
-            sendToUnreal({ [currentColorSet]: colourName });
+            const activeSet = getActiveFinishSelectionSet();
+            if (!colourName || !activeSet) return;
+            sendToUnreal({ [activeSet]: colourName });
             updateProfileColorTitle(colourName);
             updateSolidColoursTitle(colourName);
         }
         function handleWoodgrainButtonClick(button) {
             const colourName = button?.dataset?.colourName || '';
-            if (!colourName || !currentColorSet) return;
-            sendToUnreal({ [currentColorSet]: colourName });
+            const activeSet = getActiveFinishSelectionSet();
+            if (!colourName || !activeSet) return;
+            sendToUnreal({ [activeSet]: colourName });
             updateProfileColorTitle(colourName);
             updateWoodgrainsTitle(colourName);
         }
         function handleWestCoastNaturalsButtonClick(button) {
             const colourName = button?.dataset?.colourName || '';
-            if (!colourName || !currentColorSet) return;
-            sendToUnreal({ [currentColorSet]: colourName });
+            const activeSet = getActiveFinishSelectionSet();
+            if (!colourName || !activeSet) return;
+            sendToUnreal({ [activeSet]: colourName });
             updateProfileColorTitle(colourName);
             updateWestCoastNaturalsTitle(colourName);
         }
         function handleTexturedColoursButtonClick(button) {
             const colourName = button?.dataset?.colourName || '';
-            if (!colourName || !currentColorSet) return;
-            sendToUnreal({ [currentColorSet]: colourName });
+            const activeSet = getActiveFinishSelectionSet();
+            if (!colourName || !activeSet) return;
+            sendToUnreal({ [activeSet]: colourName });
             updateProfileColorTitle(colourName);
             updateTexturedColoursTitle(colourName);
         }
         function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-        function getButtonsForFloor(floor) { return Array.from(document.querySelectorAll(`.teleportJumpTarget[data-floor="${floor}"]`)); }
-        function getTargetSequenceDuration(floor) { const count = jumpTargetData[floor]?.length || 0; if (count === 0) return 0; return 420 + ((count - 1) * 80); }
-        function setActiveFloorButton(floor) {
-            teleportFloorButtons.forEach((button) => button.classList.remove('active'));
-            if (floor === 'basement') teleportBasementButton.classList.add('active');
-            else if (floor === 'ground') teleportGroundButton.classList.add('active');
-            else if (floor === 'first') teleportFirstButton.classList.add('active');
+        function getTeleportConfig(buildName = currentTeleportBuild) {
+            return teleportBuildConfigs[buildName] || teleportBuildConfigs.Mod;
         }
-        function setActiveTeleportPlan(floor) { Object.values(teleportPlans).forEach(plan => plan.classList.remove('active')); teleportPlans[floor].classList.add('active'); }
+        function getButtonsForFloor(floor) { return Array.from(document.querySelectorAll(`.teleportJumpTarget[data-floor="${floor}"]`)); }
+        function getTargetSequenceDuration(floor) {
+            const teleportConfig = getTeleportConfig();
+            const count = teleportConfig.jumpTargetData[floor]?.length || 0;
+            if (count === 0) return 0;
+            return 420 + ((count - 1) * 80);
+        }
+        function setActiveFloorButton(floor) {
+            teleportFloorButtons.forEach((button) => {
+                if (!button) return;
+                button.classList.remove('active');
+            });
+            if (floor === 'basement' && teleportBasementButton) teleportBasementButton.classList.add('active');
+            else if (floor === 'ground' && teleportGroundButton) teleportGroundButton.classList.add('active');
+            else if (floor === 'first' && teleportFirstButton) teleportFirstButton.classList.add('active');
+        }
+        function setActiveTeleportPlan(floor) {
+            Object.values(teleportPlans).forEach(plan => {
+                if (!plan) return;
+                plan.classList.remove('active');
+            });
+            if (teleportPlans[floor]) teleportPlans[floor].classList.add('active');
+        }
         function hideJumpTargets(floor) { getButtonsForFloor(floor).forEach(button => button.classList.remove('is-visible')); }
         function showJumpTargets(floor) { getButtonsForFloor(floor).forEach(button => button.classList.add('is-visible')); }
         function animateTeleportTitle(text, options = {}) {
@@ -4838,45 +5035,53 @@
             }
         }
         function openTeleportMenu() {
+            syncTeleportMenuForBuild(selectedBuild || currentTeleportBuild || 'Mod');
             switchPanel('teleport');
-            teleportFloorButtons.forEach((button) => { button.disabled = true; });
+            teleportFloorButtons.forEach((button) => { if (button) button.disabled = true; });
             teleportTitleAnimationId += 1;
             teleportMapTitle.classList.remove('is-fading');
             teleportMapTitle.innerHTML = '';
-            hideJumpTargets('basement'); hideJumpTargets('ground'); hideJumpTargets('first');
+            ['basement', 'ground', 'first'].forEach(hideJumpTargets);
             setActiveTeleportPlan(currentTeleportFloor); setActiveFloorButton(currentTeleportFloor);
+            const teleportConfig = getTeleportConfig();
             const thisOpenId = ++teleportFloorTransitionId;
             setTimeout(() => {
                 if (thisOpenId !== teleportFloorTransitionId) return;
                 if (!bodyEl.classList.contains('teleport-mode')) return;
-                animateTeleportTitle(teleportFloorTitles[currentTeleportFloor], { immediate: true });
+                animateTeleportTitle(teleportConfig.floorTitles[currentTeleportFloor] || 'GROUND FLOOR', { immediate: true });
                 showJumpTargets(currentTeleportFloor);
                 const inDuration = getTargetSequenceDuration(currentTeleportFloor);
                 setTimeout(() => {
                     if (thisOpenId !== teleportFloorTransitionId) return;
                     if (!bodyEl.classList.contains('teleport-mode')) return;
-                    teleportFloorButtons.forEach((button) => { button.disabled = false; });
+                    teleportFloorButtons.forEach((button) => {
+                        if (button && button.offsetParent !== null) button.disabled = false;
+                    });
                 }, inDuration + 120);
             }, TELEPORT_MENU_OPEN_ANIMATION_DELAY);
         }
         function closeTeleportMenu() {
             teleportFloorTransitionId += 1;
             const transitionId = teleportFloorTransitionId;
-            teleportFloorButtons.forEach((button) => { button.disabled = true; });
+            teleportFloorButtons.forEach((button) => { if (button) button.disabled = true; });
             teleportMapTitle.classList.add('is-fading');
             hideJumpTargets(currentTeleportFloor);
             setTimeout(() => {
                 if (transitionId !== teleportFloorTransitionId) return;
                 switchPanel('main');
-                teleportFloorButtons.forEach((button) => { button.disabled = false; });
+                teleportFloorButtons.forEach((button) => {
+                    if (button && button.offsetParent !== null) button.disabled = false;
+                });
             }, 80);
         }
         async function setTeleportFloor(floor) {
+            const teleportConfig = getTeleportConfig();
+            if (!teleportConfig.visibleFloors.includes(floor)) return;
             if (floor === currentTeleportFloor) return;
             teleportFloorTransitionId += 1;
             const transitionId = teleportFloorTransitionId;
             const previousFloor = currentTeleportFloor;
-            teleportFloorButtons.forEach((button) => { button.disabled = true; });
+            teleportFloorButtons.forEach((button) => { if (button) button.disabled = true; });
             hideJumpTargets(previousFloor);
             const outDuration = getTargetSequenceDuration(previousFloor);
             await wait(Math.max(90, outDuration * 0.22));
@@ -4884,12 +5089,14 @@
             currentTeleportFloor = floor;
             setActiveTeleportPlan(floor);
             setActiveFloorButton(floor);
-            animateTeleportTitle(teleportFloorTitles[floor]);
+            animateTeleportTitle(teleportConfig.floorTitles[floor] || 'GROUND FLOOR');
             showJumpTargets(floor);
             const inDuration = getTargetSequenceDuration(floor);
             await wait(Math.max(outDuration, inDuration) + 120);
             if (transitionId !== teleportFloorTransitionId) return;
-            teleportFloorButtons.forEach((button) => { button.disabled = false; });
+            teleportFloorButtons.forEach((button) => {
+                if (button && button.offsetParent !== null) button.disabled = false;
+            });
         }
         function normalizeVariantToken(value) { return String(value || '').trim(); }
         function getProfileButtonVariant(variant) {
@@ -5006,11 +5213,18 @@
         function handleProfileTypeButtonClick(button) {
             const variant = normalizeVariantToken(button?.dataset?.variant);
             if (!variant || button.disabled || button.classList.contains('is-disabled')) return;
+            currentFinishTypeSource = 'profile';
             if (currentProfileSet) sendToUnreal({ [currentProfileSet]: variant });
             updateProfileTitle(variant);
         }
         function handleProfileOptionsButtonClick() {
-            if (!profileOptionsButtonEl || !currentProfileSet) return;
+            if (!profileOptionsButtonEl) return;
+            if (normalizeVariantToken(currentProfileVariant) === 'RANDOM_PLANK') {
+                currentFinishTypeSource = 'joiner';
+                openFinishTypeMenu();
+                return;
+            }
+            if (!currentProfileSet) return;
             let nextVariant = '';
             if (isVGrooveVariant(currentProfileVariant)) {
                 nextVariant = getToggledVGrooveVariant(currentProfileVariant);
@@ -5024,6 +5238,7 @@
         function handleProfileBackendPayload(parsed) {
             if (typeof parsed.profileSet === 'string') currentProfileSet = normalizeVariantToken(parsed.profileSet);
             if (typeof parsed.colorSet === 'string') currentColorSet = parsed.colorSet;
+            if (typeof parsed.joinerSet === 'string') currentJoinerSet = parsed.joinerSet;
             if (typeof parsed.profileTitle === 'string') updateProfileTitle(parsed.profileTitle, { immediate: true });
             if (typeof parsed.colorTitle === 'string') {
                 updateProfileColorTitle(parsed.colorTitle);
@@ -5033,29 +5248,137 @@
                 updateTexturedColoursTitle(parsed.colorTitle);
             }
             if (typeof parsed.showButtons === 'string') applyProfileButtonAvailability(parsed.showButtons);
-            if (parsed.open === 'editProfiles') openProfileMenu();
+            if (parsed.open === 'editProfiles') {
+                const shouldOpenFromArches = environmentMenuVariant === 'arches' || archesAwaitingProfilePayload;
+                archesAwaitingProfilePayload = false;
+                if (shouldOpenFromArches) {
+                    setEnvironmentMenuVariant('environment');
+                }
+                openProfileMenu();
+            }
         }
-        const teleportJumpTargetMessages = {
-            first: {
-                'first-01': { teleportMapMod: 'modFirst_01' },
-                'first-02': { teleportMapMod: 'modFirst_02' },
-                'first-03': { teleportMapMod: 'modFirst_03' }
+        const teleportBuildConfigs = {
+            Mod: {
+                visibleFloors: ['basement', 'ground', 'first'],
+                floorTitles: { basement: 'BASEMENT', ground: 'GROUND FLOOR', first: 'FIRST FLOOR' },
+                planImages: {
+                    basement: 'PLAN_MODERN_BASEMENT.png',
+                    ground: 'PLAN_MODERN_GROUND_FLOOR.png',
+                    first: 'PLAN_MODERN_FIRST_FLOOR.png'
+                },
+                jumpTargetData: {
+                    basement: [{ id: 'basement-03', x: 18.07, y: 19.78, label: 'Basement target 3' }, { id: 'basement-01', x: 47.01, y: 24.96, label: 'Basement target 1' }, { id: 'basement-02', x: 40.11, y: 53.46, label: 'Basement target 2' }],
+                    ground: [{ id: 'ground-03', x: 47.52, y: 14.75, label: 'Ground floor target 3' }, { id: 'ground-02', x: 66.61, y: 19.75, label: 'Ground floor target 2' }, { id: 'ground-01', x: 77.51, y: 53.50, label: 'Ground floor target 1' }, { id: 'ground-05', x: 13.92, y: 60.72, label: 'Ground floor target 5' }, { id: 'ground-04', x: 43.42, y: 80.35, label: 'Ground floor target 4' }],
+                    first: [{ id: 'first-03', x: 48.02, y: 18.36, label: 'First floor target 3' }, { id: 'first-02', x: 62.41, y: 30.66, label: 'First floor target 2' }, { id: 'first-01', x: 80.81, y: 32.68, label: 'First floor target 1' }]
+                },
+                jumpTargetMessages: {
+                    first: {
+                        'first-01': { teleportMapMod: 'modFirst_01' },
+                        'first-02': { teleportMapMod: 'modFirst_02' },
+                        'first-03': { teleportMapMod: 'modFirst_03' }
+                    },
+                    ground: {
+                        'ground-01': { teleportMapMod: 'modGround_01' },
+                        'ground-02': { teleportMapMod: 'modGround_02' },
+                        'ground-03': { teleportMapMod: 'modGround_03' },
+                        'ground-04': { teleportMapMod: 'modGround_04' },
+                        'ground-05': { teleportMapMod: 'modGround_05' }
+                    },
+                    basement: {
+                        'basement-01': { teleportMapMod: 'modBasement_01' },
+                        'basement-02': { teleportMapMod: 'modBasement_02' },
+                        'basement-03': { teleportMapMod: 'modBasement_03' }
+                    }
+                }
             },
-            ground: {
-                'ground-01': { teleportMapMod: 'modGround_01' },
-                'ground-02': { teleportMapMod: 'modGround_02' },
-                'ground-03': { teleportMapMod: 'modGround_03' },
-                'ground-04': { teleportMapMod: 'modGround_04' },
-                'ground-05': { teleportMapMod: 'modGround_05' }
+            Trad: {
+                visibleFloors: ['basement', 'ground', 'first'],
+                floorTitles: { basement: 'BASEMENT', ground: 'GROUND FLOOR', first: 'FIRST FLOOR' },
+                planImages: {
+                    basement: 'PLAN_MODERN_BASEMENT.png',
+                    ground: 'PLAN_MODERN_GROUND_FLOOR.png',
+                    first: 'PLAN_MODERN_FIRST_FLOOR.png'
+                },
+                jumpTargetData: {
+                    basement: [{ id: 'basement-03', x: 18.07, y: 19.78, label: 'Basement target 3' }, { id: 'basement-01', x: 47.01, y: 24.96, label: 'Basement target 1' }, { id: 'basement-02', x: 40.11, y: 53.46, label: 'Basement target 2' }],
+                    ground: [{ id: 'ground-03', x: 47.52, y: 14.75, label: 'Ground floor target 3' }, { id: 'ground-02', x: 66.61, y: 19.75, label: 'Ground floor target 2' }, { id: 'ground-01', x: 77.51, y: 53.50, label: 'Ground floor target 1' }, { id: 'ground-05', x: 13.92, y: 60.72, label: 'Ground floor target 5' }, { id: 'ground-04', x: 43.42, y: 80.35, label: 'Ground floor target 4' }],
+                    first: [{ id: 'first-03', x: 48.02, y: 18.36, label: 'First floor target 3' }, { id: 'first-02', x: 62.41, y: 30.66, label: 'First floor target 2' }, { id: 'first-01', x: 80.81, y: 32.68, label: 'First floor target 1' }]
+                },
+                jumpTargetMessages: {
+                    first: {
+                        'first-01': { teleportMapMod: 'modFirst_01' },
+                        'first-02': { teleportMapMod: 'modFirst_02' },
+                        'first-03': { teleportMapMod: 'modFirst_03' }
+                    },
+                    ground: {
+                        'ground-01': { teleportMapMod: 'modGround_01' },
+                        'ground-02': { teleportMapMod: 'modGround_02' },
+                        'ground-03': { teleportMapMod: 'modGround_03' },
+                        'ground-04': { teleportMapMod: 'modGround_04' },
+                        'ground-05': { teleportMapMod: 'modGround_05' }
+                    },
+                    basement: {
+                        'basement-01': { teleportMapMod: 'modBasement_01' },
+                        'basement-02': { teleportMapMod: 'modBasement_02' },
+                        'basement-03': { teleportMapMod: 'modBasement_03' }
+                    }
+                }
             },
-            basement: {
-                'basement-01': { teleportMapMod: 'modBasement_01' },
-                'basement-02': { teleportMapMod: 'modBasement_02' },
-                'basement-03': { teleportMapMod: 'modBasement_03' }
+            Multi: {
+                visibleFloors: ['ground'],
+                floorTitles: { ground: 'GROUND FLOOR' },
+                planImages: {
+                    ground: 'PLAN_MULTIFAM.png'
+                },
+                jumpTargetData: {
+                    ground: [
+                        { id: 'ground-07', x: 48.74, y: 14.10, label: 'Building target B 07' },
+                        { id: 'ground-06', x: 66.80, y: 17.96, label: 'Building target B 06' },
+                        { id: 'ground-05', x: 48.71, y: 34.01, label: 'Building target B 05' },
+                        { id: 'ground-04', x: 47.42, y: 52.01, label: 'Building target B 04' },
+                        { id: 'ground-03', x: 59.85, y: 64.77, label: 'Building target B 03' },
+                        { id: 'ground-02', x: 36.00, y: 82.43, label: 'Building target B 02' },
+                        { id: 'ground-01', x: 52.08, y: 93.81, label: 'Building target B 01' }
+                    ]
+                },
+                jumpTargetMessages: {
+                    ground: {
+                        'ground-01': { teleportMapMulti: 'multiTarget_01' },
+                        'ground-02': { teleportMapMulti: 'multiTarget_02' },
+                        'ground-03': { teleportMapMulti: 'multiTarget_03' },
+                        'ground-04': { teleportMapMulti: 'multiTarget_04' },
+                        'ground-05': { teleportMapMulti: 'multiTarget_05' },
+                        'ground-06': { teleportMapMulti: 'multiTarget_06' },
+                        'ground-07': { teleportMapMulti: 'multiTarget_07' }
+                    }
+                }
             }
         };
+        function syncTeleportMenuForBuild(buildName) {
+            const normalizedBuild = teleportBuildConfigs[buildName] ? buildName : 'Mod';
+            currentTeleportBuild = normalizedBuild;
+            const teleportMapStageEl = document.getElementById('teleportMapStage');
+            if (teleportMapStageEl) teleportMapStageEl.setAttribute('data-teleport-build', normalizedBuild);
+            const teleportConfig = getTeleportConfig(normalizedBuild);
+            currentTeleportFloor = teleportConfig.visibleFloors.includes(currentTeleportFloor) ? currentTeleportFloor : teleportConfig.visibleFloors[0];
+            if (teleportPlans.basement) teleportPlans.basement.src = teleportConfig.planImages.basement || '';
+            if (teleportPlans.ground) teleportPlans.ground.src = teleportConfig.planImages.ground || '';
+            if (teleportPlans.first) teleportPlans.first.src = teleportConfig.planImages.first || '';
+            if (teleportPlans.basement) teleportPlans.basement.style.display = teleportConfig.planImages.basement ? '' : 'none';
+            if (teleportPlans.ground) teleportPlans.ground.style.display = teleportConfig.planImages.ground ? '' : 'none';
+            if (teleportPlans.first) teleportPlans.first.style.display = teleportConfig.planImages.first ? '' : 'none';
+            if (teleportBasementButton) teleportBasementButton.style.display = teleportConfig.visibleFloors.includes('basement') ? '' : 'none';
+            if (teleportGroundButton) teleportGroundButton.style.display = teleportConfig.visibleFloors.includes('ground') ? '' : 'none';
+            if (teleportFirstButton) teleportFirstButton.style.display = teleportConfig.visibleFloors.includes('first') ? '' : 'none';
+            const floorButtonsWrap = document.getElementById('teleportFloorButtons');
+            if (floorButtonsWrap) floorButtonsWrap.style.display = teleportConfig.visibleFloors.length > 1 ? '' : 'none';
+            buildJumpTargets();
+            setActiveTeleportPlan(currentTeleportFloor);
+            setActiveFloorButton(currentTeleportFloor);
+            if (teleportMapTitle) animateTeleportTitle(teleportConfig.floorTitles[currentTeleportFloor] || 'GROUND FLOOR', { immediate: true });
+        }
         function handleJumpTargetClick(targetId, floor) {
-            const payload = teleportJumpTargetMessages[floor]?.[targetId];
+            const payload = getTeleportConfig().jumpTargetMessages[floor]?.[targetId];
             if (!payload) {
                 console.warn(`No teleport payload mapped for ${targetId} on ${floor}`);
                 return;
@@ -5071,9 +5394,10 @@
             sendToUnreal(payload);
         }
         function buildJumpTargets() {
+            const teleportConfig = getTeleportConfig();
             teleportJumpTargetsLayer.innerHTML = '';
-            Object.entries(jumpTargetData).forEach(([floor, targets]) => {
-                const sortedTargets = [...targets].sort((a, b) => b.x - a.x);
+            Object.entries(teleportConfig.jumpTargetData).forEach(([floor, targets]) => {
+                const sortedTargets = [...targets].sort((a, b) => b.y - a.y);
                 sortedTargets.forEach((target, index) => {
                     const button = document.createElement('button');
                     button.type = 'button';
@@ -5093,13 +5417,7 @@
                 });
             });
         }
-        const jumpTargetData = {
-            basement: [{ id: 'basement-03', x: 18.07, y: 19.78, label: 'Basement target 3' }, { id: 'basement-01', x: 47.01, y: 24.96, label: 'Basement target 1' }, { id: 'basement-02', x: 40.11, y: 53.46, label: 'Basement target 2' }],
-            ground: [{ id: 'ground-03', x: 47.52, y: 14.75, label: 'Ground floor target 3' }, { id: 'ground-02', x: 66.61, y: 19.75, label: 'Ground floor target 2' }, { id: 'ground-01', x: 77.51, y: 53.50, label: 'Ground floor target 1' }, { id: 'ground-05', x: 13.92, y: 60.72, label: 'Ground floor target 5' }, { id: 'ground-04', x: 43.42, y: 80.35, label: 'Ground floor target 4' }],
-            first: [{ id: 'first-03', x: 48.02, y: 18.36, label: 'First floor target 3' }, { id: 'first-02', x: 62.41, y: 30.66, label: 'First floor target 2' }, { id: 'first-01', x: 80.81, y: 32.68, label: 'First floor target 1' }]
-        };
         const teleportPlans = {};
-        const teleportFloorTitles = { basement: 'BASEMENT', ground: 'GROUND FLOOR', first: 'FIRST FLOOR' };
         const teleportFloorButtons = [];
 
         function getMovieBuildKey() {
@@ -5250,6 +5568,8 @@
             document.getElementById("btnMulti").addEventListener("click", () => selectBuild("Multi"));
             updateLevelButtonStates();
             syncEnvironmentMenuForBuild(selectedBuild || 'Mod');
+            syncHowToMenuForBuild(selectedBuild || 'Mod');
+            setEnvironmentMenuVariant('environment');
             document.getElementById("retryButton").addEventListener("click", () => location.reload());
 
 
@@ -5263,6 +5583,9 @@
             const buildingMenuCloseButton = document.getElementById('buildingMenuCloseButton');
             const environmentMenuButton = document.getElementById('environmentMenuButton');
             const environmentMenuCloseButton = document.getElementById('environmentMenuCloseButton');
+            const archesBtnProtrusions = document.getElementById('archesBtnProtrusions');
+            const archesBtnRecess = document.getElementById('archesBtnRecess');
+            const archesBtnBoth = document.getElementById('archesBtnBoth');
             const howToMenuButton = document.getElementById('howToMenuButton');
             const howToMenuCloseButton = document.getElementById('howToMenuCloseButton');
             const endSessionButton = document.getElementById('endSession');
@@ -5307,13 +5630,15 @@
             teleportPlans.ground = document.getElementById('teleportPlanGround');
             teleportPlans.first = document.getElementById('teleportPlanFirst');
             teleportFloorButtons.push(teleportBasementButton, teleportGroundButton, teleportFirstButton);
+            syncTeleportMenuForBuild(selectedBuild || 'Mod');
+            syncMainMenuIconsForBuild(selectedBuild || 'Mod');
 
             setUIScale(scaleSlider.value);
             window.addEventListener('resize', () => setUIScale(scaleSlider.value));
             window.addEventListener('orientationchange', () => setTimeout(() => setUIScale(scaleSlider.value), 120));
             buildJumpTargets();
             setActiveFloorButton(currentTeleportFloor);
-            animateTeleportTitle(teleportFloorTitles[currentTeleportFloor], { immediate: true });
+            animateTeleportTitle(getTeleportConfig().floorTitles[currentTeleportFloor] || 'GROUND FLOOR', { immediate: true });
             profileTypeButtons.forEach((button) => {
                 const img = button.querySelector('img');
                 const src = img ? img.getAttribute('src') : '';
@@ -5349,11 +5674,23 @@
             buildingMenuCloseButton.addEventListener('click', closeBuildingMenu);
             environmentMenuButton.addEventListener('click', openEnvironmentMenu);
             environmentMenuCloseButton.addEventListener('click', closeEnvironmentMenu);
+            if (archesBtnProtrusions) archesBtnProtrusions.addEventListener('click', () => {
+                archesAwaitingProfilePayload = true;
+                sendToUnreal({ large_small: ' protrusions' });
+            });
+            if (archesBtnRecess) archesBtnRecess.addEventListener('click', () => {
+                archesAwaitingProfilePayload = true;
+                sendToUnreal({ large_small: 'recess' });
+            });
+            if (archesBtnBoth) archesBtnBoth.addEventListener('click', () => {
+                archesAwaitingProfilePayload = true;
+                sendToUnreal({ large_small: 'both' });
+            });
             if (howToMenuButton) howToMenuButton.addEventListener('click', openHowToMenu);
             if (howToMenuCloseButton) howToMenuCloseButton.addEventListener('click', closeHowToMenu);
-            teleportMenuButton.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); openTeleportMenu(); });
+            teleportMenuButton.addEventListener('pointerup', handleSecondaryLeftButton);
             teleportMenuButton.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); });
-            if (treeToggleButton) treeToggleButton.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); toggleTreesVisibility(); });
+            if (treeToggleButton) treeToggleButton.addEventListener('pointerup', handleSecondaryRightButton);
             if (playMovieButton) {
                 playMovieButton.addEventListener('click', () => playMovieFromEditMenu());
             }
@@ -5375,7 +5712,7 @@
             if (woodgrainsMenuCloseButton) woodgrainsMenuCloseButton.addEventListener('click', closeWoodgrainsMenu);
             if (westCoastNaturalsMenuCloseButton) westCoastNaturalsMenuCloseButton.addEventListener('click', closeWestCoastNaturalsMenu);
             if (texturedColoursMenuCloseButton) texturedColoursMenuCloseButton.addEventListener('click', closeTexturedColoursMenu);
-            if (profileColoursButton) profileColoursButton.addEventListener('click', openFinishTypeMenu);
+            if (profileColoursButton) profileColoursButton.addEventListener('click', () => { currentFinishTypeSource = 'profile'; openFinishTypeMenu(); });
             profileTypeButtons.forEach((button) => button.addEventListener('click', () => handleProfileTypeButtonClick(button)));
             if (profileOptionsButtonEl) profileOptionsButtonEl.addEventListener('click', handleProfileOptionsButtonClick);
             document.querySelectorAll('.finishTypeButton').forEach((button) => {
@@ -5412,9 +5749,9 @@
             document.querySelectorAll('.texturedColoursButton').forEach((button) => {
                 button.addEventListener('click', () => handleTexturedColoursButtonClick(button));
             });
-            teleportBasementButton.addEventListener('click', () => setTeleportFloor('basement'));
-            teleportGroundButton.addEventListener('click', () => setTeleportFloor('ground'));
-            teleportFirstButton.addEventListener('click', () => setTeleportFloor('first'));
+            if (teleportBasementButton) teleportBasementButton.addEventListener('click', () => setTeleportFloor('basement'));
+            if (teleportGroundButton) teleportGroundButton.addEventListener('click', () => setTeleportFloor('ground'));
+            if (teleportFirstButton) teleportFirstButton.addEventListener('click', () => setTeleportFloor('first'));
             endSessionButton.addEventListener('click', openConfirmMenu);
             confirmMenuCloseButton.addEventListener('click', closeConfirmMenu);
             confirmNoButton.addEventListener('click', closeConfirmMenu);
