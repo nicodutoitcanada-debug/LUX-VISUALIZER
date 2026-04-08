@@ -4806,6 +4806,7 @@
         let currentColorSet = '';
         let currentJoinerSet = '';
         let currentFinishTypeSource = 'profile';
+        let colorTypeRouteActive = false;
         let currentProfileVariant = 'BOARD_AND_BATTEN';
         let currentProfileButtonMode = 'profile';
         let profileTitleAnimationId = 0;
@@ -5261,30 +5262,53 @@
             treesAreVisible = !treesAreVisible;
             sendToUnreal(treesAreVisible ? { 'Trees': 'Visable' } : { 'Trees': 'Invisable' });
         }
-        function openProfileMenu() { switchPanel('profile'); }
+        function openProfileMenu() { colorTypeRouteActive = false; switchPanel('profile'); }
         function closeProfileMenu() { switchPanel('main'); }
         function openFinishTypeMenu() { switchPanel('finish-type'); }
-        function closeFinishTypeMenu() { switchPanel('profile'); }
+        function getFinishMenuExitTarget() {
+            return colorTypeRouteActive ? 'main' : 'profile';
+        }
+        function closeFinishTypeMenu() {
+            const exitTarget = getFinishMenuExitTarget();
+            if (exitTarget === 'main') colorTypeRouteActive = false;
+            switchPanel(exitTarget);
+        }
         function openSolidColoursMenu() {
             updateSolidColoursTitle(profileColorEl ? profileColorEl.textContent : '');
             switchPanel('solid-colours');
         }
-        function closeSolidColoursMenu() { switchPanel('profile'); }
+        function closeSolidColoursMenu() {
+            const exitTarget = getFinishMenuExitTarget();
+            if (exitTarget === 'main') colorTypeRouteActive = false;
+            switchPanel(exitTarget);
+        }
         function openWoodgrainsMenu() {
             updateWoodgrainsTitle(profileColorEl ? profileColorEl.textContent : '');
             switchPanel('woodgrains');
         }
-        function closeWoodgrainsMenu() { switchPanel('profile'); }
+        function closeWoodgrainsMenu() {
+            const exitTarget = getFinishMenuExitTarget();
+            if (exitTarget === 'main') colorTypeRouteActive = false;
+            switchPanel(exitTarget);
+        }
         function openWestCoastNaturalsMenu() {
             updateWestCoastNaturalsTitle(profileColorEl ? profileColorEl.textContent : '');
             switchPanel('west-coast-naturals');
         }
-        function closeWestCoastNaturalsMenu() { switchPanel('profile'); }
+        function closeWestCoastNaturalsMenu() {
+            const exitTarget = getFinishMenuExitTarget();
+            if (exitTarget === 'main') colorTypeRouteActive = false;
+            switchPanel(exitTarget);
+        }
         function openTexturedColoursMenu() {
             updateTexturedColoursTitle(profileColorEl ? profileColorEl.textContent : '');
             switchPanel('textured-colours');
         }
-        function closeTexturedColoursMenu() { switchPanel('profile'); }
+        function closeTexturedColoursMenu() {
+            const exitTarget = getFinishMenuExitTarget();
+            if (exitTarget === 'main') colorTypeRouteActive = false;
+            switchPanel(exitTarget);
+        }
         function getActiveFinishSelectionSet() {
             if (currentFinishTypeSource === 'joiner' && currentJoinerSet) return currentJoinerSet;
             return currentColorSet;
@@ -5602,6 +5626,7 @@
             if (typeof parsed.showButtons === 'string') applyProfileButtonAvailability(parsed.showButtons);
             if (parsed.open === 'colorType') {
                 currentFinishTypeSource = 'profile';
+                colorTypeRouteActive = true;
                 openFinishTypeMenu();
                 return;
             }
@@ -6062,7 +6087,7 @@
             if (westCoastNaturalsMenuCloseButton) westCoastNaturalsMenuCloseButton.addEventListener('click', closeWestCoastNaturalsMenu);
             if (texturedColoursMenuCloseButton) texturedColoursMenuCloseButton.addEventListener('click', closeTexturedColoursMenu);
             if (archesMenuCloseButton) archesMenuCloseButton.addEventListener('click', closeArchesMenu);
-            if (profileColoursButton) profileColoursButton.addEventListener('click', () => { currentFinishTypeSource = 'profile'; openFinishTypeMenu(); });
+            if (profileColoursButton) profileColoursButton.addEventListener('click', () => { currentFinishTypeSource = 'profile'; colorTypeRouteActive = false; openFinishTypeMenu(); });
             profileTypeButtons.forEach((button) => button.addEventListener('click', () => handleProfileTypeButtonClick(button)));
             if (profileOptionsButtonEl) profileOptionsButtonEl.addEventListener('click', handleProfileOptionsButtonClick);
             document.querySelectorAll('.finishTypeButton').forEach((button) => {
