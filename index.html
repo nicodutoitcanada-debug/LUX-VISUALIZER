@@ -2745,9 +2745,11 @@
 
         .archesOptionButton {
             appearance: none;
-            border: 0;
-            background: transparent;
-            padding: 0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.10)), rgba(0, 0, 0, 0.10);
+            border-radius: 18px;
+            overflow: hidden;
+            padding: 10px 8px 8px 8px;
             margin: 0;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
@@ -2757,6 +2759,7 @@
             align-items: center;
             justify-content: flex-start;
             gap: 10px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.10);
         }
 
         .archesOptionLabel {
@@ -2779,7 +2782,7 @@
             height: auto;
             display: block;
             object-fit: contain;
-            opacity: 0.9;
+            opacity: 0.8;
             transition: opacity 0.2s ease, transform 0.2s ease;
             pointer-events: none;
             user-select: none;
@@ -2792,7 +2795,7 @@
         }
 
         .archesOptionButton:active img {
-            transform: scale(0.98);
+            transform: scale(0.985);
         }
 
         @media (max-width: 680px) {
@@ -3982,6 +3985,7 @@
         let revealGamePromise = null;
         let editModeIntroShown = false;
         let archesMenuAvailable = false;
+        let confirmMenuVariant = 'end-session';
         let awaitingArchesProfilePayload = false;
         let editModeIntroAutoHideTimer = null;
         let editModeIntroHideTimer = null;
@@ -4233,13 +4237,19 @@
         function handleSecondaryLeftButton(event) {
             event.preventDefault();
             event.stopPropagation();
-            if (selectedBuild === 'Trad') return;
+            if (selectedBuild === 'Trad') {
+                sendToUnreal({ go_to: 'pergola' });
+                return;
+            }
             openTeleportMenu();
         }
         function handleSecondaryRightButton(event) {
             event.preventDefault();
             event.stopPropagation();
-            if (selectedBuild === 'Trad') return;
+            if (selectedBuild === 'Trad') {
+                sendToUnreal({ go_to: 'fence' });
+                return;
+            }
             toggleTreesVisibility();
         }
         function setLevelLoadingContent(buildName) {
@@ -5021,7 +5031,30 @@
             activeDockMode = 'walk';
             enterDockedMode('walk');
         }
+        function setConfirmMenuVariant(variant = 'end-session') {
+            confirmMenuVariant = variant === 'trad-edit' ? 'trad-edit' : 'end-session';
+            const confirmTitle = document.getElementById('confirmTitle');
+            const confirmYesButton = document.getElementById('confirmYesButton');
+            const confirmNoButton = document.getElementById('confirmNoButton');
+            const confirmMenuCloseButton = document.getElementById('confirmMenuCloseButton');
+            if (confirmMenuVariant === 'trad-edit') {
+                if (confirmTitle) confirmTitle.textContent = 'WHAT WOULD YOU LIKE TO EDIT';
+                if (confirmYesButton) confirmYesButton.textContent = 'WALLS';
+                if (confirmNoButton) confirmNoButton.textContent = 'SOFFIT';
+                if (confirmMenuCloseButton) confirmMenuCloseButton.setAttribute('aria-label', 'Cancel traditional profile selection');
+            } else {
+                if (confirmTitle) confirmTitle.textContent = 'ARE YOU SURE YOU WANT TO END THE SESSION';
+                if (confirmYesButton) confirmYesButton.textContent = 'YES';
+                if (confirmNoButton) confirmNoButton.textContent = 'NO';
+                if (confirmMenuCloseButton) confirmMenuCloseButton.setAttribute('aria-label', 'Cancel end session');
+            }
+        }
         function enterEditMode() {
+            if (selectedBuild === 'Trad') {
+                activeDockMode = 'walk';
+                openConfirmMenu('trad-edit');
+                return;
+            }
             activeDockMode = 'edit';
             const editModePayload = selectedBuild === 'Multi'
                 ? { multi: 'editMode' }
@@ -5047,7 +5080,7 @@
         function closeEnvironmentMenu() { switchPanel('main'); }
         function openHowToMenu() { switchPanel('how-to'); }
         function closeHowToMenu() { switchPanel('main'); }
-        function openConfirmMenu() { switchPanel('confirm'); }
+        function openConfirmMenu(variant = 'end-session') { setConfirmMenuVariant(variant); switchPanel('confirm'); }
         function openArchesMenu() { switchPanel('arches', { includeSliderOnEnter: true }); }
         function closeArchesMenu() { archesMenuAvailable = false; awaitingArchesProfilePayload = false; switchPanel('main'); }
         function handleArchesOptionClick(mode) {
@@ -5055,7 +5088,7 @@
             awaitingArchesProfilePayload = true;
             sendToUnreal({ large_small: mode });
         }
-        function closeConfirmMenu() { switchPanel('main'); }
+        function closeConfirmMenu() { setConfirmMenuVariant('end-session'); switchPanel('main'); }
         function toggleTreesVisibility() {
             treesAreVisible = !treesAreVisible;
             sendToUnreal(treesAreVisible ? { 'Trees': 'Visable' } : { 'Trees': 'Invisable' });
@@ -5781,6 +5814,7 @@
             teleportFloorButtons.push(teleportBasementButton, teleportGroundButton, teleportFirstButton);
             syncTeleportMenuForBuild(selectedBuild || 'Mod');
             syncMainMenuIconsForBuild(selectedBuild || 'Mod');
+            setConfirmMenuVariant('end-session');
 
             setUIScale(scaleSlider.value);
             window.addEventListener('resize', () => setUIScale(scaleSlider.value));
@@ -5893,10 +5927,24 @@
             if (teleportBasementButton) teleportBasementButton.addEventListener('click', () => setTeleportFloor('basement'));
             if (teleportGroundButton) teleportGroundButton.addEventListener('click', () => setTeleportFloor('ground'));
             if (teleportFirstButton) teleportFirstButton.addEventListener('click', () => setTeleportFloor('first'));
-            endSessionButton.addEventListener('click', openConfirmMenu);
+            endSessionButton.addEventListener('click', () => openConfirmMenu('end-session'));
             confirmMenuCloseButton.addEventListener('click', closeConfirmMenu);
-            confirmNoButton.addEventListener('click', closeConfirmMenu);
-            confirmYesButton.addEventListener('click', () => endSessionByUser('Your session has ended.'));
+            confirmNoButton.addEventListener('click', () => {
+                if (confirmMenuVariant === 'trad-edit') {
+                    closeConfirmMenu();
+                    sendToUnreal({ profile_info: 'Trad_Soffit' });
+                    return;
+                }
+                closeConfirmMenu();
+            });
+            confirmYesButton.addEventListener('click', () => {
+                if (confirmMenuVariant === 'trad-edit') {
+                    closeConfirmMenu();
+                    sendToUnreal({ profile_info: 'Trad_Walls' });
+                    return;
+                }
+                endSessionByUser('Your session has ended.');
+            });
 
             function suppressPersistentUiFocus(event) {
                 const target = event.target;
@@ -6306,7 +6354,7 @@
                 <div id="archesInnerBoxWrapper">
                     <div id="archesInnerBox">
                         <div class="archesOptionGrid">
-                            <button class="archesOptionButton" type="button" data-large-small=" protrusions" aria-label="Edit protrusions">
+                            <button class="archesOptionButton" type="button" data-large-small="protrusions" aria-label="Edit protrusions">
                                 <div class="archesOptionLabel">EDIT PROTRUSIONS</div>
                                 <img src="multi protrusions.png" alt="Edit protrusions">
                             </button>
