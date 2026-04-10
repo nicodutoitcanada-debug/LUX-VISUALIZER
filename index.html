@@ -24,11 +24,15 @@
             --confirm-x: 260px;
             --teleport-x: 260px;
             --profile-x: 260px;
+            --profile-vgroove-options-x: 260px;
             --finish-type-x: 260px;
             --solid-colours-x: 260px;
             --woodgrains-x: 260px;
             --west-coast-naturals-x: 260px;
             --textured-colours-x: 260px;
+            --arches-x: 260px;
+            --fence-x: 260px;
+            --pergola-x: 260px;
             --arches-x: 260px;
             --anim-time: 1.1s;
             --anim-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -716,12 +720,15 @@
         #confirmMenuWrapper,
         #teleportMenuWrapper,
         #profileMenuWrapper,
+        #profileVGrooveOptionsMenuWrapper,
         #finishTypeMenuWrapper,
         #solidColoursMenuWrapper,
         #woodgrainsMenuWrapper,
         #westCoastNaturalsMenuWrapper,
         #texturedColoursMenuWrapper,
-        #archesMenuWrapper {
+        #archesMenuWrapper,
+        #fenceMenuWrapper,
+        #pergolaMenuWrapper {
             position: absolute;
             right: 120px;
             top: 50%;
@@ -770,6 +777,10 @@
             background: rgba(14, 18, 24, 0.02);
         }
 
+        #profileVGrooveOptionsMenuWrapper {
+            background: rgba(14, 18, 24, 0.02);
+        }
+
         #finishTypeMenuWrapper {
             background: rgba(14, 18, 24, 0.02);
         }
@@ -791,6 +802,14 @@
         }
 
         #archesMenuWrapper {
+            background: rgba(14, 18, 24, 0.02);
+        }
+
+        #fenceMenuWrapper {
+            background: rgba(14, 18, 24, 0.02);
+        }
+
+        #pergolaMenuWrapper {
             background: rgba(14, 18, 24, 0.02);
         }
 
@@ -826,6 +845,10 @@
             transform: translate3d(var(--profile-x), -50%, 0) scale(var(--ui-scale));
         }
 
+        #profileVGrooveOptionsMenuWrapper {
+            transform: translate3d(var(--profile-vgroove-options-x), -50%, 0) scale(var(--ui-scale));
+        }
+
         #finishTypeMenuWrapper {
             transform: translate3d(var(--finish-type-x), -50%, 0) scale(var(--ui-scale));
         }
@@ -850,6 +873,14 @@
             transform: translate3d(var(--arches-x), -50%, 0) scale(var(--ui-scale));
         }
 
+        #fenceMenuWrapper {
+            transform: translate3d(var(--fence-x), -50%, 0) scale(var(--ui-scale));
+        }
+
+        #pergolaMenuWrapper {
+            transform: translate3d(var(--pergola-x), -50%, 0) scale(var(--ui-scale));
+        }
+
         /* hidden until backend says load_ui modern */
         body:not(.inGameUiVisible) #uiWrapper,
         body:not(.inGameUiVisible) #cameraMenuWrapper,
@@ -859,12 +890,15 @@
         body:not(.inGameUiVisible) #confirmMenuWrapper,
         body:not(.inGameUiVisible) #teleportMenuWrapper,
         body:not(.inGameUiVisible) #profileMenuWrapper,
+        body:not(.inGameUiVisible) #profileVGrooveOptionsMenuWrapper,
         body:not(.inGameUiVisible) #finishTypeMenuWrapper,
         body:not(.inGameUiVisible) #solidColoursMenuWrapper,
         body:not(.inGameUiVisible) #woodgrainsMenuWrapper,
         body:not(.inGameUiVisible) #westCoastNaturalsMenuWrapper,
         body:not(.inGameUiVisible) #texturedColoursMenuWrapper,
-        body:not(.inGameUiVisible) #archesMenuWrapper {
+        body:not(.inGameUiVisible) #archesMenuWrapper,
+        body:not(.inGameUiVisible) #fenceMenuWrapper,
+        body:not(.inGameUiVisible) #pergolaMenuWrapper {
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
@@ -915,12 +949,15 @@
         body.inGameUiVisible #confirmMenuWrapper,
         body.inGameUiVisible #teleportMenuWrapper,
         body.inGameUiVisible #profileMenuWrapper,
+        body.inGameUiVisible #profileVGrooveOptionsMenuWrapper,
         body.inGameUiVisible #finishTypeMenuWrapper,
         body.inGameUiVisible #solidColoursMenuWrapper,
         body.inGameUiVisible #woodgrainsMenuWrapper,
         body.inGameUiVisible #westCoastNaturalsMenuWrapper,
         body.inGameUiVisible #texturedColoursMenuWrapper,
         body.inGameUiVisible #archesMenuWrapper,
+        body.inGameUiVisible #fenceMenuWrapper,
+        body.inGameUiVisible #pergolaMenuWrapper,
         body.inGameUiVisible #sliderContainer,
         body.inGameUiVisible #soloDockButton {
             pointer-events: auto;
@@ -1275,9 +1312,16 @@
             width: 286px;
         }
 
+        #pergolaOuterBox {
+            width: 560px;
+        }
+
         #teleportOuterBox,
         #profileOuterBox,
+        #profileVGrooveOptionsOuterBox,
         #archesOuterBox,
+        #fenceOuterBox,
+        #pergolaOuterBox,
         #finishTypeOuterBox,
         #solidColoursOuterBox,
         #woodgrainsOuterBox,
@@ -1293,7 +1337,10 @@
         #confirmOuterBox,
         #teleportOuterBox,
         #profileOuterBox,
+        #profileVGrooveOptionsOuterBox,
         #archesOuterBox,
+        #fenceOuterBox,
+        #pergolaOuterBox,
         #finishTypeOuterBox,
         #solidColoursOuterBox,
         #woodgrainsOuterBox,
@@ -1309,7 +1356,10 @@
         #confirmOuterBox::before,
         #teleportOuterBox::before,
         #profileOuterBox::before,
+        #profileVGrooveOptionsOuterBox::before,
         #archesOuterBox::before,
+        #fenceOuterBox::before,
+        #pergolaOuterBox::before,
         #finishTypeOuterBox::before,
         #solidColoursOuterBox::before,
         #woodgrainsOuterBox::before,
@@ -1331,7 +1381,10 @@
         #confirmOuterBox::after,
         #teleportOuterBox::after,
         #profileOuterBox::after,
+        #profileVGrooveOptionsOuterBox::after,
         #archesOuterBox::after,
+        #fenceOuterBox::after,
+        #pergolaOuterBox::after,
         #finishTypeOuterBox::after,
         #solidColoursOuterBox::after,
         #woodgrainsOuterBox::after,
@@ -1374,7 +1427,10 @@
         #cameraTopBar,
         #buildingTopBar,
         #environmentTopBar,
+        #profileVGrooveOptionsTopBar,
         #archesTopBar,
+        #fenceTopBar,
+        #pergolaTopBar,
         #howToTopBar,
         #teleportTopBar,
         #profileTopBar,
@@ -1398,7 +1454,22 @@
             margin-bottom: 0;
         }
 
+        #profileVGrooveOptionsTopBar {
+            height: 42px;
+            margin-bottom: 4px;
+        }
+
         #archesTopBar {
+            height: 42px;
+            margin-bottom: 4px;
+        }
+
+        #fenceTopBar {
+            height: 42px;
+            margin-bottom: 4px;
+        }
+
+        #pergolaTopBar {
             height: 42px;
             margin-bottom: 4px;
         }
@@ -1443,7 +1514,10 @@
         #howToLogo,
         #teleportLogo,
         #profileLogo,
+        #profileVGrooveOptionsLogo,
         #archesLogo,
+        #fenceLogo,
+        #pergolaLogo,
         #finishTypeLogo,
         #solidColoursLogo,
         #woodgrainsLogo,
@@ -1460,7 +1534,8 @@
         #buildingTitle,
         #environmentTitle,
         #howToTitle,
-        #confirmTitle {
+        #confirmTitle,
+        #profileVGrooveOptionsTitle {
             color: rgba(255, 255, 255, 0.78);
             font-weight: 700;
             letter-spacing: 1px;
@@ -1476,6 +1551,12 @@
         }
 
         #confirmTitle {
+            font-size: 8px;
+            line-height: 1.15;
+            max-width: 205px;
+        }
+
+        #profileVGrooveOptionsTitle {
             font-size: 8px;
             line-height: 1.15;
             max-width: 205px;
@@ -1549,8 +1630,11 @@
         #environmentInnerBoxWrapper,
         #howToInnerBoxWrapper,
         #confirmInnerBoxWrapper,
+        #profileVGrooveOptionsInnerBoxWrapper,
         #teleportInnerBoxWrapper,
         #profileInnerBoxWrapper,
+        #fenceInnerBoxWrapper,
+        #pergolaInnerBoxWrapper,
         #finishTypeInnerBoxWrapper,
         #solidColoursInnerBoxWrapper,
         #woodgrainsInnerBoxWrapper,
@@ -1618,9 +1702,12 @@
         #environmentInnerBox,
         #howToInnerBox,
         #confirmInnerBox,
+        #profileVGrooveOptionsInnerBox,
         #teleportInnerBox,
         #profileInnerBox,
         #archesInnerBox,
+        #fenceInnerBox,
+        #pergolaInnerBox,
         #finishTypeInnerBox,
         #solidColoursInnerBox,
         #woodgrainsInnerBox,
@@ -1664,7 +1751,23 @@
         }
 
         #confirmInnerBox {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(18, 22, 28, 0.10) 31%, rgba(8, 10, 14, 0.28) 60%, rgba(2, 3, 5, 0.58) 84%, rgba(0, 0, 0, 0.78) 100%), rgba(20, 20, 20, 0.28);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.045) 16%, rgba(255, 255, 255, 0.018) 32%, rgba(18, 22, 28, 0.10) 48%, rgba(8, 10, 14, 0.22) 66%, rgba(2, 3, 5, 0.40) 84%, rgba(0, 0, 0, 0.58) 100%), rgba(20, 20, 20, 0.28);
+            border-radius: 24px;
+            backdrop-filter: blur(12px) saturate(118%);
+            -webkit-backdrop-filter: blur(12px) saturate(118%);
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            padding: 0px 6px 0px 6px;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #profileVGrooveOptionsInnerBox {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.045) 16%, rgba(255, 255, 255, 0.018) 32%, rgba(18, 22, 28, 0.10) 48%, rgba(8, 10, 14, 0.22) 66%, rgba(2, 3, 5, 0.40) 84%, rgba(0, 0, 0, 0.58) 100%), rgba(20, 20, 20, 0.28);
             border-radius: 24px;
             backdrop-filter: blur(12px) saturate(118%);
             -webkit-backdrop-filter: blur(12px) saturate(118%);
@@ -1682,6 +1785,8 @@
         #teleportInnerBox,
         #profileInnerBox,
         #archesInnerBox,
+        #fenceInnerBox,
+        #pergolaInnerBox,
         #finishTypeInnerBox,
         #solidColoursInnerBox,
         #woodgrainsInnerBox,
@@ -1697,31 +1802,35 @@
         }
 
         #profileInnerBox {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.04) 16%, rgba(255, 255, 255, 0.018) 32%, rgba(20, 24, 30, 0.09) 48%, rgba(12, 15, 20, 0.20) 66%, rgba(6, 8, 12, 0.36) 84%, rgba(0, 0, 0, 0.54) 100%), rgba(16, 20, 26, 0.32);
         }
 
         #archesInnerBox {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.04) 16%, rgba(255, 255, 255, 0.018) 32%, rgba(20, 24, 30, 0.09) 48%, rgba(12, 15, 20, 0.20) 66%, rgba(6, 8, 12, 0.36) 84%, rgba(0, 0, 0, 0.54) 100%), rgba(16, 20, 26, 0.32);
+        }
+
+        #fenceInnerBox {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.038) 20%, rgba(255, 255, 255, 0.014) 38%, rgba(15, 18, 24, 0.08) 52%, rgba(7, 9, 13, 0.22) 68%, rgba(2, 3, 5, 0.46) 86%, rgba(0, 0, 0, 0.68) 100%), rgba(16, 20, 26, 0.32);
         }
 
         #finishTypeInnerBox {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.04) 16%, rgba(255, 255, 255, 0.018) 32%, rgba(20, 24, 30, 0.09) 48%, rgba(12, 15, 20, 0.20) 66%, rgba(6, 8, 12, 0.36) 84%, rgba(0, 0, 0, 0.54) 100%), rgba(16, 20, 26, 0.32);
         }
 
         #solidColoursInnerBox {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.04) 16%, rgba(255, 255, 255, 0.018) 32%, rgba(20, 24, 30, 0.09) 48%, rgba(12, 15, 20, 0.20) 66%, rgba(6, 8, 12, 0.36) 84%, rgba(0, 0, 0, 0.54) 100%), rgba(16, 20, 26, 0.32);
         }
 
         #woodgrainsInnerBox {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.04) 16%, rgba(255, 255, 255, 0.018) 32%, rgba(20, 24, 30, 0.09) 48%, rgba(12, 15, 20, 0.20) 66%, rgba(6, 8, 12, 0.36) 84%, rgba(0, 0, 0, 0.54) 100%), rgba(16, 20, 26, 0.32);
         }
 
         #westCoastNaturalsInnerBox {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.04) 16%, rgba(255, 255, 255, 0.018) 32%, rgba(20, 24, 30, 0.09) 48%, rgba(12, 15, 20, 0.20) 66%, rgba(6, 8, 12, 0.36) 84%, rgba(0, 0, 0, 0.54) 100%), rgba(16, 20, 26, 0.32);
         }
 
         #texturedColoursInnerBox {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(15, 18, 24, 0.10) 31%, rgba(7, 9, 13, 0.26) 60%, rgba(2, 3, 5, 0.54) 84%, rgba(0, 0, 0, 0.76) 100%), rgba(16, 20, 26, 0.32);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.04) 16%, rgba(255, 255, 255, 0.018) 32%, rgba(20, 24, 30, 0.09) 48%, rgba(12, 15, 20, 0.20) 66%, rgba(6, 8, 12, 0.36) 84%, rgba(0, 0, 0, 0.54) 100%), rgba(16, 20, 26, 0.32);
         }
 
         .iconGrid {
@@ -2020,6 +2129,13 @@
             gap: 6px;
         }
 
+        #profileVGrooveOptionsButtons {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
         .confirmButton {
             appearance: none;
             -webkit-appearance: none;
@@ -2290,6 +2406,10 @@
 
         #profileInnerBox {
             padding: 8px 8px 8px 8px;
+        }
+
+        #fenceInnerBox {
+            padding: 12px 12px 16px 12px;
         }
 
         #finishTypeInnerBox {
@@ -2654,9 +2774,19 @@
         }
 
         .woodgrainsButtonRow--knotty {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            max-width: 210px;
-            margin: 0 auto;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .woodgrainsButtonRow--knotty .woodgrainButton:nth-child(1) {
+            grid-column: 2;
+        }
+
+        .woodgrainsButtonRow--knotty .woodgrainButton:nth-child(2) {
+            grid-column: 3;
+        }
+
+        .woodgrainsButtonRow--knotty .woodgrainButton:nth-child(3) {
+            grid-column: 4;
         }
 
         .woodgrainButton {
@@ -2879,6 +3009,241 @@
             }
         }
 
+
+
+
+        #pergolaTitle {
+            color: rgba(255, 255, 255, 0.96);
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            user-select: none;
+            pointer-events: none;
+            margin: 4px 0 8px 8px;
+            position: relative;
+            z-index: 3;
+        }
+
+        #pergolaExplainer {
+            color: rgba(255, 255, 255, 0.70);
+            font-weight: 300;
+            font-size: 10px;
+            line-height: 1.35;
+            letter-spacing: 0.35px;
+            margin: 0 8px 12px 8px;
+            max-width: 48ch;
+            position: relative;
+            z-index: 3;
+        }
+
+        #pergolaStage {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1500 / 833;
+            border-radius: 14px;
+            overflow: hidden;
+            background: transparent;
+            margin: 0;
+        }
+
+        .pergolaBaseImage,
+        .pergolaScreenOverlay {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .pergolaScreenOverlay {
+            opacity: 0;
+            transition: opacity 0.22s ease;
+        }
+
+        .pergolaScreenOverlay.active {
+            opacity: 1;
+        }
+
+        .pergolaToggleButton {
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            transform: translate(-50%, -50%);
+            appearance: none;
+            -webkit-appearance: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 4;
+        }
+
+        .pergolaToggleButton img {
+            width: 50%;
+            height: 50%;
+            object-fit: contain;
+            display: block;
+            opacity: 0.96;
+            transition: transform 0.18s ease, opacity 0.18s ease;
+            pointer-events: none;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.28));
+        }
+
+        .pergolaToggleButton:hover img,
+        .pergolaToggleButton:focus-visible img {
+            transform: scale(1.04);
+            opacity: 1;
+        }
+
+        .pergolaToggleButton:active img {
+            transform: scale(0.96);
+            opacity: 1;
+        }
+
+        .pergolaToggleButton[data-screen-id="A"] {
+            left: 16.04%;
+            top: 51.87%;
+        }
+
+        .pergolaToggleButton[data-screen-id="B"] {
+            left: 26.19%;
+            top: 50.88%;
+        }
+
+        .pergolaToggleButton[data-screen-id="C"] {
+            left: 74.03%;
+            top: 51.88%;
+        }
+
+        .pergolaToggleButton[data-screen-id="D"] {
+            left: 84.18%;
+            top: 51.88%;
+        }
+
+        #pergolaChooseColourButton {
+            position: relative;
+            z-index: 5;
+            pointer-events: auto;
+            width: calc(100% - 16px - (var(--plate-side-inset) * 2));
+            height: 40px;
+            margin: 12px auto 12px auto;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            user-select: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            appearance: none;
+            -webkit-appearance: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.012) 26%, rgba(0, 0, 0, 0.28) 100%), rgba(0, 0, 0, 0.24);
+        }
+
+        @media (max-width: 680px) {
+            #pergolaOuterBox {
+                width: min(92vw, 560px);
+            }
+
+            .pergolaToggleButton {
+                width: 34px;
+                height: 34px;
+            }
+
+            #pergolaExplainer {
+                font-size: 9px;
+            }
+        }
+
+
+        #fenceChooseColourButton {
+            width: calc(100% - 16px - (var(--plate-side-inset) * 2));
+            height: 40px;
+            margin: 12px auto 12px auto;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            user-select: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            appearance: none;
+            -webkit-appearance: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.012) 26%, rgba(0, 0, 0, 0.28) 100%), rgba(0, 0, 0, 0.24);
+        }
+
+        #fenceOptions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .fenceCard {
+            appearance: none;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0;
+            margin: 0;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.035) 22%, rgba(255, 255, 255, 0.012) 42%, rgba(0, 0, 0, 0.055) 62%, rgba(0, 0, 0, 0.14) 100%), rgba(0, 0, 0, 0.10);
+            border-radius: 18px;
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: block;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+        }
+
+        .fenceCard img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            opacity: 0.88;
+            transition: opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+            pointer-events: none;
+        }
+
+        .fenceCard:hover img,
+        .fenceCard:active img {
+            opacity: 1;
+        }
+
+        .fenceCard:active img {
+            transform: scale(0.985);
+        }
+
+        .fenceCard.is-disabled {
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .fenceCard.is-disabled img {
+            opacity: 0.28;
+            filter: grayscale(1) saturate(0);
+            transform: none !important;
+        }
+
+        .fenceCard.is-disabled:hover img,
+        .fenceCard.is-disabled:active img {
+            opacity: 0.28;
+            transform: none !important;
+        }
 
         .archesOptionGrid {
             display: grid;
@@ -3284,7 +3649,8 @@
         body.movie-ui-hidden #woodgrainsMenuWrapper,
         body.movie-ui-hidden #westCoastNaturalsMenuWrapper,
         body.movie-ui-hidden #texturedColoursMenuWrapper,
-        body.movie-ui-hidden #archesMenuWrapper {
+        body.movie-ui-hidden #archesMenuWrapper,
+        body.movie-ui-hidden #fenceMenuWrapper {
             transform: translate3d(260px, -50%, 0) scale(var(--ui-scale)) !important;
         }
 
@@ -3328,7 +3694,8 @@
         body.movie-ui-restoring #woodgrainsMenuWrapper,
         body.movie-ui-restoring #westCoastNaturalsMenuWrapper,
         body.movie-ui-restoring #texturedColoursMenuWrapper,
-        body.movie-ui-restoring #archesMenuWrapper {
+        body.movie-ui-restoring #archesMenuWrapper,
+        body.movie-ui-restoring #fenceMenuWrapper {
             transform: translate3d(260px, -50%, 0) scale(var(--ui-scale)) !important;
         }
 
@@ -3378,7 +3745,8 @@
         body.camera-mode #environmentMenuWrapper,
         body.camera-mode #confirmMenuWrapper,
         body.camera-mode #teleportMenuWrapper,
-        body.camera-mode #profileMenuWrapper {
+        body.camera-mode #profileMenuWrapper,
+        body.camera-mode #fenceMenuWrapper {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
@@ -3407,7 +3775,8 @@
         body.building-mode #environmentMenuWrapper,
         body.building-mode #confirmMenuWrapper,
         body.building-mode #teleportMenuWrapper,
-        body.building-mode #profileMenuWrapper {
+        body.building-mode #profileMenuWrapper,
+        body.building-mode #fenceMenuWrapper {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
@@ -3435,7 +3804,8 @@
         body.environment-mode #buildingMenuWrapper,
         body.environment-mode #confirmMenuWrapper,
         body.environment-mode #teleportMenuWrapper,
-        body.environment-mode #profileMenuWrapper {
+        body.environment-mode #profileMenuWrapper,
+        body.environment-mode #fenceMenuWrapper {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
@@ -3582,13 +3952,66 @@
         body.profile-mode #woodgrainsMenuWrapper,
         body.profile-mode #westCoastNaturalsMenuWrapper,
         body.profile-mode #texturedColoursMenuWrapper,
-        body.profile-mode #archesMenuWrapper {
+        body.profile-mode #archesMenuWrapper,
+        body.profile-mode #fenceMenuWrapper,
+        body.profile-mode #pergolaMenuWrapper {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
 
         body.profile-mode #profileMenuWrapper {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition-delay: 0s, 0s, 0s;
+        }
+
+        body.profile-vgroove-options-mode {
+            --main-x: 260px;
+            --camera-x: 260px;
+            --building-x: 260px;
+            --environment-x: 260px;
+            --how-to-x: 260px;
+            --confirm-x: 260px;
+            --teleport-x: 260px;
+            --profile-x: 260px;
+            --profile-vgroove-options-x: 0px;
+            --finish-type-x: 260px;
+            --solid-colours-x: 260px;
+            --woodgrains-x: 260px;
+            --west-coast-naturals-x: 260px;
+            --textured-colours-x: 260px;
+            --arches-x: 260px;
+        }
+
+        body.inGameUiVisible:not(.profile-vgroove-options-mode) #profileVGrooveOptionsMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        body.profile-vgroove-options-mode #uiWrapper,
+        body.profile-vgroove-options-mode #cameraMenuWrapper,
+        body.profile-vgroove-options-mode #buildingMenuWrapper,
+        body.profile-vgroove-options-mode #environmentMenuWrapper,
+        body.profile-vgroove-options-mode #confirmMenuWrapper,
+        body.profile-vgroove-options-mode #teleportMenuWrapper,
+        body.profile-vgroove-options-mode #profileMenuWrapper,
+        body.profile-vgroove-options-mode #finishTypeMenuWrapper,
+        body.profile-vgroove-options-mode #solidColoursMenuWrapper,
+        body.profile-vgroove-options-mode #woodgrainsMenuWrapper,
+        body.profile-vgroove-options-mode #westCoastNaturalsMenuWrapper,
+        body.profile-vgroove-options-mode #texturedColoursMenuWrapper,
+        body.profile-vgroove-options-mode #archesMenuWrapper,
+        body.profile-vgroove-options-mode #fenceMenuWrapper,
+        body.profile-vgroove-options-mode #pergolaMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        body.profile-vgroove-options-mode #profileVGrooveOptionsMenuWrapper {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
@@ -3629,6 +4052,7 @@
         }
 
         body.finish-type-mode #finishTypeMenuWrapper {
+
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
@@ -3789,12 +4213,31 @@
             pointer-events: none;
         }
 
+        body.textured-colours-mode #fenceMenuWrapper,
+        body.textured-colours-mode #pergolaMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
         body.textured-colours-mode #texturedColoursMenuWrapper {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
             transition-delay: 0s, 0s, 0s;
         }
+
+
+        body.finish-type-mode #pergolaMenuWrapper,
+        body.solid-colours-mode #pergolaMenuWrapper,
+        body.woodgrains-mode #pergolaMenuWrapper,
+        body.west-coast-naturals-mode #pergolaMenuWrapper,
+        body.textured-colours-mode #pergolaMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
 
         body.arches-mode {
             --solo-rotate: 180deg;
@@ -3840,6 +4283,99 @@
             transform: translate3d(0, -50%, 0) scale(var(--ui-scale));
         }
 
+        body.fence-mode {
+            --solo-rotate: 180deg;
+        }
+
+        body.fence-mode #uiWrapper,
+        body.fence-mode #cameraMenuWrapper,
+        body.fence-mode #buildingMenuWrapper,
+        body.fence-mode #environmentMenuWrapper,
+        body.fence-mode #howToMenuWrapper,
+        body.fence-mode #confirmMenuWrapper,
+        body.fence-mode #teleportMenuWrapper,
+        body.fence-mode #profileMenuWrapper,
+        body.fence-mode #finishTypeMenuWrapper,
+        body.fence-mode #solidColoursMenuWrapper,
+        body.fence-mode #woodgrainsMenuWrapper,
+        body.fence-mode #westCoastNaturalsMenuWrapper,
+        body.fence-mode #texturedColoursMenuWrapper,
+        body.fence-mode #archesMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translate3d(260px, -50%, 0) scale(var(--ui-scale));
+        }
+
+        body.fence-mode #sliderContainer {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate3d(0, -50%, 0);
+        }
+
+        body.fence-mode #soloDockButton {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translate3d(140px, -50%, 0) rotate(180deg);
+        }
+
+        body.fence-mode #fenceMenuWrapper {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate3d(0, -50%, 0) scale(var(--ui-scale));
+        }
+
+
+        body.pergola-mode {
+            --solo-rotate: 180deg;
+        }
+
+        body.pergola-mode #uiWrapper,
+        body.pergola-mode #cameraMenuWrapper,
+        body.pergola-mode #buildingMenuWrapper,
+        body.pergola-mode #environmentMenuWrapper,
+        body.pergola-mode #howToMenuWrapper,
+        body.pergola-mode #confirmMenuWrapper,
+        body.pergola-mode #teleportMenuWrapper,
+        body.pergola-mode #profileMenuWrapper,
+        body.pergola-mode #finishTypeMenuWrapper,
+        body.pergola-mode #solidColoursMenuWrapper,
+        body.pergola-mode #woodgrainsMenuWrapper,
+        body.pergola-mode #westCoastNaturalsMenuWrapper,
+        body.pergola-mode #texturedColoursMenuWrapper,
+        body.pergola-mode #archesMenuWrapper,
+        body.pergola-mode #fenceMenuWrapper {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translate3d(260px, -50%, 0) scale(var(--ui-scale));
+        }
+
+        body.pergola-mode #sliderContainer {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate3d(0, -50%, 0);
+        }
+
+        body.pergola-mode #soloDockButton {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translate3d(140px, -50%, 0) rotate(180deg);
+        }
+
+        body.pergola-mode #pergolaMenuWrapper {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate3d(0, -50%, 0) scale(var(--ui-scale));
+        }
+
+
         body.menu-switching #uiWrapper,
         body.menu-switching #cameraMenuWrapper,
         body.menu-switching #buildingMenuWrapper,
@@ -3852,7 +4388,9 @@
         body.menu-switching #woodgrainsMenuWrapper,
         body.menu-switching #westCoastNaturalsMenuWrapper,
         body.menu-switching #texturedColoursMenuWrapper,
-        body.menu-switching #archesMenuWrapper {
+        body.menu-switching #archesMenuWrapper,
+        body.menu-switching #fenceMenuWrapper,
+        body.menu-switching #pergolaMenuWrapper {
             pointer-events: none !important;
         }
 
@@ -4092,7 +4630,8 @@
             #woodgrainsMenuWrapper,
             #westCoastNaturalsMenuWrapper,
             #texturedColoursMenuWrapper,
-            #archesMenuWrapper {
+            #archesMenuWrapper,
+            #fenceMenuWrapper {
                 right: 50px;
             }
 
@@ -4825,7 +5364,13 @@
         let currentColorSet = '';
         let currentJoinerSet = '';
         let currentFinishTypeSource = 'profile';
+        let currentColourDisplayTitle = '';
         let colorTypeRouteActive = false;
+        let finishMenuReturnTarget = 'profile';
+        let fenceEditingActive = false;
+        let pergolaEditingActive = false;
+        let currentFenceVariant = '02';
+        const pergolaScreenState = { A: false, B: false, C: false, D: false };
         let currentProfileVariant = 'BOARD_AND_BATTEN';
         let currentProfileButtonMode = 'profile';
         let profileTitleAnimationId = 0;
@@ -4833,6 +5378,8 @@
         let profileTitleEl;
         let profileColorEl;
         let profileOptionsButtonEl;
+        let profileVGrooveOptionsMenuSizeButtonEl;
+        let profileVGrooveOptionsMenuVentButtonEl;
         let solidColoursTitleEl;
         let woodgrainsTitleEl;
         let westCoastNaturalsTitleEl;
@@ -4857,6 +5404,10 @@
         };
         const profileButtonVariantAliasMap = {
             [V_GROOVE_VARIANTS.four]: V_GROOVE_VARIANTS.six,
+            V_GROOVE_6INCH_VENTED: 'V_GROOVE_6INCH_VENTED',
+            V_GROOVE_4INCH_VENTED: 'V_GROOVE_6INCH_VENTED',
+            V_GROOVE_6INCH_NON_VENTED: 'V_GROOVE_6INCH_VENTED',
+            V_GROOVE_4INCH_NON_VENTED: 'V_GROOVE_6INCH_VENTED',
             [DOUBLE_SEVEN_VARIANTS.nonVented]: DOUBLE_SEVEN_VARIANTS.vented
         };
         const profileOptionLabelByVariant = {
@@ -4867,7 +5418,10 @@
             FOLDED_WALL: 'NO OPTIONS',
             [DOUBLE_SEVEN_VARIANTS.vented]: 'NON VENTED',
             [DOUBLE_SEVEN_VARIANTS.nonVented]: 'VENTED',
-            V_GROOVE_6INCH_VENTED: 'OPTIONS'
+            V_GROOVE_6INCH_VENTED: 'OPTIONS',
+            V_GROOVE_4INCH_VENTED: 'OPTIONS',
+            V_GROOVE_6INCH_NON_VENTED: 'OPTIONS',
+            V_GROOVE_4INCH_NON_VENTED: 'OPTIONS'
         };
         const solidColourOptions = [
             'BRONZE',
@@ -4945,7 +5499,7 @@
             const responsiveScale = userScale * getResponsiveUiScaleMultiplier();
             root.style.setProperty('--ui-scale', responsiveScale.toFixed(3));
         }
-        const uiModeClasses = ['walk-mode', 'camera-mode', 'building-mode', 'environment-mode', 'how-to-mode', 'confirm-mode', 'teleport-mode', 'profile-mode', 'finish-type-mode', 'solid-colours-mode', 'woodgrains-mode', 'west-coast-naturals-mode', 'textured-colours-mode', 'arches-mode'];
+        const uiModeClasses = ['walk-mode', 'camera-mode', 'building-mode', 'environment-mode', 'how-to-mode', 'confirm-mode', 'teleport-mode', 'profile-mode', 'profile-vgroove-options-mode', 'finish-type-mode', 'solid-colours-mode', 'woodgrains-mode', 'west-coast-naturals-mode', 'textured-colours-mode', 'arches-mode', 'fence-mode', 'pergola-mode'];
         const panelWrapperMap = {
             main: 'uiWrapper',
             walk: null,
@@ -4956,12 +5510,15 @@
             confirm: 'confirmMenuWrapper',
             teleport: 'teleportMenuWrapper',
             profile: 'profileMenuWrapper',
+            'profile-vgroove-options': 'profileVGrooveOptionsMenuWrapper',
             'finish-type': 'finishTypeMenuWrapper',
             'solid-colours': 'solidColoursMenuWrapper',
             'woodgrains': 'woodgrainsMenuWrapper',
             'west-coast-naturals': 'westCoastNaturalsMenuWrapper',
             'textured-colours': 'texturedColoursMenuWrapper',
-            arches: 'archesMenuWrapper'
+            arches: 'archesMenuWrapper',
+            fence: 'fenceMenuWrapper',
+            pergola: 'pergolaMenuWrapper'
         };
         let menuSwitchTimer = null;
         let menuCleanupTimer = null;
@@ -4975,12 +5532,15 @@
             if (bodyEl.classList.contains('confirm-mode')) return 'confirm';
             if (bodyEl.classList.contains('teleport-mode')) return 'teleport';
             if (bodyEl.classList.contains('profile-mode')) return 'profile';
+            if (bodyEl.classList.contains('profile-vgroove-options-mode')) return 'profile-vgroove-options';
             if (bodyEl.classList.contains('finish-type-mode')) return 'finish-type';
             if (bodyEl.classList.contains('solid-colours-mode')) return 'solid-colours';
             if (bodyEl.classList.contains('woodgrains-mode')) return 'woodgrains';
             if (bodyEl.classList.contains('west-coast-naturals-mode')) return 'west-coast-naturals';
             if (bodyEl.classList.contains('textured-colours-mode')) return 'textured-colours';
             if (bodyEl.classList.contains('arches-mode')) return 'arches';
+            if (bodyEl.classList.contains('fence-mode')) return 'fence';
+            if (bodyEl.classList.contains('pergola-mode')) return 'pergola';
             if (bodyEl.classList.contains('walk-mode')) return 'walk';
             return 'main';
         }
@@ -5276,61 +5836,139 @@
             awaitingArchesProfilePayload = true;
             sendToUnreal({ large_small: mode });
         }
+        function updateFenceButtonStates(activeVariant = currentFenceVariant) {
+            currentFenceVariant = String(activeVariant || '02').replace(/[^0-9]/g, '') || '02';
+            const normalized = currentFenceVariant.padStart(2, '0');
+            document.querySelectorAll('.fenceCard').forEach((button) => {
+                const variant = String(button.dataset.fenceVariant || '').padStart(2, '0');
+                const isActive = variant === normalized;
+                button.disabled = isActive;
+                button.classList.toggle('is-disabled', isActive);
+                button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+        }
+        function handleFenceOptionClick(variant) {
+            const normalized = String(variant || '').replace(/[^0-9]/g, '').padStart(2, '0');
+            if (!normalized) return;
+            updateFenceButtonStates(normalized);
+            sendToUnreal({ FenceDesign: normalized });
+        }
+        function openFenceMenu(options = {}) {
+            if (selectedBuild !== 'Trad') return;
+            fenceEditingActive = true;
+            finishMenuReturnTarget = 'fence';
+            currentFinishTypeSource = 'fence';
+            colorTypeRouteActive = false;
+            currentColorSet = 'FenceFinish';
+            if (options.defaultVariant) updateFenceButtonStates(options.defaultVariant);
+            switchPanel('fence', { includeSliderOnEnter: options.includeSliderOnEnter === true });
+        }
+        function closeFenceMenu() {
+            fenceEditingActive = false;
+            finishMenuReturnTarget = 'profile';
+            currentFinishTypeSource = 'profile';
+            colorTypeRouteActive = false;
+            switchPanel('main');
+        }
+        function syncPergolaMenuState() {
+            Object.entries(pergolaScreenState).forEach(([id, isActive]) => {
+                const overlay = document.getElementById(`pergolaScreen${id}`);
+                const button = document.querySelector(`.pergolaToggleButton[data-screen-id="${id}"]`);
+                const icon = button ? button.querySelector('img') : null;
+                if (overlay) overlay.classList.toggle('active', !!isActive);
+                if (button) button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                if (icon) icon.setAttribute('src', isActive ? 'Minus.png' : 'Plus.png');
+            });
+        }
+        function handlePergolaToggleClick(screenId) {
+            const id = String(screenId || '').toUpperCase();
+            if (!['A', 'B', 'C', 'D'].includes(id)) return;
+            pergolaScreenState[id] = !pergolaScreenState[id];
+            syncPergolaMenuState();
+            sendToUnreal({ PrivacyScreen: `${id}_${pergolaScreenState[id] ? 'on' : 'off'}` });
+        }
+        function openPergolaMenu(options = {}) {
+            pergolaEditingActive = true;
+            finishMenuReturnTarget = 'pergola';
+            currentFinishTypeSource = 'pergola';
+            colorTypeRouteActive = false;
+            currentColorSet = 'PrivacyScreen_Finish';
+            syncPergolaMenuState();
+            switchPanel('pergola', { includeSliderOnEnter: options.includeSliderOnEnter === true });
+        }
+        function closePergolaMenu() {
+            pergolaEditingActive = false;
+            finishMenuReturnTarget = 'profile';
+            currentFinishTypeSource = 'profile';
+            colorTypeRouteActive = false;
+            switchPanel('main');
+        }
         function closeConfirmMenu() { setConfirmMenuVariant('end-session'); switchPanel('main'); }
         function toggleTreesVisibility() {
             treesAreVisible = !treesAreVisible;
             sendToUnreal(treesAreVisible ? { 'Trees': 'Visable' } : { 'Trees': 'Invisable' });
         }
-        function openProfileMenu() { colorTypeRouteActive = false; switchPanel('profile'); }
+        function openProfileMenu() { finishMenuReturnTarget = 'profile'; colorTypeRouteActive = false; switchPanel('profile'); }
         function closeProfileMenu() { switchPanel('main'); }
         function openFinishTypeMenu() { switchPanel('finish-type'); }
         function getFinishMenuExitTarget() {
-            return colorTypeRouteActive ? 'main' : 'profile';
+            if (finishMenuReturnTarget === 'fence') return 'fence';
+            if (finishMenuReturnTarget === 'pergola') return 'pergola';
+            if (finishMenuReturnTarget === 'main' || colorTypeRouteActive) return 'main';
+            return 'profile';
         }
         function closeFinishTypeMenu() {
             const exitTarget = getFinishMenuExitTarget();
             if (exitTarget === 'main') colorTypeRouteActive = false;
+            if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
             switchPanel(exitTarget);
         }
         function openSolidColoursMenu() {
-            updateSolidColoursTitle(profileColorEl ? profileColorEl.textContent : '');
+            updateSolidColoursTitle(getCurrentColourDisplayTitle());
             switchPanel('solid-colours');
         }
         function closeSolidColoursMenu() {
             const exitTarget = getFinishMenuExitTarget();
             if (exitTarget === 'main') colorTypeRouteActive = false;
+            if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
             switchPanel(exitTarget);
         }
         function openWoodgrainsMenu() {
-            updateWoodgrainsTitle(profileColorEl ? profileColorEl.textContent : '');
+            updateWoodgrainsTitle(getCurrentColourDisplayTitle());
             switchPanel('woodgrains');
         }
         function closeWoodgrainsMenu() {
             const exitTarget = getFinishMenuExitTarget();
             if (exitTarget === 'main') colorTypeRouteActive = false;
+            if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
             switchPanel(exitTarget);
         }
         function openWestCoastNaturalsMenu() {
-            updateWestCoastNaturalsTitle(profileColorEl ? profileColorEl.textContent : '');
+            updateWestCoastNaturalsTitle(getCurrentColourDisplayTitle());
             switchPanel('west-coast-naturals');
         }
         function closeWestCoastNaturalsMenu() {
             const exitTarget = getFinishMenuExitTarget();
             if (exitTarget === 'main') colorTypeRouteActive = false;
+            if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
             switchPanel(exitTarget);
         }
         function openTexturedColoursMenu() {
-            updateTexturedColoursTitle(profileColorEl ? profileColorEl.textContent : '');
+            updateTexturedColoursTitle(getCurrentColourDisplayTitle());
             switchPanel('textured-colours');
         }
         function closeTexturedColoursMenu() {
             const exitTarget = getFinishMenuExitTarget();
             if (exitTarget === 'main') colorTypeRouteActive = false;
+            if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
             switchPanel(exitTarget);
         }
         function getActiveFinishSelectionSet() {
+            if (fenceEditingActive || currentFinishTypeSource === 'fence' || finishMenuReturnTarget === 'fence') return 'FenceFinish';
+            if (pergolaEditingActive || currentFinishTypeSource === 'pergola' || finishMenuReturnTarget === 'pergola') return 'PrivacyScreen_Finish';
             if (currentFinishTypeSource === 'joiner' && currentJoinerSet) return currentJoinerSet;
-            return currentColorSet;
+            if ((currentFinishTypeSource === 'fence' || currentFinishTypeSource === 'pergola' || currentFinishTypeSource === 'profile') && currentColorSet) return currentColorSet;
+            return currentColorSet || currentJoinerSet || currentProfileSet;
         }
         function handleSolidColourButtonClick(button) {
             const colourName = button?.dataset?.colourName || '';
@@ -5550,6 +6188,36 @@
             if (!profileOptionsButtonEl) return;
             profileOptionsButtonEl.textContent = profileOptionLabelByVariant[normalizeVariantToken(variant)] || 'OPTIONS';
         }
+        function isVGrooveVentedFamilyVariant(variant) {
+            return /^V_GROOVE_(?:4INCH|6INCH)_(?:NON_)?VENTED$/i.test(normalizeVariantToken(variant));
+        }
+        function getVGrooveVentedState(variant = currentProfileVariant) {
+            const normalized = normalizeVariantToken(variant);
+            return {
+                variant: normalized,
+                isFamily: isVGrooveVentedFamilyVariant(normalized),
+                width: normalized.includes('4INCH') ? '4INCH' : '6INCH',
+                vent: normalized.includes('NON_VENTED') ? 'NON_VENTED' : 'VENTED'
+            };
+        }
+        function buildVGrooveVentedVariant(width, vent) {
+            const normalizedWidth = String(width || '').toUpperCase() === '4INCH' ? '4INCH' : '6INCH';
+            const normalizedVent = String(vent || '').toUpperCase() === 'NON_VENTED' ? 'NON_VENTED' : 'VENTED';
+            return `V_GROOVE_${normalizedWidth}_${normalizedVent}`;
+        }
+        function syncProfileVGrooveOptionsMenuButtons() {
+            if (!profileVGrooveOptionsMenuSizeButtonEl || !profileVGrooveOptionsMenuVentButtonEl) return;
+            const state = getVGrooveVentedState();
+            profileVGrooveOptionsMenuSizeButtonEl.textContent = state.width === '6INCH' ? '4 INCH' : '6 INCH';
+            profileVGrooveOptionsMenuVentButtonEl.textContent = state.vent === 'VENTED' ? 'NON VENTED' : 'VENTED';
+        }
+        function sendProfileVariantSelection(variant) {
+            const normalized = normalizeVariantToken(variant);
+            if (!normalized) return;
+            if (currentProfileSet) sendToUnreal({ [currentProfileSet]: normalized });
+            updateProfileTitle(normalized);
+            syncProfileVGrooveOptionsMenuButtons();
+        }
         function updateProfileTitle(variant, options = {}) {
             const normalized = normalizeVariantToken(variant);
             if (!normalized) return;
@@ -5561,25 +6229,39 @@
         function formatColourTitle(value) {
             return String(value || '').replace(/_/g, ' ');
         }
+        function setCurrentColourDisplayTitle(value) {
+            currentColourDisplayTitle = formatColourTitle(value);
+            return currentColourDisplayTitle;
+        }
+        function getCurrentColourDisplayTitle() {
+            if (currentColourDisplayTitle) return currentColourDisplayTitle;
+            if (profileColorEl && profileColorEl.textContent) return profileColorEl.textContent;
+            return '';
+        }
         function updateProfileColorTitle(value) {
+            const formattedValue = setCurrentColourDisplayTitle(value);
             if (!profileColorEl) return;
-            profileColorEl.textContent = formatColourTitle(value);
+            profileColorEl.textContent = formattedValue;
         }
         function updateSolidColoursTitle(value) {
+            const formattedValue = setCurrentColourDisplayTitle(value);
             if (!solidColoursTitleEl) return;
-            solidColoursTitleEl.textContent = formatColourTitle(value);
+            solidColoursTitleEl.textContent = formattedValue;
         }
         function updateWoodgrainsTitle(value) {
+            const formattedValue = setCurrentColourDisplayTitle(value);
             if (!woodgrainsTitleEl) return;
-            woodgrainsTitleEl.textContent = formatColourTitle(value);
+            woodgrainsTitleEl.textContent = formattedValue;
         }
         function updateWestCoastNaturalsTitle(value) {
+            const formattedValue = setCurrentColourDisplayTitle(value);
             if (!westCoastNaturalsTitleEl) return;
-            westCoastNaturalsTitleEl.textContent = formatColourTitle(value);
+            westCoastNaturalsTitleEl.textContent = formattedValue;
         }
         function updateTexturedColoursTitle(value) {
+            const formattedValue = setCurrentColourDisplayTitle(value);
             if (!texturedColoursTitleEl) return;
-            texturedColoursTitleEl.textContent = formatColourTitle(value);
+            texturedColoursTitleEl.textContent = formattedValue;
         }
         function applyProfileButtonAvailability(mode) {
             const normalizedMode = normalizeVariantToken(mode).toLowerCase();
@@ -5604,14 +6286,37 @@
             const variant = normalizeVariantToken(button?.dataset?.variant);
             if (!variant || button.disabled || button.classList.contains('is-disabled')) return;
             currentFinishTypeSource = 'profile';
-            if (currentProfileSet) sendToUnreal({ [currentProfileSet]: variant });
-            updateProfileTitle(variant);
+            sendProfileVariantSelection(variant);
+        }
+        function openProfileVGrooveOptionsMenu() {
+            syncProfileVGrooveOptionsMenuButtons();
+            switchPanel('profile-vgroove-options');
+        }
+        function closeProfileVGrooveOptionsMenu() {
+            switchPanel('profile');
+        }
+        function handleProfileVGrooveSizeButtonClick() {
+            const state = getVGrooveVentedState();
+            if (!state.isFamily) return;
+            const nextWidth = state.width === '6INCH' ? '4INCH' : '6INCH';
+            sendProfileVariantSelection(buildVGrooveVentedVariant(nextWidth, state.vent));
+        }
+        function handleProfileVGrooveVentButtonClick() {
+            const state = getVGrooveVentedState();
+            if (!state.isFamily) return;
+            const nextVent = state.vent === 'VENTED' ? 'NON_VENTED' : 'VENTED';
+            sendProfileVariantSelection(buildVGrooveVentedVariant(state.width, nextVent));
         }
         function handleProfileOptionsButtonClick() {
             if (!profileOptionsButtonEl) return;
             if (normalizeVariantToken(currentProfileVariant) === 'RANDOM_PLANK') {
                 currentFinishTypeSource = 'joiner';
+                finishMenuReturnTarget = 'profile';
                 openFinishTypeMenu();
+                return;
+            }
+            if (isVGrooveVentedFamilyVariant(currentProfileVariant)) {
+                openProfileVGrooveOptionsMenu();
                 return;
             }
             if (!currentProfileSet) return;
@@ -5622,8 +6327,7 @@
                 nextVariant = getToggledDoubleSevenVariant(currentProfileVariant);
             }
             if (!nextVariant) return;
-            sendToUnreal({ [currentProfileSet]: nextVariant });
-            updateProfileTitle(nextVariant);
+            sendProfileVariantSelection(nextVariant);
         }
         function handleProfileBackendPayload(parsed) {
             if (parsed.create === 'archesMenu' && selectedBuild === 'Multi' && activeDockMode === 'edit') {
@@ -5631,11 +6335,65 @@
                 awaitingArchesProfilePayload = false;
                 openArchesMenu();
             }
+            if (parsed.pergola === 'enter') {
+                pergolaEditingActive = true;
+                finishMenuReturnTarget = 'pergola';
+                currentFinishTypeSource = 'pergola';
+                colorTypeRouteActive = false;
+                currentColorSet = 'PrivacyScreen_Finish';
+                syncPergolaMenuState();
+                const currentPanel = getCurrentPanelName();
+                if (currentPanel !== 'pergola') {
+                    openPergolaMenu({ includeSliderOnEnter: currentPanel === 'walk' });
+                }
+            }
+            if (parsed.pergola === 'exit') {
+                pergolaEditingActive = false;
+                finishMenuReturnTarget = 'profile';
+                currentFinishTypeSource = 'profile';
+                colorTypeRouteActive = false;
+                const currentPanel = getCurrentPanelName();
+                if (currentPanel !== 'main') {
+                    switchPanel('main');
+                }
+            }
+            if (parsed.fence === 'enter' && selectedBuild === 'Trad') {
+                fenceEditingActive = true;
+                finishMenuReturnTarget = 'fence';
+                currentFinishTypeSource = 'fence';
+                colorTypeRouteActive = false;
+                currentColorSet = 'FenceFinish';
+                updateFenceButtonStates('02');
+                const currentPanel = getCurrentPanelName();
+                if (currentPanel !== 'fence') {
+                    openFenceMenu({ includeSliderOnEnter: currentPanel === 'walk' });
+                }
+            }
+            if (parsed.fence === 'exit' && selectedBuild === 'Trad') {
+                fenceEditingActive = false;
+                currentFinishTypeSource = 'profile';
+                const currentPanel = getCurrentPanelName();
+                if (currentPanel !== 'main') {
+                    finishMenuReturnTarget = 'profile';
+                    colorTypeRouteActive = false;
+                    switchPanel('main');
+                }
+            }
+            if (typeof parsed.fenceVariant === 'string' || typeof parsed.fenceVariant === 'number') {
+                updateFenceButtonStates(String(parsed.fenceVariant));
+            }
             if (typeof parsed.profileSet === 'string') currentProfileSet = normalizeVariantToken(parsed.profileSet);
-            if (typeof parsed.colorSet === 'string') currentColorSet = parsed.colorSet;
+            if (typeof parsed.colorSet === 'string') {
+                currentColorSet = fenceEditingActive ? 'FenceFinish' : (pergolaEditingActive ? 'PrivacyScreen_Finish' : parsed.colorSet);
+                if (finishMenuReturnTarget === 'fence') currentFinishTypeSource = 'fence';
+                if (finishMenuReturnTarget === 'pergola') currentFinishTypeSource = 'pergola';
+            }
             if (typeof parsed.joinerSet === 'string') currentJoinerSet = parsed.joinerSet;
             if (typeof parsed.profileTitle === 'string') updateProfileTitle(parsed.profileTitle, { immediate: true });
             if (typeof parsed.colorTitle === 'string') {
+                if (fenceEditingActive) currentColorSet = 'FenceFinish';
+                if (pergolaEditingActive) currentColorSet = 'PrivacyScreen_Finish';
+                setCurrentColourDisplayTitle(parsed.colorTitle);
                 updateProfileColorTitle(parsed.colorTitle);
                 updateSolidColoursTitle(parsed.colorTitle);
                 updateWoodgrainsTitle(parsed.colorTitle);
@@ -5645,6 +6403,7 @@
             if (typeof parsed.showButtons === 'string') applyProfileButtonAvailability(parsed.showButtons);
             if (parsed.open === 'colorType') {
                 currentFinishTypeSource = 'profile';
+                finishMenuReturnTarget = 'main';
                 colorTypeRouteActive = true;
                 openFinishTypeMenu();
                 return;
@@ -6007,12 +6766,17 @@
             const cameraDofSlider = document.getElementById('cameraDofSlider');
             const editButton = document.getElementById('editButton');
             const profileMenuCloseButton = document.getElementById('profileMenuCloseButton');
+            const profileVGrooveOptionsMenuCloseButton = document.getElementById('profileVGrooveOptionsMenuCloseButton');
             const finishTypeMenuCloseButton = document.getElementById('finishTypeMenuCloseButton');
             const solidColoursMenuCloseButton = document.getElementById('solidColoursMenuCloseButton');
             const woodgrainsMenuCloseButton = document.getElementById('woodgrainsMenuCloseButton');
             const westCoastNaturalsMenuCloseButton = document.getElementById('westCoastNaturalsMenuCloseButton');
             const texturedColoursMenuCloseButton = document.getElementById('texturedColoursMenuCloseButton');
             const archesMenuCloseButton = document.getElementById('archesMenuCloseButton');
+            const fenceMenuCloseButton = document.getElementById('fenceMenuCloseButton');
+            const fenceChooseColourButton = document.getElementById('fenceChooseColourButton');
+            const pergolaMenuCloseButton = document.getElementById('pergolaMenuCloseButton');
+            const pergolaChooseColourButton = document.getElementById('pergolaChooseColourButton');
             const profileColoursButton = document.getElementById('profileColoursButton');
             const editModeIntroOkButton = document.getElementById('editModeIntroOkButton');
             const profileTypeButtons = Array.from(document.querySelectorAll('.profileTypeButton'));
@@ -6020,6 +6784,8 @@
             profileTitleEl = document.querySelector('.profileTitleText');
             profileColorEl = document.querySelector('.profileColorText');
             profileOptionsButtonEl = document.getElementById('profileOptionsButton');
+            profileVGrooveOptionsMenuSizeButtonEl = document.getElementById('profileVGrooveOptionsSizeButton');
+            profileVGrooveOptionsMenuVentButtonEl = document.getElementById('profileVGrooveOptionsVentButton');
             solidColoursTitleEl = document.getElementById('solidColoursTitle');
             woodgrainsTitleEl = document.getElementById('woodgrainsTitle');
             westCoastNaturalsTitleEl = document.getElementById('westCoastNaturalsTitle');
@@ -6051,8 +6817,11 @@
                 button.dataset.variant = variant;
             });
             updateProfileTitle(currentProfileVariant, { immediate: true });
+            syncProfileVGrooveOptionsMenuButtons();
             updateProfileColorTitle('KNOTTY_CHESTNUT');
             applyProfileButtonAvailability(currentProfileButtonMode);
+            updateFenceButtonStates('02');
+            syncPergolaMenuState();
 
             scaleSlider.addEventListener('input', () => setUIScale(scaleSlider.value));
             bindCameraSlider(cameraHeightSlider, 'camSetHeight');
@@ -6100,15 +6869,22 @@
             editButton.addEventListener('click', enterEditMode);
             if (editModeIntroOkButton) editModeIntroOkButton.addEventListener('click', () => hideEditModeIntro());
             profileMenuCloseButton.addEventListener('click', closeProfileMenu);
+            if (profileVGrooveOptionsMenuCloseButton) profileVGrooveOptionsMenuCloseButton.addEventListener('click', closeProfileVGrooveOptionsMenu);
             if (finishTypeMenuCloseButton) finishTypeMenuCloseButton.addEventListener('click', closeFinishTypeMenu);
             if (solidColoursMenuCloseButton) solidColoursMenuCloseButton.addEventListener('click', closeSolidColoursMenu);
             if (woodgrainsMenuCloseButton) woodgrainsMenuCloseButton.addEventListener('click', closeWoodgrainsMenu);
             if (westCoastNaturalsMenuCloseButton) westCoastNaturalsMenuCloseButton.addEventListener('click', closeWestCoastNaturalsMenu);
             if (texturedColoursMenuCloseButton) texturedColoursMenuCloseButton.addEventListener('click', closeTexturedColoursMenu);
             if (archesMenuCloseButton) archesMenuCloseButton.addEventListener('click', closeArchesMenu);
-            if (profileColoursButton) profileColoursButton.addEventListener('click', () => { currentFinishTypeSource = 'profile'; colorTypeRouteActive = false; openFinishTypeMenu(); });
+            if (fenceMenuCloseButton) fenceMenuCloseButton.addEventListener('click', closeFenceMenu);
+            if (pergolaMenuCloseButton) pergolaMenuCloseButton.addEventListener('click', closePergolaMenu);
+            if (fenceChooseColourButton) fenceChooseColourButton.addEventListener('click', () => { currentFinishTypeSource = 'fence'; finishMenuReturnTarget = 'fence'; colorTypeRouteActive = false; openFinishTypeMenu(); });
+            if (pergolaChooseColourButton) { const openPergolaFinishMenu = () => { currentFinishTypeSource = 'pergola'; finishMenuReturnTarget = 'pergola'; colorTypeRouteActive = false; openFinishTypeMenu(); }; pergolaChooseColourButton.addEventListener('click', openPergolaFinishMenu); pergolaChooseColourButton.onclick = openPergolaFinishMenu; }
+            if (profileColoursButton) profileColoursButton.addEventListener('click', () => { currentFinishTypeSource = 'profile'; finishMenuReturnTarget = 'profile'; colorTypeRouteActive = false; openFinishTypeMenu(); });
             profileTypeButtons.forEach((button) => button.addEventListener('click', () => handleProfileTypeButtonClick(button)));
             if (profileOptionsButtonEl) profileOptionsButtonEl.addEventListener('click', handleProfileOptionsButtonClick);
+            if (profileVGrooveOptionsMenuSizeButtonEl) profileVGrooveOptionsMenuSizeButtonEl.addEventListener('click', handleProfileVGrooveSizeButtonClick);
+            if (profileVGrooveOptionsMenuVentButtonEl) profileVGrooveOptionsMenuVentButtonEl.addEventListener('click', handleProfileVGrooveVentButtonClick);
             document.querySelectorAll('.finishTypeButton').forEach((button) => {
                 button.addEventListener('click', () => {
                     const finishMenu = button.dataset.finishMenu || '';
@@ -6145,6 +6921,12 @@
             });
             document.querySelectorAll('.archesOptionButton').forEach((button) => {
                 button.addEventListener('click', () => handleArchesOptionClick(button.dataset.largeSmall || ''));
+            });
+            document.querySelectorAll('.fenceCard').forEach((button) => {
+                button.addEventListener('click', () => handleFenceOptionClick(button.dataset.fenceVariant || ''));
+            });
+            document.querySelectorAll('.pergolaToggleButton').forEach((button) => {
+                button.addEventListener('click', () => handlePergolaToggleClick(button.dataset.screenId || ''));
             });
             if (teleportBasementButton) teleportBasementButton.addEventListener('click', () => setTeleportFloor('basement'));
             if (teleportGroundButton) teleportGroundButton.addEventListener('click', () => setTeleportFloor('ground'));
@@ -6428,6 +7210,69 @@
             </div>
         </div>
 
+        <div id="profileVGrooveOptionsMenuWrapper" class="uiInteractive">
+            <div id="profileVGrooveOptionsOuterBox" class="glassPanel">
+                <div id="profileVGrooveOptionsTopBar"><img id="profileVGrooveOptionsLogo" src="LOGO.png" alt="Logo"><button class="topIconButton"
+                        id="profileVGrooveOptionsMenuCloseButton" type="button" aria-label="Back to profile menu"><img
+                            src="01 DOCK MENU.png" alt="Back"></button></div>
+                <div id="profileVGrooveOptionsInnerBoxWrapper">
+                    <div id="profileVGrooveOptionsInnerBox">
+                        <div id="profileVGrooveOptionsButtons"><button class="confirmButton" id="profileVGrooveOptionsSizeButton"
+                                type="button">4 INCH</button><button class="confirmButton" id="profileVGrooveOptionsVentButton"
+                                type="button">NON VENTED</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="fenceMenuWrapper" class="uiInteractive">
+            <div id="fenceOuterBox" class="glassPanel">
+                <div id="fenceTopBar"><img id="fenceLogo" src="LOGO.png" alt="Logo"><button class="topIconButton"
+                        id="fenceMenuCloseButton" type="button" aria-label="Exit fence menu"><img
+                            src="01 DOCK MENU.png" alt="Exit"></button></div>
+                <div id="fenceInnerBoxWrapper">
+                    <div id="fenceInnerBox">
+                        <div id="fenceOptions"><button class="fenceCard" id="fenceBtn01" type="button"
+                                data-fence-variant="01" aria-label="Fence option 1"><img src="FENCE 01.png"
+                                    alt="Fence option 1"></button><button class="fenceCard is-disabled" id="fenceBtn02" type="button"
+                                data-fence-variant="02" aria-label="Fence option 2"><img src="FENCE 02.png"
+                                    alt="Fence option 2"></button><button class="fenceCard" id="fenceBtn03" type="button"
+                                data-fence-variant="03" aria-label="Fence option 3"><img src="FENCE 03.png"
+                                    alt="Fence option 3"></button></div>
+                    </div>
+                </div>
+                <button id="fenceChooseColourButton" class="profilePillButton" type="button">CHOOSE COLOUR</button>
+            </div>
+        </div>
+
+
+        <div id="pergolaMenuWrapper" class="uiInteractive">
+            <div id="pergolaOuterBox" class="glassPanel">
+                <div id="pergolaTopBar"><img id="pergolaLogo" src="LOGO.png" alt="Logo"><button class="topIconButton"
+                        id="pergolaMenuCloseButton" type="button" aria-label="Exit pergola menu"><img
+                            src="01 DOCK MENU.png" alt="Exit"></button></div>
+                <div id="pergolaInnerBoxWrapper">
+                    <div id="pergolaInnerBox">
+                        <div id="pergolaTitle">PRIVACY SCREENS</div>
+                        <div id="pergolaExplainer">Add privacy screens by clicking on the plus icons below. Once a screen has been added, click the minus icon to remove</div>
+                        <div id="pergolaStage">
+                            <img class="pergolaBaseImage" src="Pergola BG.png" alt="Pergola privacy screen layout">
+                            <img class="pergolaScreenOverlay" id="pergolaScreenA" src="SCREEN_A.png" alt="">
+                            <img class="pergolaScreenOverlay" id="pergolaScreenB" src="SCREEN_B.png" alt="">
+                            <img class="pergolaScreenOverlay" id="pergolaScreenC" src="SCREEN_C.png" alt="">
+                            <img class="pergolaScreenOverlay" id="pergolaScreenD" src="SCREEN_D.png" alt="">
+                            <button class="pergolaToggleButton" type="button" data-screen-id="A" aria-label="Toggle privacy screen A" aria-pressed="false"><img src="Plus.png" alt=""></button>
+                            <button class="pergolaToggleButton" type="button" data-screen-id="B" aria-label="Toggle privacy screen B" aria-pressed="false"><img src="Plus.png" alt=""></button>
+                            <button class="pergolaToggleButton" type="button" data-screen-id="C" aria-label="Toggle privacy screen C" aria-pressed="false"><img src="Plus.png" alt=""></button>
+                            <button class="pergolaToggleButton" type="button" data-screen-id="D" aria-label="Toggle privacy screen D" aria-pressed="false"><img src="Plus.png" alt=""></button>
+                        </div>
+                    </div>
+                </div>
+                <button id="pergolaChooseColourButton" class="profilePillButton" type="button">CHOOSE COLOUR</button>
+            </div>
+        </div>
+
         <div id="finishTypeMenuWrapper" class="uiInteractive">
             <div id="finishTypeOuterBox" class="glassPanel">
                 <div id="finishTypeTopBar"><img id="finishTypeLogo" src="LOGO.png" alt="Logo"><button
@@ -6512,17 +7357,17 @@
                                 <button class="woodgrainButton" type="button" data-colour-name="DRIFTWOOD" aria-label="Select DRIFTWOOD"><img src="wg_swatches/DRIFTWOOD.jpg" alt="DRIFTWOOD"></button>
                                 <button class="woodgrainButton" type="button" data-colour-name="FIR" aria-label="Select FIR"><img src="wg_swatches/FIR.jpg" alt="FIR"></button>
                             </div>
-                            <div class="woodgrainsButtonRow woodgrainsButtonRow--knotty">
-                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_CHESTNUT" aria-label="Select KNOTTY CHESTNUT"><img src="wg_swatches/KNOTTY_CHESTNUT.jpg" alt="KNOTTY_CHESTNUT"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_DESERT_OAK" aria-label="Select KNOTTY DESERT OAK"><img src="wg_swatches/KNOTTY_DESERT_OAK.jpg" alt="KNOTTY_DESERT_OAK"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_TEAK" aria-label="Select KNOTTY TEAK"><img src="wg_swatches/KNOTTY_TEAK.jpg" alt="KNOTTY_TEAK"></button>
-                            </div>
                             <div class="woodgrainsButtonRow">
                                 <button class="woodgrainButton" type="button" data-colour-name="KONA" aria-label="Select KONA"><img src="wg_swatches/KONA.jpg" alt="KONA"></button>
                                 <button class="woodgrainButton" type="button" data-colour-name="PECAN" aria-label="Select PECAN"><img src="wg_swatches/PECAN.jpg" alt="PECAN"></button>
                                 <button class="woodgrainButton" type="button" data-colour-name="SUEDE" aria-label="Select SUEDE"><img src="wg_swatches/SUEDE.jpg" alt="SUEDE"></button>
                                 <button class="woodgrainButton" type="button" data-colour-name="WALNUT" aria-label="Select WALNUT"><img src="wg_swatches/WALNUT.jpg" alt="WALNUT"></button>
                                 <button class="woodgrainButton" type="button" data-colour-name="WHITE_OAK" aria-label="Select WHITE OAK"><img src="wg_swatches/WHITE_OAK.jpg" alt="WHITE_OAK"></button>
+                            </div>
+                            <div class="woodgrainsButtonRow woodgrainsButtonRow--knotty">
+                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_CHESTNUT" aria-label="Select KNOTTY CHESTNUT"><img src="wg_swatches/KNOTTY_CHESTNUT.jpg" alt="KNOTTY_CHESTNUT"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_DESERT_OAK" aria-label="Select KNOTTY DESERT OAK"><img src="wg_swatches/KNOTTY_DESERT_OAK.jpg" alt="KNOTTY_DESERT_OAK"></button>
+                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_TEAK" aria-label="Select KNOTTY TEAK"><img src="wg_swatches/KNOTTY_TEAK.jpg" alt="KNOTTY_TEAK"></button>
                             </div>
                         </div>
                     </div>
