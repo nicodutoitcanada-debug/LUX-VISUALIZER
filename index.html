@@ -4771,6 +4771,12 @@
                     if (parsed.movie === 'ended') {
                         handleMovieEndedMessage();
                     }
+                    if (parsed.camera === 'limit') {
+                        setCameraHeightSliderMax(50);
+                    }
+                    if (parsed.camera === 'UNlimit') {
+                        setCameraHeightSliderMax(300);
+                    }
                     handleProfileBackendPayload(parsed);
                 } catch (e) { }
                 if (response.startsWith("CreateScreenshot")) {
@@ -5071,6 +5077,20 @@
                 slider.blur();
             });
             if (cameraMenuWrapper) cameraMenuWrapper.style.pointerEvents = enabled ? 'auto' : 'none';
+        }
+        function setCameraHeightSliderMax(maxValue) {
+            const slider = document.getElementById('cameraHeightSlider');
+            if (!slider) return;
+            const normalizedMax = Number(maxValue);
+            if (!Number.isFinite(normalizedMax)) return;
+            slider.max = String(normalizedMax);
+            const currentValue = Number(slider.value);
+            if (Number.isFinite(currentValue) && currentValue > normalizedMax) {
+                slider.value = String(normalizedMax);
+                if (!slider.disabled) {
+                    sendToUnreal({ camSetHeight: formatSliderValue(slider.value) });
+                }
+            }
         }
         function startTraditionalProfileSelectionTransition(profileInfo) {
             if (!profileInfo) return;
