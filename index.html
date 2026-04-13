@@ -5535,8 +5535,30 @@
         };
         let menuSwitchTimer = null;
         let menuCleanupTimer = null;
+        let lastPointerClientX = null;
+        let lastPointerClientY = null;
 
         function clearModes() { bodyEl.classList.remove(...uiModeClasses); }
+        function rememberPointerPosition(event) {
+            if (!event) return;
+            if (typeof event.clientX !== 'number' || typeof event.clientY !== 'number') return;
+            lastPointerClientX = event.clientX;
+            lastPointerClientY = event.clientY;
+        }
+        function refreshHoverStateUnderPointer() {
+            if (lastPointerClientX === null || lastPointerClientY === null) return;
+            const pointerEventInit = {
+                bubbles: true,
+                cancelable: true,
+                clientX: lastPointerClientX,
+                clientY: lastPointerClientY,
+                view: window
+            };
+            document.dispatchEvent(new MouseEvent('mousemove', pointerEventInit));
+        }
+
+        window.addEventListener('mousemove', rememberPointerPosition, { passive: true });
+        window.addEventListener('pointermove', rememberPointerPosition, { passive: true });
         function getCurrentPanelName() {
             if (bodyEl.classList.contains('camera-mode')) return 'camera';
             if (bodyEl.classList.contains('building-mode')) return 'building';
@@ -5588,6 +5610,7 @@
             menuCleanupTimer = setTimeout(() => {
                 resetPanelInlineStyles();
                 bodyEl.classList.remove('menu-switching');
+                refreshHoverStateUnderPointer();
             }, duration);
         }
         function animateElementsFromRight(entries) {
