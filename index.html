@@ -1215,7 +1215,7 @@
                 min-height: auto;
                 grid-template-columns: 1fr;
                 gap: 14px;
-                padding: 0 14px 0 14px;
+                padding: 0 12px 0 12px;
             }
 
             #howToInfoImage {
@@ -1233,13 +1233,15 @@
                 padding-right: 0;
             }
 
+            #howToDesktopHeader,
             #howToTouchHeader {
                 gap: 6px;
             }
 
+            #howToDesktopIcon,
             #howToTouchIcon {
-                width: 42px;
-                height: 42px;
+                width: 32px;
+                height: 32px;
                 margin: 0;
             }
         }
@@ -2038,19 +2040,19 @@
 
 
         #howToInfoWrap {
-            min-height: 250px;
+            min-height: 234px;
             display: grid;
-            grid-template-columns: minmax(0, 430px) minmax(0, 1fr);
+            grid-template-columns: minmax(0, 448px) minmax(0, 1fr);
             align-items: start;
-            gap: 34px;
-            padding: 0 18px 0 18px;
+            gap: 24px;
+            padding: 0 10px 0 10px;
             position: relative;
             z-index: 2;
         }
 
         #howToInfoImage {
             width: 100%;
-            max-width: 430px;
+            max-width: 448px;
             max-height: 430px;
             height: auto;
             display: block;
@@ -2069,14 +2071,22 @@
             color: rgba(255, 255, 255, 0.92);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            padding-top: 2px;
-            padding-right: 14px;
-            max-width: 360px;
+            gap: 10px;
+            padding-top: 0;
+            padding-right: 10px;
+            max-width: 390px;
+        }
+
+        #howToDesktopHeader,
+        #howToTouchHeader {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 0;
         }
 
         .howToSectionTitle {
-            font-size: 17px;
+            font-size: 18px;
             line-height: 1.05;
             font-weight: 700;
             letter-spacing: 0.02em;
@@ -2084,8 +2094,8 @@
         }
 
         .howToBodyText {
-            font-size: 11px;
-            line-height: 1.28;
+            font-size: 12px;
+            line-height: 1.3;
             font-weight: 600;
             letter-spacing: 0.01em;
             color: rgba(255, 255, 255, 0.74);
@@ -2099,20 +2109,13 @@
             margin-bottom: 0;
         }
 
-        #howToTouchHeader {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 0;
-        }
-
+        #howToDesktopHeader .howToSectionTitle,
         #howToTouchHeader .howToSectionTitle {
             font-size: 14px;
         }
 
+        #howToDesktopIcon,
         #howToTouchIcon {
-            width: 38px;
-            height: 38px;
             object-fit: contain;
             object-position: center center;
             flex: 0 0 auto;
@@ -2120,6 +2123,16 @@
             pointer-events: none;
             user-select: none;
             margin: 0;
+        }
+
+        #howToDesktopIcon {
+            width: 34px;
+            height: 34px;
+        }
+
+        #howToTouchIcon {
+            width: 34px;
+            height: 34px;
         }
 
         #confirmButtons {
@@ -5887,6 +5900,11 @@
             syncPergolaMenuState();
             sendToUnreal({ PrivacyScreen: `${id}_${pergolaScreenState[id] ? 'on' : 'off'}` });
         }
+        function handlePergolaHoverState(screenId, isHovering) {
+            const id = String(screenId || '').toUpperCase();
+            if (!['A', 'B', 'C', 'D'].includes(id)) return;
+            sendToUnreal({ PrivacyScreenOvers: isHovering ? id : 'off' });
+        }
         function openPergolaMenu(options = {}) {
             pergolaEditingActive = true;
             finishMenuReturnTarget = 'pergola';
@@ -6926,7 +6944,12 @@
                 button.addEventListener('click', () => handleFenceOptionClick(button.dataset.fenceVariant || ''));
             });
             document.querySelectorAll('.pergolaToggleButton').forEach((button) => {
-                button.addEventListener('click', () => handlePergolaToggleClick(button.dataset.screenId || ''));
+                const screenId = button.dataset.screenId || '';
+                button.addEventListener('click', () => handlePergolaToggleClick(screenId));
+                if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+                    button.addEventListener('mouseenter', () => handlePergolaHoverState(screenId, true));
+                    button.addEventListener('mouseleave', () => handlePergolaHoverState(screenId, false));
+                }
             });
             if (teleportBasementButton) teleportBasementButton.addEventListener('click', () => setTeleportFloor('basement'));
             if (teleportGroundButton) teleportGroundButton.addEventListener('click', () => setTeleportFloor('ground'));
@@ -7144,7 +7167,7 @@
                             src="01 DOCK MENU.png" alt="Exit"></button></div>
                 <div id="howToInnerBoxWrapper">
                     <div id="howToInnerBox">
-                        <div id="howToInfoWrap"><img id="howToInfoImage" src="info.png" alt="How to information"><div id="howToTextContent"><div class="howToSectionTitle">DESK TOP</div><div class="howToBodyText"><p>Use the arrow or the WASD letters on the keyboard to move around.</p><p>In order to move the camera or the area viewing, press and hold the left mouse button and move the mouse to the area you would like to view</p></div><div id="howToTouchHeader"><img id="howToTouchIcon" src="Touch_HV.png" alt="Touch screen icon"><div class="howToSectionTitle">TOUCH SCREEN</div></div><div class="howToBodyText"><p>For touch devices, use your left thumb in the bottom left corner to move around. A joystick will automatically appear when the bottom left corner of the screen is touched. To look around, drag your right index finger across the screen</p></div></div></div>
+                        <div id="howToInfoWrap"><img id="howToInfoImage" src="info.png" alt="How to information"><div id="howToTextContent"><div id="howToDesktopHeader"><img id="howToDesktopIcon" src="Desktop_HV.png" alt="Desktop icon"><div class="howToSectionTitle">DESKTOP</div></div><div class="howToBodyText"><p>Use the arrow or the WASD letters on the keyboard to move around.</p><p>In order to move the camera or the area viewing, press and hold the left mouse button and move the mouse to the area you would like to view</p></div><div id="howToTouchHeader"><img id="howToTouchIcon" src="Touch_HV.png" alt="Touch screen icon"><div class="howToSectionTitle">TOUCH SCREEN</div></div><div class="howToBodyText"><p>For touch devices, use your left thumb in the bottom left corner to move around. A joystick will automatically appear when the bottom left corner of the screen is touched. To look around, drag your right index finger across the screen</p></div></div></div>
                     </div>
                 </div>
             </div>
