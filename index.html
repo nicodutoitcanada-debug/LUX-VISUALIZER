@@ -3372,8 +3372,113 @@
             transition: transform var(--anim-time) var(--anim-ease), opacity var(--anim-time) var(--anim-ease), visibility 0s linear var(--anim-time), background 0.2s ease;
             will-change: transform, opacity;
             z-index: 9;
-            overflow: hidden;
+            overflow: visible;
             box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        }
+
+        #cameraMenuWrapper::before,
+        #sliderContainer::after {
+            content: "";
+            position: absolute;
+            background: rgba(0, 0, 0, 0.001);
+            pointer-events: auto;
+        }
+
+        #cameraMenuWrapper::before {
+            inset: -22px;
+            border-radius: 42px;
+            z-index: 0;
+        }
+
+        #sliderContainer::after {
+            inset: -22px;
+            border-radius: 64px;
+            z-index: -1;
+        }
+
+        #mainMenuTooltipLayer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: visible;
+            z-index: 40;
+        }
+
+        .mainMenuTooltip {
+            position: absolute;
+            display: block;
+            color: rgba(255, 255, 255, 0.96);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            line-height: 1.15;
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, calc(-100% + 8px));
+            transition: opacity 720ms cubic-bezier(0.22, 1, 0.36, 1), transform 720ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 720ms;
+            text-shadow: none;
+            white-space: normal;
+            width: max-content;
+            max-width: 184px;
+            left: 0;
+            top: 0;
+        }
+
+        .mainMenuTooltip.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, calc(-100% - 4px));
+            transition-delay: 0s;
+        }
+
+        .mainMenuTooltip__label {
+            position: relative;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.24);
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .mainMenuTooltip__label::before,
+        .mainMenuTooltip__label::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .mainMenuTooltip__label::before {
+            background: rgba(0, 0, 0, 0.16);
+            -webkit-backdrop-filter: blur(10px) saturate(120%);
+            backdrop-filter: blur(10px) saturate(120%);
+            z-index: -2;
+        }
+
+        .mainMenuTooltip__label::after {
+            background: rgba(0, 0, 0, 0.18);
+            z-index: -1;
+        }
+
+        @media (max-width: 1280px) {
+            .mainMenuTooltip {
+                font-size: 10px;
+                max-width: 160px;
+            }
+
+            .mainMenuTooltip__label {
+                padding: 7px 10px;
+            }
+        }
+
+        @media (max-width: 1024px), (hover: none) {
+            #mainMenuTooltipLayer {
+                display: none;
+            }
         }
 
         #sliderContainer.engaged::before {
@@ -4951,6 +5056,15 @@
             const treeButton = document.getElementById('treeToggleButton');
             if (teleportButton) teleportButton.setAttribute('aria-label', isTraditionalBuild ? 'Screens' : 'Teleport');
             if (treeButton) treeButton.setAttribute('aria-label', isTraditionalBuild ? 'Fence' : 'Toggle trees');
+
+            const teleportTooltipLabel = document.querySelector('[data-tooltip-id="teleport"] .mainMenuTooltip__label');
+            const treeTooltipLabel = document.querySelector('[data-tooltip-id="tree"] .mainMenuTooltip__label');
+            if (teleportTooltipLabel) {
+                teleportTooltipLabel.textContent = isTraditionalBuild ? 'Add & Edit Privacy Screens' : 'Teleport Map';
+            }
+            if (treeTooltipLabel) {
+                treeTooltipLabel.textContent = isTraditionalBuild ? 'Edit Fencing' : 'Remove Trees';
+            }
         }
         function handleSecondaryLeftButton(event) {
             event.preventDefault();
@@ -5052,6 +5166,23 @@
             if (!Number.isFinite(numericValue)) return String(value);
             if (Number.isInteger(numericValue)) return String(numericValue);
             return String(numericValue).replace(/(?:\.0+|(?:(\.\d*?)0+))$/, '$1');
+        }
+        function setCameraHeightSliderValue(value) {
+            const slider = document.getElementById('cameraHeightSlider');
+            const numericValue = Number(value);
+            if (!slider || !Number.isFinite(numericValue)) return;
+            const minValue = Number(slider.min);
+            const maxValue = Number(slider.max);
+            const clampedValue = Math.min(maxValue, Math.max(minValue, numericValue));
+            slider.value = String(clampedValue);
+            slider.setAttribute('value', String(clampedValue));
+        }
+        function resetCameraHeightToDefault(options = {}) {
+            const { emit = false } = options;
+            setCameraHeightSliderValue(-50);
+            if (emit) {
+                sendToUnreal({ camSetHeight: '-50.0' });
+            }
         }
         function bindCameraSlider(slider, messageKey) {
             if (!slider) return;
@@ -5750,6 +5881,7 @@
             if (!bodyEl.classList.contains('inGameUiVisible')) return;
             const currentPanel = getCurrentPanelName();
             if (currentPanel === panelName) return;
+            clearMainMenuTooltips();
             if (currentPanel === 'camera' && panelName !== 'camera') setCameraSlidersInteractive(false);
             if (panelName === 'camera') setCameraSlidersInteractive(true);
             clearTimeout(menuSwitchTimer);
@@ -5827,6 +5959,78 @@
             screen.setAttribute('aria-hidden', 'false');
             screen.classList.add('visible');
         }
+        let mainMenuTooltipTimer = null;
+        let activeMainMenuTooltipId = '';
+        function getTooltipLayerScale(layerEl) {
+            if (!layerEl) return { scaleX: 1, scaleY: 1 };
+            const rect = layerEl.getBoundingClientRect();
+            const rawWidth = layerEl.offsetWidth || rect.width || 1;
+            const rawHeight = layerEl.offsetHeight || rect.height || 1;
+            const scaleX = rect.width / rawWidth || 1;
+            const scaleY = rect.height / rawHeight || 1;
+            return { scaleX, scaleY };
+        }
+        function positionMainMenuTooltip(tooltipEl, button) {
+            if (!tooltipEl || !button) return;
+            const tooltipLayer = document.getElementById('mainMenuTooltipLayer');
+            if (!tooltipLayer) return;
+            const layerRect = tooltipLayer.getBoundingClientRect();
+            const buttonRect = button.getBoundingClientRect();
+            const { scaleX, scaleY } = getTooltipLayerScale(tooltipLayer);
+            tooltipEl.classList.add('active');
+            const tooltipWidth = (tooltipEl.offsetWidth || (tooltipEl.getBoundingClientRect().width / scaleX) || 0);
+            const horizontalPadding = 10;
+            const buttonCenter = ((buttonRect.left - layerRect.left) + (buttonRect.width / 2)) / scaleX;
+            const minCenter = horizontalPadding + (tooltipWidth / 2);
+            const maxCenter = Math.max(minCenter, (tooltipLayer.offsetWidth || (layerRect.width / scaleX)) - horizontalPadding - (tooltipWidth / 2));
+            const clampedLeft = Math.min(Math.max(buttonCenter, minCenter), maxCenter);
+            const top = ((buttonRect.top - layerRect.top) / scaleY) + 2;
+            tooltipEl.style.left = `${clampedLeft}px`;
+            tooltipEl.style.top = `${top}px`;
+        }
+        function clearMainMenuTooltips() {
+            clearTimeout(mainMenuTooltipTimer);
+            mainMenuTooltipTimer = null;
+            activeMainMenuTooltipId = '';
+            document.querySelectorAll('.mainMenuTooltip.active').forEach((tooltip) => {
+                tooltip.classList.remove('active');
+            });
+        }
+        function showMainMenuTooltip(tooltipId) {
+            if (!tooltipId || window.matchMedia('(hover: none)').matches) return;
+            if (!bodyEl.classList.contains('inGameUiVisible')) return;
+            if (getCurrentPanelName() !== 'main') return;
+            clearTimeout(mainMenuTooltipTimer);
+            mainMenuTooltipTimer = setTimeout(() => {
+                if (!bodyEl.classList.contains('inGameUiVisible')) return;
+                if (getCurrentPanelName() !== 'main') return;
+                document.querySelectorAll('.mainMenuTooltip.active').forEach((tooltip) => tooltip.classList.remove('active'));
+                const nextTooltip = document.querySelector(`.mainMenuTooltip[data-tooltip-id="${tooltipId}"]`);
+                if (!nextTooltip) return;
+                const button = document.getElementById(nextTooltip.dataset.buttonId || '');
+                if (!button) return;
+                positionMainMenuTooltip(nextTooltip, button);
+                activeMainMenuTooltipId = tooltipId;
+            }, 1320);
+        }
+        function bindMainMenuTooltip(button, tooltipId) {
+            if (!button || !tooltipId) return;
+            const tooltip = document.querySelector(`.mainMenuTooltip[data-tooltip-id="${tooltipId}"]`);
+            if (tooltip) tooltip.dataset.buttonId = button.id || '';
+            button.addEventListener('mouseenter', () => showMainMenuTooltip(tooltipId));
+            button.addEventListener('mouseleave', clearMainMenuTooltips);
+            button.addEventListener('focus', () => showMainMenuTooltip(tooltipId));
+            button.addEventListener('blur', clearMainMenuTooltips);
+            button.addEventListener('pointerdown', clearMainMenuTooltips);
+        }
+        window.addEventListener('resize', () => {
+            if (!activeMainMenuTooltipId) return;
+            const tooltip = document.querySelector(`.mainMenuTooltip[data-tooltip-id="${activeMainMenuTooltipId}"]`);
+            const button = tooltip ? document.getElementById(tooltip.dataset.buttonId || '') : null;
+            if (tooltip && button && tooltip.classList.contains('active')) {
+                positionMainMenuTooltip(tooltip, button);
+            }
+        });
         function enterDockedMode(mode = 'walk') {
             activeDockMode = mode;
             switchPanel('walk');
@@ -6125,6 +6329,7 @@
         }
         function openTeleportMenu() {
             syncTeleportMenuForBuild(selectedBuild || currentTeleportBuild || 'Mod');
+            resetCameraHeightToDefault({ emit: true });
             switchPanel('teleport');
             teleportFloorButtons.forEach((button) => { if (button) button.disabled = true; });
             teleportTitleAnimationId += 1;
@@ -6936,6 +7141,14 @@
             if (woodgrainsMenuCloseButton) woodgrainsMenuCloseButton.addEventListener('click', closeWoodgrainsMenu);
             if (westCoastNaturalsMenuCloseButton) westCoastNaturalsMenuCloseButton.addEventListener('click', closeWestCoastNaturalsMenu);
             if (texturedColoursMenuCloseButton) texturedColoursMenuCloseButton.addEventListener('click', closeTexturedColoursMenu);
+            bindMainMenuTooltip(cameraSettingsButton, 'camera');
+            bindMainMenuTooltip(dockMenuButton, 'dock');
+            bindMainMenuTooltip(environmentMenuButton, 'environment');
+            bindMainMenuTooltip(homeMenuButton, 'building');
+            bindMainMenuTooltip(playMovieButton, 'movie');
+            bindMainMenuTooltip(teleportMenuButton, 'teleport');
+            bindMainMenuTooltip(treeToggleButton, 'tree');
+            bindMainMenuTooltip(editButton, 'edit');
             if (archesMenuCloseButton) archesMenuCloseButton.addEventListener('click', closeArchesMenu);
             if (fenceMenuCloseButton) fenceMenuCloseButton.addEventListener('click', closeFenceMenu);
             if (pergolaMenuCloseButton) pergolaMenuCloseButton.addEventListener('click', closePergolaMenu);
@@ -7164,6 +7377,16 @@
                 <button id="editButton" type="button" aria-label="Open edit profile menu"><img src="EDIT ICON.png"
                         alt="Edit"></button>
             </div>
+            <div id="mainMenuTooltipLayer" aria-hidden="true">
+                <div class="mainMenuTooltip" data-tooltip-id="camera"><span class="mainMenuTooltip__label">Adjust Camera Settings &amp; Save Screenshots</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="environment"><span class="mainMenuTooltip__label">Change Environment</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="movie"><span class="mainMenuTooltip__label">Play Movie</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="teleport"><span class="mainMenuTooltip__label">Teleport Map</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="edit"><span class="mainMenuTooltip__label">Edit Lux Products</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="dock"><span class="mainMenuTooltip__label">Hide Menu</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="building"><span class="mainMenuTooltip__label">View Other Buildings</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="tree"><span class="mainMenuTooltip__label">Remove Trees</span></div>
+            </div>
         </div>
 
         <div id="cameraMenuWrapper" class="uiInteractive">
@@ -7375,7 +7598,7 @@
                                             alt=""><img class="finishTypeButtonLayer finishTypeButtonLayer--middle"
                                             src="tx02.png" alt=""><img
                                             class="finishTypeButtonLayer finishTypeButtonLayer--top" src="tx03.png"
-                                            alt=""></div><span class="finishTypeButtonLabel">TEXTURED COLOURS</span>
+                                            alt=""></div><span class="finishTypeButtonLabel">TEXTURED &amp; METALLIC</span>
                                 </div>
                             </button><button class="finishTypeButton" type="button" data-finish-menu="SOLID_COLOURS"
                                 aria-label="Open solid colours menu">
