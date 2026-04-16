@@ -619,13 +619,156 @@
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 8500;
+            z-index: 10010;
             pointer-events: none;
             background: black;
         }
 
         #preloadSpinner.visible {
             display: flex;
+        }
+
+
+        #afkPromptOverlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10030;
+            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.32);
+            backdrop-filter: blur(12px) saturate(112%);
+            -webkit-backdrop-filter: blur(12px) saturate(112%);
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        #afkPromptOverlay.visible {
+            display: flex;
+        }
+
+        #afkPromptBox {
+            width: min(420px, 90vw);
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.022) 18%, rgba(255, 255, 255, 0.008) 34%, rgba(16, 20, 26, 0.08) 54%, rgba(8, 10, 14, 0.16) 74%, rgba(0, 0, 0, 0.28) 100%), rgba(16, 20, 26, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 24px;
+            backdrop-filter: blur(18px) saturate(122%);
+            -webkit-backdrop-filter: blur(18px) saturate(122%);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            padding: 22px 18px 18px 18px;
+            color: white;
+            text-align: center;
+        }
+
+        #afkPromptBox::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.03) 24%, rgba(255, 255, 255, 0.008) 44%, rgba(0, 0, 0, 0.03) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #afkPromptBox::after {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            background: radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.03) 28%, rgba(255, 255, 255, 0.00) 56%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #afkPromptBox > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        #afkPromptTitle {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        #afkPromptBody {
+            font-size: 14px;
+            line-height: 1.5;
+            opacity: 0.94;
+            margin-bottom: 18px;
+        }
+
+        #afkPromptCountdown {
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.98);
+        }
+
+        #afkPromptActions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .afkPromptButton {
+            appearance: none;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            min-width: 118px;
+            height: 42px;
+            padding: 0 20px;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.18s ease, background 0.2s ease, border-color 0.2s ease;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .afkPromptButton:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.24);
+        }
+
+        .afkPromptButton:active {
+            transform: scale(0.98);
+        }
+
+        .afkPromptButton--primary {
+            background: linear-gradient(to bottom, rgba(235, 57, 0, 0.94), rgba(188, 31, 0, 0.94));
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .afkPromptButton--primary:hover {
+            background: linear-gradient(to bottom, rgba(242, 70, 16, 0.96), rgba(200, 40, 6, 0.96));
+        }
+
+        .colourMenuButtonEntrance {
+            opacity: 0;
+            transform: translateY(16px) scale(0.94);
+            animation: colourMenuButtonEntrance 560ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes colourMenuButtonEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(16px) scale(0.94);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .overlayBox {
@@ -1165,6 +1308,10 @@
                 display: none !important;
             }
 
+            #solidColoursOuterBox {
+                width: min(94vw, 560px);
+            }
+
             #editModeIntroScreen {
                 padding: 14px;
             }
@@ -1325,11 +1472,14 @@
         #fenceOuterBox,
         #pergolaOuterBox,
         #finishTypeOuterBox,
-        #solidColoursOuterBox,
         #woodgrainsOuterBox,
         #westCoastNaturalsOuterBox,
         #texturedColoursOuterBox {
             width: 420px;
+        }
+
+        #solidColoursOuterBox {
+            width: 560px;
         }
 
         #cameraOuterBox,
@@ -1344,10 +1494,13 @@
         #fenceOuterBox,
         #pergolaOuterBox,
         #finishTypeOuterBox,
-        #solidColoursOuterBox,
         #woodgrainsOuterBox,
         #westCoastNaturalsOuterBox,
         #texturedColoursOuterBox {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.018) 18%, rgba(255, 255, 255, 0.004) 38%, rgba(14, 18, 24, 0.025) 46%, rgba(10, 12, 16, 0.055) 66%, rgba(4, 6, 9, 0.10) 84%, rgba(0, 0, 0, 0.16) 100%), rgba(20, 24, 30, 0.08);
+        }
+
+        #solidColoursOuterBox {
             background: linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.018) 18%, rgba(255, 255, 255, 0.004) 38%, rgba(14, 18, 24, 0.025) 46%, rgba(10, 12, 16, 0.055) 66%, rgba(4, 6, 9, 0.10) 84%, rgba(0, 0, 0, 0.16) 100%), rgba(20, 24, 30, 0.08);
         }
 
@@ -1366,7 +1519,8 @@
         #solidColoursOuterBox::before,
         #woodgrainsOuterBox::before,
         #westCoastNaturalsOuterBox::before,
-        #texturedColoursOuterBox::before {
+        #texturedColoursOuterBox::before,
+        #solidColoursOuterBox::before {
             content: "";
             position: absolute;
             inset: 0;
@@ -1391,7 +1545,8 @@
         #solidColoursOuterBox::after,
         #woodgrainsOuterBox::after,
         #westCoastNaturalsOuterBox::after,
-        #texturedColoursOuterBox::after {
+        #texturedColoursOuterBox::after,
+        #solidColoursOuterBox::after {
             content: "";
             position: absolute;
             inset: 1px;
@@ -2692,10 +2847,11 @@
 
         #solidColoursButtonGrid {
             display: grid;
-            grid-template-columns: repeat(10, minmax(0, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 8px;
             padding: 4px 4px 8px 4px;
             align-items: start;
+            justify-items: center;
         }
 
         .solidColourButton {
@@ -2714,7 +2870,7 @@
 
         .solidColourButton img {
             width: 100%;
-            max-width: 52px;
+            max-width: 99px;
             height: auto;
             display: block;
             object-fit: contain;
@@ -2736,22 +2892,23 @@
 
         @media (max-width:1024px) {
             #solidColoursButtonGrid {
-                gap: 8px;
-            }
-
-            .solidColourButton img {
-                max-width: 44px;
-            }
-        }
-
-        @media (max-width:680px) {
-            #solidColoursButtonGrid {
                 grid-template-columns: repeat(5, minmax(0, 1fr));
                 gap: 8px;
             }
 
             .solidColourButton img {
-                max-width: 48px;
+                max-width: 90px;
+            }
+        }
+
+        @media (max-width:680px) {
+            #solidColoursButtonGrid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .solidColourButton img {
+                max-width: 82px;
             }
         }
 
@@ -2776,6 +2933,36 @@
             flex-direction: column;
             gap: 10px;
             padding: 4px 4px 8px 4px;
+        }
+
+        .woodgrainsSectionTitle,
+        .texturedColoursSectionTitle {
+            color: rgba(255, 255, 255, 0.94);
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.16em;
+            line-height: 1;
+            text-transform: uppercase;
+            user-select: none;
+            pointer-events: none;
+            min-height: 14px;
+            margin: 2px 0 2px 8px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .woodgrainsSectionTitle .title-letter,
+        .texturedColoursSectionTitle .title-letter {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(4px);
+            animation: teleportTitleLetterIn 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .woodgrainsSectionTitle.is-fading,
+        .texturedColoursSectionTitle.is-fading {
+            opacity: 0;
+            transition: opacity 190ms ease;
         }
 
         .woodgrainsButtonRow {
@@ -2956,13 +3143,35 @@
             z-index: 3;
         }
 
-        #texturedColoursButtonGrid {
+        #texturedColoursButtonRows {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 4px 4px 8px 4px;
+        }
+
+        .texturedColoursButtonRow {
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 10px;
-            padding: 4px 4px 8px 4px;
-            align-items: start;
             justify-items: center;
+            align-items: start;
+        }
+
+        .texturedColoursButtonRow--textured {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .texturedColoursButtonRow--textured .texturedColoursButton:nth-child(1) {
+            grid-column: 2;
+        }
+
+        .texturedColoursButtonRow--textured .texturedColoursButton:nth-child(2) {
+            grid-column: 3;
+        }
+
+        #texturedColoursButtonGrid {
+            display: contents;
         }
 
         .texturedColoursButton {
@@ -3002,7 +3211,7 @@
         }
 
         @media (max-width:1024px) {
-            #texturedColoursButtonGrid {
+            .texturedColoursButtonRow {
                 gap: 8px;
             }
 
@@ -3012,9 +3221,14 @@
         }
 
         @media (max-width:680px) {
-            #texturedColoursButtonGrid {
+            .texturedColoursButtonRow {
                 grid-template-columns: repeat(4, minmax(0, 1fr));
                 gap: 8px;
+            }
+
+            .texturedColoursButtonRow--textured .texturedColoursButton:nth-child(1),
+            .texturedColoursButtonRow--textured .texturedColoursButton:nth-child(2) {
+                grid-column: auto;
             }
 
             .texturedColoursButton img {
@@ -3475,7 +3689,8 @@
             }
         }
 
-        @media (max-width: 1024px), (hover: none) {
+        @media (max-width: 1024px),
+        (hover: none) {
             #mainMenuTooltipLayer {
                 display: none;
             }
@@ -4787,12 +5002,13 @@
         let movieStartSignalTimer = null;
         let movieSequenceToken = 0;
         let activeEnvironmentByBuild = {
-            Trad: "01",
+            Trad: "03",
             Mod: "03",
             Multi: "01"
         };
         let lottieInstance = null;
         let readyMessageTimer = null;
+        let cameraHeightResetAnimationToken = 0;
         let appInAttentionState = false;
         let gameRevealed = false;
         let isRevealingGame = false;
@@ -4835,9 +5051,9 @@
             }
 
             const shareIds = [
-                "share-ba04e7bb-3b1c-4c4f-89f4-dddfae1001e5",
-                "share-53e1b508-2ea9-43cc-900f-b160b7654fdb",
-                "share-26d724db-7a70-40f2-893c-25c18deb0e29"
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35"
             ];
             const selectedShareId = shareIds[Math.floor(Math.random() * shareIds.length)];
             console.log("Arcware seat selected:", selectedShareId);
@@ -4927,6 +5143,11 @@
             }, 100);
 
             initLottie();
+            registerAfkActivityListeners();
+            const afkContinueButton = document.getElementById('afkContinueButton');
+            const afkDisconnectButton = document.getElementById('afkDisconnectButton');
+            if (afkContinueButton) afkContinueButton.addEventListener('click', continueAfterAfkPrompt);
+            if (afkDisconnectButton) afkDisconnectButton.addEventListener('click', handleAfkSessionEnd);
             startApp();
             window.addEventListener('beforeunload', handleIntentionalPageExit);
             window.addEventListener('pagehide', handleIntentionalPageExit);
@@ -4951,8 +5172,8 @@
         }
         function showInitialLoadingScreen() { hideAllUiScreens(); const screen = document.getElementById("loadingScreen"); const video = document.getElementById("loadingBgVideo"); screen.classList.add("visible"); playLottie(); try { video.currentTime = 0; video.play().catch(() => { }); } catch (e) { } }
         function hideInitialLoadingScreen() { const screen = document.getElementById("loadingScreen"); const video = document.getElementById("loadingBgVideo"); screen.classList.remove("visible"); stopLottie(); try { video.pause(); } catch (e) { } }
-        function showBuildMenu() { hideAllUiScreens(); hideInGameUi(); const screen = document.getElementById("buildMenu"); const video = document.getElementById("menuBgVideo"); resetBuildMenuExitState(); screen.classList.add("visible"); restartMenuAnimations(); try { video.currentTime = 0; video.play().catch(() => { }); } catch (e) { } }
-        function hideBuildMenu() { const screen = document.getElementById("buildMenu"); const video = document.getElementById("menuBgVideo"); screen.classList.remove("visible"); try { video.pause(); } catch (e) { } }
+        function showBuildMenu() { hideAllUiScreens(); hideInGameUi(); const screen = document.getElementById("buildMenu"); const video = document.getElementById("menuBgVideo"); resetBuildMenuExitState(); screen.classList.add("visible"); restartMenuAnimations(); resetAfkTimer(); try { video.currentTime = 0; video.play().catch(() => { }); } catch (e) { } }
+        function hideBuildMenu() { clearAfkIdleTimer(); const screen = document.getElementById("buildMenu"); const video = document.getElementById("menuBgVideo"); screen.classList.remove("visible"); try { video.pause(); } catch (e) { } }
         function getLevelButtonMap() {
             return {
                 Trad: [document.getElementById('btnTrad'), document.getElementById('buildingBtnTrad')],
@@ -4983,7 +5204,7 @@
         }
         function getDefaultEnvironmentForBuild(buildName) {
             if (buildName === 'Mod') return '03';
-            if (buildName === 'Trad') return '01';
+            if (buildName === 'Trad') return '03';
             if (buildName === 'Multi') return '01';
             return '01';
         }
@@ -5070,6 +5291,7 @@
             event.preventDefault();
             event.stopPropagation();
             if (selectedBuild === 'Trad') {
+                resetCameraHeightToDefault({ emit: true, animate: true, duration: 420 });
                 sendToUnreal({ go_to: 'pergola' });
                 return;
             }
@@ -5079,6 +5301,7 @@
             event.preventDefault();
             event.stopPropagation();
             if (selectedBuild === 'Trad') {
+                resetCameraHeightToDefault({ emit: true, animate: true, duration: 420 });
                 sendToUnreal({ go_to: 'fence' });
                 return;
             }
@@ -5177,17 +5400,54 @@
             slider.value = String(clampedValue);
             slider.setAttribute('value', String(clampedValue));
         }
+        function cancelCameraHeightResetAnimation() {
+            cameraHeightResetAnimationToken += 1;
+        }
         function resetCameraHeightToDefault(options = {}) {
-            const { emit = false } = options;
-            setCameraHeightSliderValue(-50);
-            if (emit) {
-                sendToUnreal({ camSetHeight: '-50.0' });
+            const { emit = false, animate = false, duration = 360 } = options;
+            const slider = document.getElementById('cameraHeightSlider');
+            const targetValue = -50;
+            if (!slider) {
+                if (emit) sendToUnreal({ camSetHeight: '-50.0' });
+                return;
             }
+            const startValue = Number(slider.value);
+            if (!Number.isFinite(startValue)) {
+                setCameraHeightSliderValue(targetValue);
+                if (emit) sendToUnreal({ camSetHeight: '-50.0' });
+                return;
+            }
+            cancelCameraHeightResetAnimation();
+            if (!animate || Math.abs(startValue - targetValue) < 0.01) {
+                setCameraHeightSliderValue(targetValue);
+                if (emit) sendToUnreal({ camSetHeight: '-50.0' });
+                return;
+            }
+            const animationToken = cameraHeightResetAnimationToken;
+            const startTime = performance.now();
+            const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+            const step = (now) => {
+                if (animationToken !== cameraHeightResetAnimationToken) return;
+                const progress = Math.min(1, (now - startTime) / Math.max(1, duration));
+                const nextValue = startValue + ((targetValue - startValue) * easeOutCubic(progress));
+                setCameraHeightSliderValue(nextValue);
+                if (emit) {
+                    sendToUnreal({ camSetHeight: formatSliderValue(nextValue) });
+                }
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                    return;
+                }
+                setCameraHeightSliderValue(targetValue);
+                if (emit) sendToUnreal({ camSetHeight: '-50.0' });
+            };
+            requestAnimationFrame(step);
         }
         function bindCameraSlider(slider, messageKey) {
             if (!slider) return;
             const emitValue = (event) => {
                 if (slider.disabled) return;
+                if (messageKey === 'camSetHeight') cancelCameraHeightResetAnimation();
                 sendToUnreal({ [messageKey]: formatSliderValue(event.target.value) });
             };
             slider.addEventListener('input', emitValue);
@@ -5341,6 +5601,8 @@
             } catch (e) { }
         }
         async function endSessionLocally(message = 'Your session has ended.') {
+            hideAfkPrompt();
+            clearAfkIdleTimer();
             endedSessionMessage = message;
             sessionEndedByUser = true;
             appInAttentionState = true;
@@ -5374,7 +5636,7 @@
         }
         function shouldSurfaceAttention(message) { if (suppressReconnect || sessionEndedByUser) return false; if (!message) return false; const lower = String(message).toLowerCase(); if (lower.includes("xr-spatial-tracking")) return false; if (lower.includes("issessionsupported")) return false; if (lower.includes("securityerror") && lower.includes("xr")) return false; return lower.includes("failed") || lower.includes("timeout") || lower.includes("disconnected") || lower.includes("disconnect") || lower.includes("unable") || lower.includes("cannot send") || lower.includes("allocation") || lower.includes("runner resources") || lower.includes("connection failed"); }
         function brandMessage(message) { let branded = String(message || "Connection issue. Please retry."); branded = branded.replace(/arcware/gi, "Lux"); branded = branded.replace(/\s+/g, " ").trim(); return branded; }
-        async function showAttentionScreen(message) { if (suppressReconnect || sessionEndedByUser || appInAttentionState) return; appInAttentionState = true; hidePreloadSpinner(); const brandedMessage = brandMessage(message); const retryButton = document.getElementById("retryButton"); if (retryButton) retryButton.style.display = ''; document.getElementById("attentionMessage").textContent = brandedMessage; await fadeToBlack(500); hideAllUiScreens(); hideInGameUi(); document.getElementById("attentionScreen").classList.add("visible"); await fadeFromBlack(700); }
+        async function showAttentionScreen(message) { if (suppressReconnect || sessionEndedByUser || appInAttentionState) return; appInAttentionState = true; hideAfkPrompt(); clearAfkIdleTimer(); hidePreloadSpinner(); const brandedMessage = brandMessage(message); const retryButton = document.getElementById("retryButton"); if (retryButton) retryButton.style.display = ''; document.getElementById("attentionMessage").textContent = brandedMessage; await fadeToBlack(500); hideAllUiScreens(); hideInGameUi(); document.getElementById("attentionScreen").classList.add("visible"); await fadeFromBlack(700); }
         function registerArcwareAttentionHandlers() {
             if (typeof Application?.on === "function") {
                 ["error", "disconnect", "close"].forEach(eventName => {
@@ -5542,10 +5804,28 @@
         let profileTitleEl;
         let profileColorEl;
         let profileOptionsButtonEl;
+        let solidColoursButtonGridEl;
+        let woodgrainsButtonRowsEl;
+        let westCoastNaturalsButtonGridEl;
+        let texturedColoursButtonRowsEl;
+        let activeSolidColoursThumbnailFolder = '';
+        let activeWoodgrainsThumbnailFolder = '';
+        let activeWestCoastNaturalsThumbnailFolder = '';
+        let activeTexturedColoursThumbnailFolder = '';
+        let texturedColoursMetallicTitleEl;
+        let texturedColoursTexturedTitleEl;
+        const AFK_IDLE_TIMEOUT_MS = 5 * 60 * 1000;
+        const AFK_COUNTDOWN_SECONDS = 15;
+        let afkIdleTimer = null;
+        let afkCountdownTimer = null;
+        let afkCountdownRemaining = AFK_COUNTDOWN_SECONDS;
+        let afkPromptVisible = false;
         let profileVGrooveOptionsMenuSizeButtonEl;
         let profileVGrooveOptionsMenuVentButtonEl;
         let solidColoursTitleEl;
         let woodgrainsTitleEl;
+        let woodgrainsStandardTitleEl;
+        let woodgrainsKnottyTitleEl;
         let westCoastNaturalsTitleEl;
         let texturedColoursTitleEl;
         const V_GROOVE_VARIANTS = {
@@ -5588,26 +5868,74 @@
             V_GROOVE_4INCH_NON_VENTED: 'OPTIONS'
         };
         const solidColourOptions = [
-            'BRONZE',
-            'COLONIAL_RED',
-            'DARK_BRONZE',
-            'FOREST_GREEN',
-            'GLACIER_WHITE',
-            'HARTFORD_GREEN',
-            'HEMLOCK_GREEN',
-            'MOCHA',
             'OBSIDIAN',
-            'OLD_TOWN_GREY',
-            'OLD_ZINC_GREY',
             'PARCHMENT',
-            'REGAL_BLUE',
-            'RETRO_RED',
-            'SIERRATAN',
+            'OLD_ZINC_GREY',
             'SLATE_GREY',
-            'TERRACOTTA',
+            'REGAL_BLUE',
             'TWILIGHT_BLUE',
-            'WEATHERED_COPPER'
+            'OLD_TOWN_GREY',
+            'HEMLOCK_GREEN',
+            'HARTFORD_GREEN',
+            'FOREST_GREEN',
+            'WEATHERED_COPPER',
+            'BRONZE',
+            'DARK_BRONZE',
+            'MOCHA',
+            'SIERRATAN',
+            'TERRACOTTA',
+            'COLONIAL_RED',
+            'RETRO_RED',
+            'GLACIER_WHITE'
         ];
+
+        const solidColourThumbnailFolders = {
+            default: 'SC_DEFAULT',
+            vGroove: 'SC_V_GROOVE',
+            vGrooveVented: 'SC_V_GROOVE_VENTED',
+            randomPlank: 'SC_RANDOM_PLANK',
+            foldedWall: 'SC_FOLDED_WALL',
+            boardAndBatten: 'SC_BOARD_AND_BATTEN',
+            doubl7Vented: 'SC_DOUBL7_VENTED',
+            doubl7NonVented: 'SC_DOUBL7_NON_VENTED',
+            joiner: 'SC_JOINER'
+        };
+
+        const woodgrainThumbnailFolders = {
+            default: 'WG_DEFAULT',
+            vGroove: 'WG_V_GROOVE',
+            vGrooveVented: 'WG_V_GROOVE_VENTED',
+            randomPlank: 'WG_RANDOM_PLANK',
+            foldedWall: 'WG_FOLDED_WALL',
+            boardAndBatten: 'WG_BOARD_AND_BATTEN',
+            doubl7Vented: 'WG_DOUBL7_VENTED',
+            doubl7NonVented: 'WG_DOUBL7_NON_VENTED',
+            joiner: 'WG_JOINER'
+        };
+
+        const westCoastNaturalsThumbnailFolders = {
+            default: 'WCN_DEFAULT',
+            vGroove: 'WCN_V_GROOVE',
+            vGrooveVented: 'WCN_V_GROOVE_VENTED',
+            randomPlank: 'WCN_RANDOM_PLANK',
+            foldedWall: 'WCN_FOLDED_WALL',
+            boardAndBatten: 'WCN_BOARD_AND_BATTEN',
+            doubl7Vented: 'WCN_DOUBL7_VENTED',
+            doubl7NonVented: 'WCN_DOUBL7_NON_VENTED',
+            joiner: 'WCN_JOINER'
+        };
+
+        const texturedColourThumbnailFolders = {
+            default: 'TX_DEFAULT',
+            vGroove: 'TX_V_GROOVE',
+            vGrooveVented: 'TX_V_GROOVE_VENTED',
+            randomPlank: 'TX_RANDOM_PLANK',
+            foldedWall: 'TX_FOLDED_WALL',
+            boardAndBatten: 'TX_BOARD_AND_BATTEN',
+            doubl7Vented: 'TX_DOUBL7_VENTED',
+            doubl7NonVented: 'TX_DOUBL7_NON_VENTED',
+            joiner: 'TX_JOINER'
+        };
 
         const woodgrainOptions = [
             'CEDAR',
@@ -5927,8 +6255,141 @@
                 animatePanelEntry(panelName, { includeSlider: includeSliderOnEnter });
             }, currentPanel === 'walk' ? 80 : 180);
         }
-        function hideInGameUi() { clearTimeout(menuSwitchTimer); clearTimeout(menuCleanupTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.remove('inGameUiVisible'); hideEditModeIntro(true); }
-        function showInGameUiAnimated() { if (inGameUiLoaded) return; inGameUiLoaded = true; clearTimeout(menuSwitchTimer); clearTimeout(menuCleanupTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.add('inGameUiVisible'); animateEditMenuReturn(true); }
+        function hideInGameUi() { clearAfkIdleTimer(); clearTimeout(menuSwitchTimer); clearTimeout(menuCleanupTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.remove('inGameUiVisible'); hideEditModeIntro(true); }
+        function showInGameUiAnimated() { if (inGameUiLoaded) return; inGameUiLoaded = true; clearTimeout(menuSwitchTimer); clearTimeout(menuCleanupTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.add('inGameUiVisible'); resetAfkTimer(); animateEditMenuReturn(true); }
+        function getColourMenuButtons(panelName) {
+            if (panelName === 'solid-colours') return Array.from(document.querySelectorAll('#solidColoursButtonGrid .solidColourButton'));
+            if (panelName === 'woodgrains') return Array.from(document.querySelectorAll('#woodgrainsButtonRows .woodgrainButton'));
+            if (panelName === 'west-coast-naturals') return Array.from(document.querySelectorAll('#westCoastNaturalsButtonGrid .westCoastNaturalsButton'));
+            if (panelName === 'textured-colours') return Array.from(document.querySelectorAll('#texturedColoursButtonRows .texturedColoursButton'));
+            return [];
+        }
+        function animateColourMenuButtons(panelName, options = {}) {
+            const { startDelay = 380, stagger = 55 } = options;
+            const buttons = getColourMenuButtons(panelName);
+            if (!buttons.length) return;
+            buttons.forEach((button, index) => {
+                button.classList.remove('colourMenuButtonEntrance');
+                button.style.animationDelay = '0ms';
+                void button.offsetWidth;
+                button.classList.add('colourMenuButtonEntrance');
+                button.style.animationDelay = `${startDelay + (index * stagger)}ms`;
+            });
+        }
+        function animateLetterTitle(targetEl, text, options = {}) {
+            if (!targetEl) return;
+            const { immediate = false, baseDelay = 0, fadeDuration = 150, staggerStep = 42 } = options;
+            const letters = Array.from(text || '');
+            if (immediate) {
+                targetEl.classList.remove('is-fading');
+                targetEl.innerHTML = '';
+                mountAnimatedLetters();
+                return;
+            }
+            targetEl.classList.add('is-fading');
+            setTimeout(() => {
+                targetEl.classList.remove('is-fading');
+                targetEl.innerHTML = '';
+                mountAnimatedLetters();
+            }, fadeDuration);
+            function mountAnimatedLetters() {
+                letters.forEach((char, index) => {
+                    const span = document.createElement('span');
+                    span.className = 'title-letter';
+                    span.textContent = char === ' ' ? ' ' : char;
+                    span.style.animationDelay = `${baseDelay + (index * staggerStep)}ms`;
+                    targetEl.appendChild(span);
+                });
+            }
+        }
+        function animateWoodgrainsSectionTitles() {
+            animateLetterTitle(document.getElementById('woodgrainsStandardTitle'), 'WOODGRAINS', { baseDelay: 380 });
+            animateLetterTitle(document.getElementById('woodgrainsKnottyTitle'), 'KNOTTY WOODGRAINS', { baseDelay: 540 });
+        }
+        function animateTexturedColoursSectionTitles() {
+            animateLetterTitle(document.getElementById('texturedColoursMetallicTitle'), 'METALLIC', { baseDelay: 380 });
+            animateLetterTitle(document.getElementById('texturedColoursTexturedTitle'), 'TEXTURED', { baseDelay: 540 });
+        }
+        function clearAfkIdleTimer() {
+            clearTimeout(afkIdleTimer);
+            afkIdleTimer = null;
+        }
+        function clearAfkCountdownTimer() {
+            clearInterval(afkCountdownTimer);
+            afkCountdownTimer = null;
+        }
+        function shouldMonitorAfk() {
+            const buildMenuVisible = document.getElementById('buildMenu')?.classList.contains('visible') === true;
+            const inGameVisible = bodyEl.classList.contains('inGameUiVisible');
+            return (buildMenuVisible || inGameVisible) && !sessionEndedByUser && !suppressReconnect && !appInAttentionState;
+        }
+        function updateAfkPromptCountdown() {
+            const countdownEl = document.getElementById('afkPromptCountdown');
+            if (countdownEl) countdownEl.textContent = String(afkCountdownRemaining);
+        }
+        function hideAfkPrompt() {
+            clearAfkCountdownTimer();
+            afkPromptVisible = false;
+            const overlay = document.getElementById('afkPromptOverlay');
+            if (overlay) {
+                overlay.classList.remove('visible');
+                overlay.setAttribute('aria-hidden', 'true');
+            }
+        }
+        function resetAfkTimer() {
+            if (afkPromptVisible || !shouldMonitorAfk()) {
+                clearAfkIdleTimer();
+                return;
+            }
+            clearAfkIdleTimer();
+            afkIdleTimer = setTimeout(showAfkPrompt, AFK_IDLE_TIMEOUT_MS);
+        }
+        async function handleAfkSessionEnd() {
+            hideAfkPrompt();
+            await endSessionByUser('Your session has ended due to inactivity.');
+        }
+        function showAfkPrompt() {
+            if (afkPromptVisible || !shouldMonitorAfk()) return;
+            afkPromptVisible = true;
+            clearAfkIdleTimer();
+            afkCountdownRemaining = AFK_COUNTDOWN_SECONDS;
+            updateAfkPromptCountdown();
+            const overlay = document.getElementById('afkPromptOverlay');
+            if (overlay) {
+                overlay.classList.add('visible');
+                overlay.setAttribute('aria-hidden', 'false');
+            }
+            clearAfkCountdownTimer();
+            afkCountdownTimer = setInterval(() => {
+                afkCountdownRemaining -= 1;
+                updateAfkPromptCountdown();
+                if (afkCountdownRemaining <= 0) {
+                    clearAfkCountdownTimer();
+                    handleAfkSessionEnd();
+                }
+            }, 1000);
+        }
+        function continueAfterAfkPrompt() {
+            hideAfkPrompt();
+            resetAfkTimer();
+        }
+        function handleUserActivityForAfk() {
+            if (afkPromptVisible) return;
+            resetAfkTimer();
+        }
+        function registerAfkActivityListeners() {
+            ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart', 'mousedown'].forEach((eventName) => {
+                window.addEventListener(eventName, handleUserActivityForAfk, { passive: true });
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    clearAfkIdleTimer();
+                    return;
+                }
+                resetAfkTimer();
+            });
+        }
+
         function clearEditModeIntroTimers() {
             clearTimeout(editModeIntroAutoHideTimer);
             clearTimeout(editModeIntroHideTimer);
@@ -6189,8 +6650,10 @@
             switchPanel(exitTarget);
         }
         function openSolidColoursMenu() {
+            hydrateSolidColourMenuThumbnails();
             updateSolidColoursTitle(getCurrentColourDisplayTitle());
             switchPanel('solid-colours');
+            setTimeout(() => animateColourMenuButtons('solid-colours'), 110);
         }
         function closeSolidColoursMenu() {
             const exitTarget = getFinishMenuExitTarget();
@@ -6200,7 +6663,12 @@
         }
         function openWoodgrainsMenu() {
             updateWoodgrainsTitle(getCurrentColourDisplayTitle());
+            hydrateWoodgrainsMenuThumbnails();
             switchPanel('woodgrains');
+            setTimeout(() => {
+                animateColourMenuButtons('woodgrains');
+                animateWoodgrainsSectionTitles();
+            }, 110);
         }
         function closeWoodgrainsMenu() {
             const exitTarget = getFinishMenuExitTarget();
@@ -6210,7 +6678,9 @@
         }
         function openWestCoastNaturalsMenu() {
             updateWestCoastNaturalsTitle(getCurrentColourDisplayTitle());
+            hydrateWestCoastNaturalsMenuThumbnails();
             switchPanel('west-coast-naturals');
+            setTimeout(() => animateColourMenuButtons('west-coast-naturals'), 110);
         }
         function closeWestCoastNaturalsMenu() {
             const exitTarget = getFinishMenuExitTarget();
@@ -6220,7 +6690,12 @@
         }
         function openTexturedColoursMenu() {
             updateTexturedColoursTitle(getCurrentColourDisplayTitle());
+            hydrateTexturedColoursMenuThumbnails();
             switchPanel('textured-colours');
+            setTimeout(() => {
+                animateColourMenuButtons('textured-colours');
+                animateTexturedColoursSectionTitles();
+            }, 110);
         }
         function closeTexturedColoursMenu() {
             const exitTarget = getFinishMenuExitTarget();
@@ -6235,6 +6710,77 @@
             if ((currentFinishTypeSource === 'fence' || currentFinishTypeSource === 'pergola' || currentFinishTypeSource === 'profile') && currentColorSet) return currentColorSet;
             return currentColorSet || currentJoinerSet || currentProfileSet;
         }
+        function getVariantThumbnailFolder(folderMap) {
+            const variant = normalizeVariantToken(currentProfileVariant).toUpperCase();
+            const usingJoinerThumbnails = currentFinishTypeSource === 'joiner' && variant.includes('RANDOM_PLANK');
+            if (colorTypeRouteActive || pergolaEditingActive || currentFinishTypeSource === 'pergola' || finishMenuReturnTarget === 'pergola') return folderMap.randomPlank;
+            if (usingJoinerThumbnails) return folderMap.joiner;
+            if (variant.includes('DOUBL7_NON_VENTED')) return folderMap.doubl7NonVented;
+            if (variant.includes('DOUBL7_VENTED')) return folderMap.doubl7Vented;
+            if (variant.includes('BOARD_AND_BATTEN')) return folderMap.boardAndBatten;
+            if (variant.includes('FOLDED_WALL')) return folderMap.foldedWall;
+            if (variant.includes('RANDOM_PLANK')) return folderMap.randomPlank;
+            if (variant.includes('V_GROOVE') && variant.includes('VENTED') && !variant.includes('NON')) return folderMap.vGrooveVented;
+            if (variant.includes('V_GROOVE')) return folderMap.vGroove;
+            return folderMap.default;
+        }
+        function getSolidColourThumbnailFolder() {
+            return getVariantThumbnailFolder(solidColourThumbnailFolders);
+        }
+        function getWoodgrainsThumbnailFolder() {
+            return getVariantThumbnailFolder(woodgrainThumbnailFolders);
+        }
+        function getWestCoastNaturalsThumbnailFolder() {
+            return getVariantThumbnailFolder(westCoastNaturalsThumbnailFolders);
+        }
+        function getTexturedColoursThumbnailFolder() {
+            return getVariantThumbnailFolder(texturedColourThumbnailFolders);
+        }
+        function buildSolidColourThumbnailPath(folder, colourName) {
+            return `${folder}/${colourName}.png`;
+        }
+        function buildWoodgrainThumbnailPath(folder, colourName) {
+            return `${folder}/${colourName}.png`;
+        }
+        function buildWestCoastNaturalsThumbnailPath(folder, colourName) {
+            return `${folder}/${colourName}.png`;
+        }
+        function buildTexturedColoursThumbnailPath(folder, colourName) {
+            return `${folder}/${colourName}.png`;
+        }
+        function renderSolidColourButtons() {
+            if (!solidColoursButtonGridEl) return;
+            solidColoursButtonGridEl.innerHTML = '';
+            solidColourOptions.forEach((colourName) => {
+                const button = document.createElement('button');
+                button.className = 'solidColourButton';
+                button.type = 'button';
+                button.dataset.colourName = colourName;
+                button.setAttribute('aria-label', `Select ${formatColourTitle(colourName)}`);
+                const image = document.createElement('img');
+                image.alt = colourName;
+                image.loading = 'lazy';
+                image.decoding = 'async';
+                image.dataset.colourName = colourName;
+                button.appendChild(image);
+                button.addEventListener('click', () => handleSolidColourButtonClick(button));
+                solidColoursButtonGridEl.appendChild(button);
+            });
+            activeSolidColoursThumbnailFolder = '';
+        }
+        function hydrateSolidColourMenuThumbnails(force = false) {
+            if (!solidColoursButtonGridEl) return;
+            const nextFolder = getSolidColourThumbnailFolder();
+            if (!force && activeSolidColoursThumbnailFolder === nextFolder) return;
+            solidColoursButtonGridEl.querySelectorAll('.solidColourButton').forEach((button) => {
+                const colourName = button.dataset.colourName || '';
+                const image = button.querySelector('img');
+                if (!colourName || !image) return;
+                const nextSrc = buildSolidColourThumbnailPath(nextFolder, colourName);
+                if (image.getAttribute('src') !== nextSrc) image.src = nextSrc;
+            });
+            activeSolidColoursThumbnailFolder = nextFolder;
+        }
         function handleSolidColourButtonClick(button) {
             const colourName = button?.dataset?.colourName || '';
             const activeSet = getActiveFinishSelectionSet();
@@ -6242,6 +6788,168 @@
             sendToUnreal({ [activeSet]: colourName });
             updateProfileColorTitle(colourName);
             updateSolidColoursTitle(colourName);
+        }
+        function renderWoodgrainButtons() {
+            if (!woodgrainsButtonRowsEl) return;
+            woodgrainsButtonRowsEl.innerHTML = '';
+            const sections = [
+                {
+                    titleId: 'woodgrainsStandardTitle',
+                    titleText: 'WOODGRAINS',
+                    rows: [
+                        { className: 'woodgrainsButtonRow', items: woodgrainOptions.slice(0, 5) },
+                        { className: 'woodgrainsButtonRow', items: woodgrainOptions.slice(8, 13) }
+                    ]
+                },
+                {
+                    titleId: 'woodgrainsKnottyTitle',
+                    titleText: 'KNOTTY WOODGRAINS',
+                    rows: [
+                        { className: 'woodgrainsButtonRow woodgrainsButtonRow--knotty', items: woodgrainOptions.slice(5, 8) }
+                    ]
+                }
+            ];
+            sections.forEach((section) => {
+                const sectionTitle = document.createElement('div');
+                sectionTitle.className = 'woodgrainsSectionTitle';
+                sectionTitle.id = section.titleId;
+                sectionTitle.textContent = section.titleText;
+                woodgrainsButtonRowsEl.appendChild(sectionTitle);
+                section.rows.forEach(({ className, items }) => {
+                    const row = document.createElement('div');
+                    row.className = className;
+                    items.forEach((colourName) => {
+                        const button = document.createElement('button');
+                        button.className = 'woodgrainButton';
+                        button.type = 'button';
+                        button.dataset.colourName = colourName;
+                        button.setAttribute('aria-label', `Select ${formatColourTitle(colourName)}`);
+                        const image = document.createElement('img');
+                        image.alt = colourName;
+                        image.loading = 'lazy';
+                        image.decoding = 'async';
+                        image.dataset.colourName = colourName;
+                        button.appendChild(image);
+                        button.addEventListener('click', () => handleWoodgrainButtonClick(button));
+                        row.appendChild(button);
+                    });
+                    woodgrainsButtonRowsEl.appendChild(row);
+                });
+            });
+            woodgrainsStandardTitleEl = document.getElementById('woodgrainsStandardTitle');
+            woodgrainsKnottyTitleEl = document.getElementById('woodgrainsKnottyTitle');
+            activeWoodgrainsThumbnailFolder = '';
+        }
+        function hydrateWoodgrainsMenuThumbnails(force = false) {
+            if (!woodgrainsButtonRowsEl) return;
+            const nextFolder = getWoodgrainsThumbnailFolder();
+            if (!force && activeWoodgrainsThumbnailFolder === nextFolder) return;
+            woodgrainsButtonRowsEl.querySelectorAll('.woodgrainButton').forEach((button) => {
+                const colourName = button.dataset.colourName || '';
+                const image = button.querySelector('img');
+                if (!colourName || !image) return;
+                const nextSrc = buildWoodgrainThumbnailPath(nextFolder, colourName);
+                if (image.getAttribute('src') !== nextSrc) image.src = nextSrc;
+            });
+            activeWoodgrainsThumbnailFolder = nextFolder;
+        }
+        function renderWestCoastNaturalsButtons() {
+            if (!westCoastNaturalsButtonGridEl) return;
+            westCoastNaturalsButtonGridEl.innerHTML = '';
+            westCoastNaturalsOptions.forEach((colourName) => {
+                const button = document.createElement('button');
+                button.className = 'westCoastNaturalsButton';
+                button.type = 'button';
+                button.dataset.colourName = colourName;
+                button.setAttribute('aria-label', `Select ${formatColourTitle(colourName)}`);
+                const image = document.createElement('img');
+                image.alt = colourName;
+                image.loading = 'lazy';
+                image.decoding = 'async';
+                image.dataset.colourName = colourName;
+                button.appendChild(image);
+                button.addEventListener('click', () => handleWestCoastNaturalsButtonClick(button));
+                westCoastNaturalsButtonGridEl.appendChild(button);
+            });
+            activeWestCoastNaturalsThumbnailFolder = '';
+        }
+        function hydrateWestCoastNaturalsMenuThumbnails(force = false) {
+            if (!westCoastNaturalsButtonGridEl) return;
+            const nextFolder = getWestCoastNaturalsThumbnailFolder();
+            if (!force && activeWestCoastNaturalsThumbnailFolder === nextFolder) return;
+            westCoastNaturalsButtonGridEl.querySelectorAll('.westCoastNaturalsButton').forEach((button) => {
+                const colourName = button.dataset.colourName || '';
+                const image = button.querySelector('img');
+                if (!colourName || !image) return;
+                const nextSrc = buildWestCoastNaturalsThumbnailPath(nextFolder, colourName);
+                if (image.getAttribute('src') !== nextSrc) image.src = nextSrc;
+            });
+            activeWestCoastNaturalsThumbnailFolder = nextFolder;
+        }
+        function renderTexturedColoursButtons() {
+            if (!texturedColoursButtonRowsEl) return;
+            texturedColoursButtonRowsEl.innerHTML = '';
+            const metallicOptions = texturedColourOptions.filter((name) => !name.includes('TEXTURED'));
+            const texturedOptionsOnly = texturedColourOptions.filter((name) => name.includes('TEXTURED'));
+            const sections = [
+                {
+                    titleId: 'texturedColoursMetallicTitle',
+                    titleText: 'METALLIC',
+                    rows: [
+                        { className: 'texturedColoursButtonRow', items: metallicOptions }
+                    ]
+                },
+                {
+                    titleId: 'texturedColoursTexturedTitle',
+                    titleText: 'TEXTURED',
+                    rows: [
+                        { className: 'texturedColoursButtonRow texturedColoursButtonRow--textured', items: texturedOptionsOnly }
+                    ]
+                }
+            ];
+            sections.forEach((section) => {
+                const sectionTitle = document.createElement('div');
+                sectionTitle.className = 'texturedColoursSectionTitle';
+                sectionTitle.id = section.titleId;
+                sectionTitle.textContent = section.titleText;
+                texturedColoursButtonRowsEl.appendChild(sectionTitle);
+                section.rows.forEach(({ className, items }) => {
+                    const row = document.createElement('div');
+                    row.className = className;
+                    items.forEach((colourName) => {
+                        const button = document.createElement('button');
+                        button.className = 'texturedColoursButton';
+                        button.type = 'button';
+                        button.dataset.colourName = colourName;
+                        button.setAttribute('aria-label', `Select ${formatColourTitle(colourName)}`);
+                        const image = document.createElement('img');
+                        image.alt = colourName;
+                        image.loading = 'lazy';
+                        image.decoding = 'async';
+                        image.dataset.colourName = colourName;
+                        button.appendChild(image);
+                        button.addEventListener('click', () => handleTexturedColoursButtonClick(button));
+                        row.appendChild(button);
+                    });
+                    texturedColoursButtonRowsEl.appendChild(row);
+                });
+            });
+            texturedColoursMetallicTitleEl = document.getElementById('texturedColoursMetallicTitle');
+            texturedColoursTexturedTitleEl = document.getElementById('texturedColoursTexturedTitle');
+            activeTexturedColoursThumbnailFolder = '';
+        }
+        function hydrateTexturedColoursMenuThumbnails(force = false) {
+            if (!texturedColoursButtonRowsEl) return;
+            const nextFolder = getTexturedColoursThumbnailFolder();
+            if (!force && activeTexturedColoursThumbnailFolder === nextFolder) return;
+            texturedColoursButtonRowsEl.querySelectorAll('.texturedColoursButton').forEach((button) => {
+                const colourName = button.dataset.colourName || '';
+                const image = button.querySelector('img');
+                if (!colourName || !image) return;
+                const nextSrc = buildTexturedColoursThumbnailPath(nextFolder, colourName);
+                if (image.getAttribute('src') !== nextSrc) image.src = nextSrc;
+            });
+            activeTexturedColoursThumbnailFolder = nextFolder;
         }
         function handleWoodgrainButtonClick(button) {
             const colourName = button?.dataset?.colourName || '';
@@ -6329,7 +7037,7 @@
         }
         function openTeleportMenu() {
             syncTeleportMenuForBuild(selectedBuild || currentTeleportBuild || 'Mod');
-            resetCameraHeightToDefault({ emit: true });
+            resetCameraHeightToDefault({ emit: true, animate: true, duration: 420 });
             switchPanel('teleport');
             teleportFloorButtons.forEach((button) => { if (button) button.disabled = true; });
             teleportTitleAnimationId += 1;
@@ -6491,6 +7199,10 @@
             animateProfileTitle(formatVariantLabel(normalized), options);
             updateProfileOptionsText(normalized);
             setActiveProfileTypeByVariant(normalized);
+            if (getCurrentPanelName() === 'solid-colours') hydrateSolidColourMenuThumbnails(true);
+            if (getCurrentPanelName() === 'woodgrains') hydrateWoodgrainsMenuThumbnails(true);
+            if (getCurrentPanelName() === 'west-coast-naturals') hydrateWestCoastNaturalsMenuThumbnails(true);
+            if (getCurrentPanelName() === 'textured-colours') hydrateTexturedColoursMenuThumbnails(true);
         }
         function formatColourTitle(value) {
             return String(value || '').replace(/_/g, ' ');
@@ -7050,12 +7762,20 @@
             profileTitleEl = document.querySelector('.profileTitleText');
             profileColorEl = document.querySelector('.profileColorText');
             profileOptionsButtonEl = document.getElementById('profileOptionsButton');
+            solidColoursButtonGridEl = document.getElementById('solidColoursButtonGrid');
+            woodgrainsButtonRowsEl = document.getElementById('woodgrainsButtonRows');
+            westCoastNaturalsButtonGridEl = document.getElementById('westCoastNaturalsButtonGrid');
+            texturedColoursButtonRowsEl = document.getElementById('texturedColoursButtonRows');
             profileVGrooveOptionsMenuSizeButtonEl = document.getElementById('profileVGrooveOptionsSizeButton');
             profileVGrooveOptionsMenuVentButtonEl = document.getElementById('profileVGrooveOptionsVentButton');
             solidColoursTitleEl = document.getElementById('solidColoursTitle');
             woodgrainsTitleEl = document.getElementById('woodgrainsTitle');
+            woodgrainsStandardTitleEl = document.getElementById('woodgrainsStandardTitle');
+            woodgrainsKnottyTitleEl = document.getElementById('woodgrainsKnottyTitle');
             westCoastNaturalsTitleEl = document.getElementById('westCoastNaturalsTitle');
             texturedColoursTitleEl = document.getElementById('texturedColoursTitle');
+            texturedColoursMetallicTitleEl = document.getElementById('texturedColoursMetallicTitle');
+            texturedColoursTexturedTitleEl = document.getElementById('texturedColoursTexturedTitle');
             teleportMapTitle = document.getElementById('teleportMapTitle');
             teleportJumpTargetsLayer = document.getElementById('teleportJumpTargetsLayer');
             teleportBasementButton = document.getElementById('teleportBasementButton');
@@ -7181,18 +7901,10 @@
                     console.log(`Finish type selected: ${finishMenu}`);
                 });
             });
-            document.querySelectorAll('.solidColourButton').forEach((button) => {
-                button.addEventListener('click', () => handleSolidColourButtonClick(button));
-            });
-            document.querySelectorAll('.woodgrainButton').forEach((button) => {
-                button.addEventListener('click', () => handleWoodgrainButtonClick(button));
-            });
-            document.querySelectorAll('.westCoastNaturalsButton').forEach((button) => {
-                button.addEventListener('click', () => handleWestCoastNaturalsButtonClick(button));
-            });
-            document.querySelectorAll('.texturedColoursButton').forEach((button) => {
-                button.addEventListener('click', () => handleTexturedColoursButtonClick(button));
-            });
+            renderSolidColourButtons();
+            renderWoodgrainButtons();
+            renderWestCoastNaturalsButtons();
+            renderTexturedColoursButtons();
             document.querySelectorAll('.archesOptionButton').forEach((button) => {
                 button.addEventListener('click', () => handleArchesOptionClick(button.dataset.largeSmall || ''));
             });
@@ -7282,9 +7994,19 @@
     <div id="preloadSpinner">
         <div class="spinner"></div>
     </div>
+    <div id="afkPromptOverlay" aria-hidden="true">
+        <div id="afkPromptBox">
+            <div id="afkPromptTitle">ARE YOU STILL THERE?</div>
+            <div id="afkPromptBody">Your session will end in <span id="afkPromptCountdown">15</span> seconds due to inactivity. Would you like to continue?</div>
+            <div id="afkPromptActions">
+                <button id="afkContinueButton" class="afkPromptButton afkPromptButton--primary" type="button">YES</button>
+                <button id="afkDisconnectButton" class="afkPromptButton" type="button">NO</button>
+            </div>
+        </div>
+    </div>
     <div id="uiLayer">
         <div id="loadingScreen" class="uiScreen">
-            <video id="loadingBgVideo" src="LOADING_BG.mp4" muted playsinline loop></video>
+            <video id="loadingBgVideo" src="LOADING_BG_red.mp4" muted playsinline loop></video>
             <div class="loadingBgShade"></div>
             <div class="loadingWrap">
                 <div id="lottieLoader"></div>
@@ -7363,10 +8085,10 @@
                                     alt="Environment"></button>
                             <button class="iconButton" id="homeMenuButton" type="button"
                                 aria-label="Choose Building"><img src="01 HOME.png" alt="Home"></button>
-                            <button class="iconButton" id="playMovieButton" type="button" aria-label="Play"><img src="01 PLAY.png"
-                                    alt="Play"></button>
-                            <button class="iconButton" id="howToMenuButton" type="button" aria-label="How To"><img src="01 HOW TO.png"
-                                    alt="How To"></button>
+                            <button class="iconButton" id="playMovieButton" type="button" aria-label="Play"><img
+                                    src="01 PLAY.png" alt="Play"></button>
+                            <button class="iconButton" id="howToMenuButton" type="button" aria-label="How To"><img
+                                    src="01 HOW TO.png" alt="How To"></button>
                             <button class="iconButton" id="teleportMenuButton" type="button" aria-label="Teleport"><img
                                     src="01 TELEPORT.png" alt="Teleport"></button>
                             <button class="iconButton" id="treeToggleButton" type="button"
@@ -7378,14 +8100,22 @@
                         alt="Edit"></button>
             </div>
             <div id="mainMenuTooltipLayer" aria-hidden="true">
-                <div class="mainMenuTooltip" data-tooltip-id="camera"><span class="mainMenuTooltip__label">Adjust Camera Settings &amp; Save Screenshots</span></div>
-                <div class="mainMenuTooltip" data-tooltip-id="environment"><span class="mainMenuTooltip__label">Change Environment</span></div>
-                <div class="mainMenuTooltip" data-tooltip-id="movie"><span class="mainMenuTooltip__label">Play Movie</span></div>
-                <div class="mainMenuTooltip" data-tooltip-id="teleport"><span class="mainMenuTooltip__label">Teleport Map</span></div>
-                <div class="mainMenuTooltip" data-tooltip-id="edit"><span class="mainMenuTooltip__label">Edit Lux Products</span></div>
-                <div class="mainMenuTooltip" data-tooltip-id="dock"><span class="mainMenuTooltip__label">Hide Menu</span></div>
-                <div class="mainMenuTooltip" data-tooltip-id="building"><span class="mainMenuTooltip__label">View Other Buildings</span></div>
-                <div class="mainMenuTooltip" data-tooltip-id="tree"><span class="mainMenuTooltip__label">Remove Trees</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="camera"><span class="mainMenuTooltip__label">Adjust Camera
+                        Settings &amp; Save Screenshots</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="environment"><span class="mainMenuTooltip__label">Change
+                        Environment</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="movie"><span class="mainMenuTooltip__label">Play
+                        Movie</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="teleport"><span class="mainMenuTooltip__label">Teleport
+                        Map</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="edit"><span class="mainMenuTooltip__label">Edit Lux
+                        Products</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="dock"><span class="mainMenuTooltip__label">Hide
+                        Menu</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="building"><span class="mainMenuTooltip__label">View Other
+                        Buildings</span></div>
+                <div class="mainMenuTooltip" data-tooltip-id="tree"><span class="mainMenuTooltip__label">Remove
+                        Trees</span></div>
             </div>
         </div>
 
@@ -7433,7 +8163,28 @@
                             src="01 DOCK MENU.png" alt="Exit"></button></div>
                 <div id="howToInnerBoxWrapper">
                     <div id="howToInnerBox">
-                        <div id="howToInfoWrap"><img id="howToInfoImage" src="info.png" alt="How to information"><div id="howToTextContent"><div id="howToDesktopHeader"><img id="howToDesktopIcon" src="Desktop_HV.png" alt="Desktop icon"><div class="howToSectionTitle">DESKTOP</div></div><div class="howToBodyText"><p>Use the arrow or the WASD letters on the keyboard to move around.</p><p>In order to move the camera or the area viewing, press and hold the left mouse button and move the mouse to the area you would like to view</p></div><div id="howToTouchHeader"><img id="howToTouchIcon" src="Touch_HV.png" alt="Touch screen icon"><div class="howToSectionTitle">TOUCH SCREEN</div></div><div class="howToBodyText"><p>For touch devices, use your left thumb in the bottom left corner to move around. A joystick will automatically appear when the bottom left corner of the screen is touched. To look around, drag your right index finger across the screen</p></div></div></div>
+                        <div id="howToInfoWrap"><img id="howToInfoImage" src="info.png" alt="How to information">
+                            <div id="howToTextContent">
+                                <div id="howToDesktopHeader"><img id="howToDesktopIcon" src="Desktop_HV.png"
+                                        alt="Desktop icon">
+                                    <div class="howToSectionTitle">DESKTOP</div>
+                                </div>
+                                <div class="howToBodyText">
+                                    <p>Use the arrow or the WASD letters on the keyboard to move around.</p>
+                                    <p>In order to move the camera or the area viewing, press and hold the left mouse
+                                        button and move the mouse to the area you would like to view</p>
+                                </div>
+                                <div id="howToTouchHeader"><img id="howToTouchIcon" src="Touch_HV.png"
+                                        alt="Touch screen icon">
+                                    <div class="howToSectionTitle">TOUCH SCREEN</div>
+                                </div>
+                                <div class="howToBodyText">
+                                    <p>For touch devices, use your left thumb in the bottom left corner to move around.
+                                        A joystick will automatically appear when the bottom left corner of the screen
+                                        is touched. To look around, drag your right index finger across the screen</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -7501,14 +8252,15 @@
 
         <div id="profileVGrooveOptionsMenuWrapper" class="uiInteractive">
             <div id="profileVGrooveOptionsOuterBox" class="glassPanel">
-                <div id="profileVGrooveOptionsTopBar"><img id="profileVGrooveOptionsLogo" src="LOGO.png" alt="Logo"><button class="topIconButton"
-                        id="profileVGrooveOptionsMenuCloseButton" type="button" aria-label="Back to profile menu"><img
-                            src="01 DOCK MENU.png" alt="Back"></button></div>
+                <div id="profileVGrooveOptionsTopBar"><img id="profileVGrooveOptionsLogo" src="LOGO.png"
+                        alt="Logo"><button class="topIconButton" id="profileVGrooveOptionsMenuCloseButton" type="button"
+                        aria-label="Back to profile menu"><img src="01 DOCK MENU.png" alt="Back"></button></div>
                 <div id="profileVGrooveOptionsInnerBoxWrapper">
                     <div id="profileVGrooveOptionsInnerBox">
-                        <div id="profileVGrooveOptionsButtons"><button class="confirmButton" id="profileVGrooveOptionsSizeButton"
-                                type="button">4 INCH</button><button class="confirmButton" id="profileVGrooveOptionsVentButton"
-                                type="button">NON VENTED</button></div>
+                        <div id="profileVGrooveOptionsButtons"><button class="confirmButton"
+                                id="profileVGrooveOptionsSizeButton" type="button">4 INCH</button><button
+                                class="confirmButton" id="profileVGrooveOptionsVentButton" type="button">NON
+                                VENTED</button></div>
                     </div>
                 </div>
             </div>
@@ -7518,17 +8270,17 @@
         <div id="fenceMenuWrapper" class="uiInteractive">
             <div id="fenceOuterBox" class="glassPanel">
                 <div id="fenceTopBar"><img id="fenceLogo" src="LOGO.png" alt="Logo"><button class="topIconButton"
-                        id="fenceMenuCloseButton" type="button" aria-label="Exit fence menu"><img
-                            src="01 DOCK MENU.png" alt="Exit"></button></div>
+                        id="fenceMenuCloseButton" type="button" aria-label="Exit fence menu"><img src="01 DOCK MENU.png"
+                            alt="Exit"></button></div>
                 <div id="fenceInnerBoxWrapper">
                     <div id="fenceInnerBox">
                         <div id="fenceOptions"><button class="fenceCard" id="fenceBtn01" type="button"
                                 data-fence-variant="01" aria-label="Fence option 1"><img src="FENCE 01.png"
-                                    alt="Fence option 1"></button><button class="fenceCard is-disabled" id="fenceBtn02" type="button"
-                                data-fence-variant="02" aria-label="Fence option 2"><img src="FENCE 02.png"
-                                    alt="Fence option 2"></button><button class="fenceCard" id="fenceBtn03" type="button"
-                                data-fence-variant="03" aria-label="Fence option 3"><img src="FENCE 03.png"
-                                    alt="Fence option 3"></button></div>
+                                    alt="Fence option 1"></button><button class="fenceCard is-disabled" id="fenceBtn02"
+                                type="button" data-fence-variant="02" aria-label="Fence option 2"><img
+                                    src="FENCE 02.png" alt="Fence option 2"></button><button class="fenceCard"
+                                id="fenceBtn03" type="button" data-fence-variant="03" aria-label="Fence option 3"><img
+                                    src="FENCE 03.png" alt="Fence option 3"></button></div>
                     </div>
                 </div>
                 <button id="fenceChooseColourButton" class="profilePillButton" type="button">CHOOSE COLOUR</button>
@@ -7544,17 +8296,26 @@
                 <div id="pergolaInnerBoxWrapper">
                     <div id="pergolaInnerBox">
                         <div id="pergolaTitle">PRIVACY SCREENS</div>
-                        <div id="pergolaExplainer">Add privacy screens by clicking on the plus icons below. Once a screen has been added, click the minus icon to remove</div>
+                        <div id="pergolaExplainer">Add privacy screens by clicking on the plus icons below. Once a
+                            screen has been added, click the minus icon to remove</div>
                         <div id="pergolaStage">
                             <img class="pergolaBaseImage" src="Pergola BG.png" alt="Pergola privacy screen layout">
                             <img class="pergolaScreenOverlay" id="pergolaScreenA" src="SCREEN_A.png" alt="">
                             <img class="pergolaScreenOverlay" id="pergolaScreenB" src="SCREEN_B.png" alt="">
                             <img class="pergolaScreenOverlay" id="pergolaScreenC" src="SCREEN_C.png" alt="">
                             <img class="pergolaScreenOverlay" id="pergolaScreenD" src="SCREEN_D.png" alt="">
-                            <button class="pergolaToggleButton" type="button" data-screen-id="A" aria-label="Toggle privacy screen A" aria-pressed="false"><img src="Plus.png" alt=""></button>
-                            <button class="pergolaToggleButton" type="button" data-screen-id="B" aria-label="Toggle privacy screen B" aria-pressed="false"><img src="Plus.png" alt=""></button>
-                            <button class="pergolaToggleButton" type="button" data-screen-id="C" aria-label="Toggle privacy screen C" aria-pressed="false"><img src="Plus.png" alt=""></button>
-                            <button class="pergolaToggleButton" type="button" data-screen-id="D" aria-label="Toggle privacy screen D" aria-pressed="false"><img src="Plus.png" alt=""></button>
+                            <button class="pergolaToggleButton" type="button" data-screen-id="A"
+                                aria-label="Toggle privacy screen A" aria-pressed="false"><img src="Plus.png"
+                                    alt=""></button>
+                            <button class="pergolaToggleButton" type="button" data-screen-id="B"
+                                aria-label="Toggle privacy screen B" aria-pressed="false"><img src="Plus.png"
+                                    alt=""></button>
+                            <button class="pergolaToggleButton" type="button" data-screen-id="C"
+                                aria-label="Toggle privacy screen C" aria-pressed="false"><img src="Plus.png"
+                                    alt=""></button>
+                            <button class="pergolaToggleButton" type="button" data-screen-id="D"
+                                aria-label="Toggle privacy screen D" aria-pressed="false"><img src="Plus.png"
+                                    alt=""></button>
                         </div>
                     </div>
                 </div>
@@ -7571,7 +8332,8 @@
                     <div id="finishTypeInnerBox">
                         <div id="finishTypeTitle">CHOOSE FINISH TYPE</div>
                         <div id="finishTypeButtonRow"><button class="finishTypeButton" type="button"
-                                data-finish-menu="WEST_COAST_NATURALS" aria-label="Open West Coast Natural colours menu">
+                                data-finish-menu="WEST_COAST_NATURALS"
+                                aria-label="Open West Coast Natural colours menu">
                                 <div>
                                     <div class="finishTypeButtonStack"><img
                                             class="finishTypeButtonLayer finishTypeButtonLayer--bottom" src="wcn01.png"
@@ -7598,7 +8360,8 @@
                                             alt=""><img class="finishTypeButtonLayer finishTypeButtonLayer--middle"
                                             src="tx02.png" alt=""><img
                                             class="finishTypeButtonLayer finishTypeButtonLayer--top" src="tx03.png"
-                                            alt=""></div><span class="finishTypeButtonLabel">TEXTURED &amp; METALLIC</span>
+                                            alt=""></div><span class="finishTypeButtonLabel">TEXTURED &amp;
+                                        METALLIC</span>
                                 </div>
                             </button><button class="finishTypeButton" type="button" data-finish-menu="SOLID_COLOURS"
                                 aria-label="Open solid colours menu">
@@ -7624,7 +8387,7 @@
                 <div id="solidColoursInnerBoxWrapper">
                     <div id="solidColoursInnerBox">
                         <div id="solidColoursTitle">KNOTTY CHESTNUT</div>
-                        <div id="solidColoursButtonGrid"><button class="solidColourButton" type="button" data-colour-name="BRONZE" aria-label="Select BRONZE"><img src="sc_swatches/BRONZE.png" alt="BRONZE"></button><button class="solidColourButton" type="button" data-colour-name="COLONIAL_RED" aria-label="Select COLONIAL RED"><img src="sc_swatches/COLONIAL_RED.png" alt="COLONIAL_RED"></button><button class="solidColourButton" type="button" data-colour-name="DARK_BRONZE" aria-label="Select DARK BRONZE"><img src="sc_swatches/DARK_BRONZE.png" alt="DARK_BRONZE"></button><button class="solidColourButton" type="button" data-colour-name="FOREST_GREEN" aria-label="Select FOREST GREEN"><img src="sc_swatches/FOREST_GREEN.png" alt="FOREST_GREEN"></button><button class="solidColourButton" type="button" data-colour-name="GLACIER_WHITE" aria-label="Select GLACIER WHITE"><img src="sc_swatches/GLACIER_WHITE.png" alt="GLACIER_WHITE"></button><button class="solidColourButton" type="button" data-colour-name="HARTFORD_GREEN" aria-label="Select HARTFORD GREEN"><img src="sc_swatches/HARTFORD_GREEN.png" alt="HARTFORD_GREEN"></button><button class="solidColourButton" type="button" data-colour-name="HEMLOCK_GREEN" aria-label="Select HEMLOCK GREEN"><img src="sc_swatches/HEMLOCK_GREEN.png" alt="HEMLOCK_GREEN"></button><button class="solidColourButton" type="button" data-colour-name="MOCHA" aria-label="Select MOCHA"><img src="sc_swatches/MOCHA.png" alt="MOCHA"></button><button class="solidColourButton" type="button" data-colour-name="OBSIDIAN" aria-label="Select OBSIDIAN"><img src="sc_swatches/OBSIDIAN.png" alt="OBSIDIAN"></button><button class="solidColourButton" type="button" data-colour-name="OLD_TOWN_GREY" aria-label="Select OLD TOWN GREY"><img src="sc_swatches/OLD_TOWN_GREY.png" alt="OLD_TOWN_GREY"></button><button class="solidColourButton" type="button" data-colour-name="OLD_ZINC_GREY" aria-label="Select OLD ZINC GREY"><img src="sc_swatches/OLD_ZINC_GREY.png" alt="OLD_ZINC_GREY"></button><button class="solidColourButton" type="button" data-colour-name="PARCHMENT" aria-label="Select PARCHMENT"><img src="sc_swatches/PARCHMENT.png" alt="PARCHMENT"></button><button class="solidColourButton" type="button" data-colour-name="REGAL_BLUE" aria-label="Select REGAL BLUE"><img src="sc_swatches/REGAL_BLUE.png" alt="REGAL_BLUE"></button><button class="solidColourButton" type="button" data-colour-name="RETRO_RED" aria-label="Select RETRO RED"><img src="sc_swatches/RETRO_RED.png" alt="RETRO_RED"></button><button class="solidColourButton" type="button" data-colour-name="SIERRATAN" aria-label="Select SIERRATAN"><img src="sc_swatches/SIERRATAN.png" alt="SIERRATAN"></button><button class="solidColourButton" type="button" data-colour-name="SLATE_GREY" aria-label="Select SLATE GREY"><img src="sc_swatches/SLATE_GREY.png" alt="SLATE_GREY"></button><button class="solidColourButton" type="button" data-colour-name="TERRACOTTA" aria-label="Select TERRACOTTA"><img src="sc_swatches/TERRACOTTA.png" alt="TERRACOTTA"></button><button class="solidColourButton" type="button" data-colour-name="TWILIGHT_BLUE" aria-label="Select TWILIGHT BLUE"><img src="sc_swatches/TWILIGHT_BLUE.png" alt="TWILIGHT_BLUE"></button><button class="solidColourButton" type="button" data-colour-name="WEATHERED_COPPER" aria-label="Select WEATHERED COPPER"><img src="sc_swatches/WEATHERED_COPPER.png" alt="WEATHERED_COPPER"></button></div>
+                        <div id="solidColoursButtonGrid"></div>
                     </div>
                 </div>
             </div>
@@ -7638,27 +8401,7 @@
                 <div id="woodgrainsInnerBoxWrapper">
                     <div id="woodgrainsInnerBox">
                         <div id="woodgrainsTitle">WHITE OAK</div>
-                        <div id="woodgrainsButtonRows">
-                            <div class="woodgrainsButtonRow">
-                                <button class="woodgrainButton" type="button" data-colour-name="CEDAR" aria-label="Select CEDAR"><img src="wg_swatches/CEDAR.jpg" alt="CEDAR"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="CLASSIC_CHERRY" aria-label="Select CLASSIC CHERRY"><img src="wg_swatches/CLASSIC_CHERRY.jpg" alt="CLASSIC_CHERRY"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="CYPRESS" aria-label="Select CYPRESS"><img src="wg_swatches/CYPRESS.jpg" alt="CYPRESS"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="DRIFTWOOD" aria-label="Select DRIFTWOOD"><img src="wg_swatches/DRIFTWOOD.jpg" alt="DRIFTWOOD"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="FIR" aria-label="Select FIR"><img src="wg_swatches/FIR.jpg" alt="FIR"></button>
-                            </div>
-                            <div class="woodgrainsButtonRow">
-                                <button class="woodgrainButton" type="button" data-colour-name="KONA" aria-label="Select KONA"><img src="wg_swatches/KONA.jpg" alt="KONA"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="PECAN" aria-label="Select PECAN"><img src="wg_swatches/PECAN.jpg" alt="PECAN"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="SUEDE" aria-label="Select SUEDE"><img src="wg_swatches/SUEDE.jpg" alt="SUEDE"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="WALNUT" aria-label="Select WALNUT"><img src="wg_swatches/WALNUT.jpg" alt="WALNUT"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="WHITE_OAK" aria-label="Select WHITE OAK"><img src="wg_swatches/WHITE_OAK.jpg" alt="WHITE_OAK"></button>
-                            </div>
-                            <div class="woodgrainsButtonRow woodgrainsButtonRow--knotty">
-                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_CHESTNUT" aria-label="Select KNOTTY CHESTNUT"><img src="wg_swatches/KNOTTY_CHESTNUT.jpg" alt="KNOTTY_CHESTNUT"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_DESERT_OAK" aria-label="Select KNOTTY DESERT OAK"><img src="wg_swatches/KNOTTY_DESERT_OAK.jpg" alt="KNOTTY_DESERT_OAK"></button>
-                                <button class="woodgrainButton" type="button" data-colour-name="KNOTTY_TEAK" aria-label="Select KNOTTY TEAK"><img src="wg_swatches/KNOTTY_TEAK.jpg" alt="KNOTTY_TEAK"></button>
-                            </div>
-                        </div>
+                        <div id="woodgrainsButtonRows"></div>
                     </div>
                 </div>
             </div>
@@ -7672,17 +8415,7 @@
                 <div id="westCoastNaturalsInnerBoxWrapper">
                     <div id="westCoastNaturalsInnerBox">
                         <div id="westCoastNaturalsTitle">HEMLOCK</div>
-                        <div id="westCoastNaturalsButtonGrid">
-                            <button class="westCoastNaturalsButton" type="button" data-colour-name="CHARWOOD" aria-label="Select CHARWOOD"><img src="wcn_swatches/CHARWOOD.jpg" alt="CHARWOOD"></button>
-                            <button class="westCoastNaturalsButton" type="button" data-colour-name="COASTAL_SAND" aria-label="Select COASTAL SAND"><img src="wcn_swatches/COASTAL_SAND.jpg" alt="COASTAL_SAND"></button>
-                            <button class="westCoastNaturalsButton" type="button" data-colour-name="FAWN" aria-label="Select FAWN"><img src="wcn_swatches/FAWN.jpg" alt="FAWN"></button>
-                            <button class="westCoastNaturalsButton" type="button" data-colour-name="HEARTWOOD" aria-label="Select HEARTWOOD"><img src="wcn_swatches/HEARTWOOD.jpg" alt="HEARTWOOD"></button>
-                            <button class="westCoastNaturalsButton" type="button" data-colour-name="HEMLOCK" aria-label="Select HEMLOCK"><img src="wcn_swatches/HEMLOCK.jpg" alt="HEMLOCK"></button>
-                            <button class="westCoastNaturalsButton" type="button" data-colour-name="HICKORY" aria-label="Select HICKORY"><img src="wcn_swatches/HICKORY.jpg" alt="HICKORY"></button>
-                            <button class="westCoastNaturalsButton" type="button" data-colour-name="IRONWOOD" aria-label="Select IRONWOOD"><img src="wcn_swatches/IRONWOOD.jpg" alt="IRONWOOD"></button>
-                            <button class="westCoastNaturalsButton" type="button" data-colour-name="MAHOGANY" aria-label="Select MAHOGANY"><img src="wcn_swatches/MAHOGANY.jpg" alt="MAHOGANY"></button>
-                            <button class="westCoastNaturalsButton" type="button" data-colour-name="TOBACCO" aria-label="Select TOBACCO"><img src="wcn_swatches/TOBACCO.jpg" alt="TOBACCO"></button>
-                        </div>
+                        <div id="westCoastNaturalsButtonGrid"></div>
                     </div>
                 </div>
             </div>
@@ -7696,16 +8429,7 @@
                 <div id="texturedColoursInnerBoxWrapper">
                     <div id="texturedColoursInnerBox">
                         <div id="texturedColoursTitle">SILVER WAVE</div>
-                        <div id="texturedColoursButtonGrid">
-                            <button class="texturedColoursButton" type="button" data-colour-name="BRUSHED_CARBON" aria-label="Select BRUSHED CARBON"><img src="tx_swatches/BRUSHED_CARBON.png" alt="BRUSHED_CARBON"></button>
-                            <button class="texturedColoursButton" type="button" data-colour-name="BRUSHED_GRAPHITE" aria-label="Select BRUSHED GRAPHITE"><img src="tx_swatches/BRUSHED_GRAPHITE.png" alt="BRUSHED_GRAPHITE"></button>
-                            <button class="texturedColoursButton" type="button" data-colour-name="CHAMPAGNE_WAVE" aria-label="Select CHAMPAGNE WAVE"><img src="tx_swatches/CHAMPAGNE_WAVE.png" alt="CHAMPAGNE_WAVE"></button>
-                            <button class="texturedColoursButton" type="button" data-colour-name="COPPER_WAVE" aria-label="Select COPPER WAVE"><img src="tx_swatches/COPPER_WAVE.png" alt="COPPER_WAVE"></button>
-                            <button class="texturedColoursButton" type="button" data-colour-name="SILVER_WAVE" aria-label="Select SILVER WAVE"><img src="tx_swatches/SILVER_WAVE.png" alt="SILVER_WAVE"></button>
-                            <button class="texturedColoursButton" type="button" data-colour-name="STARLIGHT" aria-label="Select STARLIGHT"><img src="tx_swatches/STARLIGHT.png" alt="STARLIGHT"></button>
-                            <button class="texturedColoursButton" type="button" data-colour-name="TEXTURED_BLACK_ONYX" aria-label="Select TEXTURED BLACK ONYX"><img src="tx_swatches/TEXTURED_BLACK_ONYX.png" alt="TEXTURED_BLACK_ONYX"></button>
-                            <button class="texturedColoursButton" type="button" data-colour-name="TEXTURED_COFFEE" aria-label="Select TEXTURED COFFEE"><img src="tx_swatches/TEXTURED_COFFEE.png" alt="TEXTURED_COFFEE"></button>
-                        </div>
+                        <div id="texturedColoursButtonRows"></div>
                     </div>
                 </div>
             </div>
@@ -7721,19 +8445,23 @@
                         <div class="archesOptionGrid">
                             <div class="archesOptionItem">
                                 <div class="archesOptionLabel">EDIT PROTRUSIONS</div>
-                                <button class="archesOptionButton" type="button" data-large-small="protrusions" aria-label="Edit protrusions">
-                                    <div class="archesOptionThumb"><img src="multi protrusions.png" alt="Edit protrusions"></div>
+                                <button class="archesOptionButton" type="button" data-large-small="protrusions"
+                                    aria-label="Edit protrusions">
+                                    <div class="archesOptionThumb"><img src="multi protrusions.png"
+                                            alt="Edit protrusions"></div>
                                 </button>
                             </div>
                             <div class="archesOptionItem">
                                 <div class="archesOptionLabel">EDIT RECESS</div>
-                                <button class="archesOptionButton" type="button" data-large-small="recess" aria-label="Edit recess">
+                                <button class="archesOptionButton" type="button" data-large-small="recess"
+                                    aria-label="Edit recess">
                                     <div class="archesOptionThumb"><img src="multi recess.png" alt="Edit recess"></div>
                                 </button>
                             </div>
                             <div class="archesOptionItem">
                                 <div class="archesOptionLabel">EDIT BOTH</div>
-                                <button class="archesOptionButton" type="button" data-large-small="both" aria-label="Edit both">
+                                <button class="archesOptionButton" type="button" data-large-small="both"
+                                    aria-label="Edit both">
                                     <div class="archesOptionThumb"><img src="multi both.png" alt="Edit both"></div>
                                 </button>
                             </div>
@@ -7775,10 +8503,11 @@
                 <div id="environmentInnerBoxWrapper">
                     <div id="environmentInnerBox">
                         <div id="environmentOptions"><button class="environmentCard" id="environmentBtn01" type="button"
-                                data-environment="01" aria-label="Environment 1"><img src="ENV01_Mod.png" alt="Environment 1"></button><button
-                                class="environmentCard" id="environmentBtn02" type="button" data-environment="02" aria-label="Environment 2"><img
-                                    src="ENV02_Mod.png" alt="Environment 2"></button><button class="environmentCard"
-                                id="environmentBtn03" type="button" data-environment="03" aria-label="Environment 3"><img src="ENV03_Mod.png"
+                                data-environment="01" aria-label="Environment 1"><img src="ENV01_Mod.png"
+                                    alt="Environment 1"></button><button class="environmentCard" id="environmentBtn02"
+                                type="button" data-environment="02" aria-label="Environment 2"><img src="ENV02_Mod.png"
+                                    alt="Environment 2"></button><button class="environmentCard" id="environmentBtn03"
+                                type="button" data-environment="03" aria-label="Environment 3"><img src="ENV03_Mod.png"
                                     alt="Environment 3"></button></div>
                     </div>
                 </div>
@@ -7823,7 +8552,7 @@
     </div>
 
     <div id="moviePlaybackOverlay" aria-hidden="true">
-        <video id="moviePlaybackVideo" src="LOADING_BG.mp4" muted playsinline preload="auto"></video>
+        <video id="moviePlaybackVideo" src="LOADING_BG_red.mp4" muted playsinline preload="auto"></video>
         <div id="moviePlaybackShade"></div>
         <img id="moviePlaybackLogo" src="LOGO.png" alt="Logo">
         <img id="moviePlaybackUnrealLogo" src="UNREAL LOGO.png" alt="Unreal Logo">
@@ -7851,7 +8580,8 @@
                 <div id="overlayText">Generating high resolution image</div>
                 <div id="overlayActions" style="display:none; margin-top:14px; gap:10px; justify-content:center;">
                     <button id="saveScreenshotButton" type="button" class="overlayActionButton">SAVE IMAGE</button>
-                    <button id="closeScreenshotOverlayButton" type="button" class="overlayActionButton secondary">CLOSE</button>
+                    <button id="closeScreenshotOverlayButton" type="button"
+                        class="overlayActionButton secondary">CLOSE</button>
                 </div>
             </div>
         </div>
