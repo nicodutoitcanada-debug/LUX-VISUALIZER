@@ -17,6 +17,8 @@
             --slider-x: 140px;
             --solo-x: 120px;
             --solo-rotate: 90deg;
+            --fullscreen-top: max(16px, env(safe-area-inset-top));
+            --fullscreen-right: max(16px, env(safe-area-inset-right));
             --camera-x: 260px;
             --building-x: 260px;
             --environment-x: 260px;
@@ -2975,6 +2977,7 @@
 
         .woodgrainsButtonRow--knotty {
             grid-template-columns: repeat(5, minmax(0, 1fr));
+            justify-items: start;
         }
 
         .woodgrainButton {
@@ -3148,6 +3151,7 @@
 
         .texturedColoursButtonRow--textured {
             grid-template-columns: repeat(5, minmax(0, 1fr));
+            justify-items: start;
         }
 
         #texturedColoursButtonGrid {
@@ -3202,13 +3206,8 @@
 
         @media (max-width:680px) {
             .texturedColoursButtonRow {
-                grid-template-columns: repeat(4, minmax(0, 1fr));
+                grid-template-columns: repeat(5, minmax(0, 1fr));
                 gap: 8px;
-            }
-
-            .texturedColoursButtonRow--textured .texturedColoursButton:nth-child(1),
-            .texturedColoursButtonRow--textured .texturedColoursButton:nth-child(2) {
-                grid-column: auto;
             }
 
             .texturedColoursButton img {
@@ -3609,7 +3608,7 @@
             opacity: 0;
             visibility: hidden;
             transform: translate(-50%, calc(-100% + 9px));
-            transition: opacity 980ms cubic-bezier(0.22, 1, 0.36, 1), transform 980ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 980ms;
+            transition: opacity 1220ms cubic-bezier(0.22, 1, 0.36, 1), transform 1220ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 1220ms;
             text-shadow: none;
             white-space: normal;
             width: max-content;
@@ -3630,7 +3629,7 @@
             display: block;
             padding: 8px 12px;
             border-radius: 12px;
-            background: rgba(0, 0, 0, 0.16);
+            background: rgba(0, 0, 0, 0.11);
             text-align: center;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
             overflow: hidden;
@@ -3647,14 +3646,14 @@
         }
 
         .mainMenuTooltip__label::before {
-            background: rgba(0, 0, 0, 0.10);
+            background: rgba(0, 0, 0, 0.06);
             -webkit-backdrop-filter: blur(10px) saturate(120%);
             backdrop-filter: blur(10px) saturate(120%);
             z-index: -2;
         }
 
         .mainMenuTooltip__label::after {
-            background: rgba(0, 0, 0, 0.08);
+            background: rgba(0, 0, 0, 0.04);
             z-index: -1;
         }
 
@@ -3926,6 +3925,75 @@
         .movieControlButton:active img {
             opacity: 1;
             transform: scale(0.96);
+        }
+
+
+        #fullscreenToggleButton {
+            position: fixed;
+            top: var(--fullscreen-top);
+            right: var(--fullscreen-right);
+            width: 52px;
+            height: 52px;
+            padding: 0;
+            margin: 0;
+            border: 0;
+            background: transparent;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 8800;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        #fullscreenToggleButton.is-supported {
+            display: flex;
+        }
+
+        #fullscreenToggleButton img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            opacity: 0.84;
+            transition: opacity 0.24s ease, transform 0.24s ease;
+            pointer-events: none;
+        }
+
+        #fullscreenToggleButton:hover img,
+        #fullscreenToggleButton:focus-visible img {
+            opacity: 1;
+        }
+
+        #fullscreenToggleButton:active img {
+            transform: scale(0.96);
+        }
+
+        @media (max-width:1024px) {
+            #fullscreenToggleButton {
+                width: 46px;
+                height: 46px;
+            }
+
+            #fullscreenToggleButton img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        @media (max-width:680px) {
+            #fullscreenToggleButton {
+                top: max(10px, env(safe-area-inset-top));
+                right: max(10px, env(safe-area-inset-right));
+                width: 42px;
+                height: 42px;
+            }
+
+            #fullscreenToggleButton img {
+                width: 26px;
+                height: 26px;
+            }
         }
 
         body.movie-ui-hidden #uiWrapper,
@@ -4750,28 +4818,28 @@
             }
 
             #sliderContainer {
-                right: 12px;
-                width: 58px;
-                height: 350px;
-                border-radius: 29px;
+                right: 10px;
+                width: 50px;
+                height: 320px;
+                border-radius: 25px;
             }
 
             #scaleSlider {
-                width: 280px;
-                height: 58px;
+                width: 254px;
+                height: 50px;
             }
 
             #scaleSlider::-webkit-slider-thumb,
             #scaleSlider::-moz-range-thumb {
-                width: 118px;
-                height: 118px;
-                margin-top: -30px;
+                width: 100px;
+                height: 100px;
+                margin-top: -25px;
             }
 
             #soloDockButton {
-                right: 12px;
-                width: 60px;
-                height: 60px;
+                right: 10px;
+                width: 54px;
+                height: 54px;
             }
         }
 
@@ -4856,15 +4924,15 @@
             #woodgrainsMenuWrapper,
             #westCoastNaturalsMenuWrapper,
             #texturedColoursMenuWrapper {
-                right: 72px;
+                right: 46px;
                 transform-origin: right center;
             }
 
             #sliderContainer {
-                right: 8px;
-                height: 250px;
-                width: 42px;
-                border-radius: 21px;
+                right: 4px;
+                height: 200px;
+                width: 34px;
+                border-radius: 17px;
             }
 
             #sliderContainer.engaged::before {
@@ -4876,26 +4944,26 @@
             }
 
             #scaleSlider {
-                width: 200px;
-                height: 42px;
+                width: 160px;
+                height: 34px;
             }
 
             #scaleSlider::-webkit-slider-thumb,
             #scaleSlider::-moz-range-thumb {
-                width: 88px;
-                height: 88px;
-                margin-top: -23px;
+                width: 68px;
+                height: 68px;
+                margin-top: -17px;
             }
 
             #soloDockButton {
-                right: 8px;
-                width: 48px;
-                height: 48px;
+                right: 4px;
+                width: 40px;
+                height: 40px;
             }
 
             #soloDockButton img {
-                width: 28px;
-                height: 28px;
+                width: 24px;
+                height: 24px;
             }
         }
 
@@ -4944,12 +5012,13 @@
             #westCoastNaturalsMenuWrapper,
             #texturedColoursMenuWrapper,
             #archesMenuWrapper,
-            #fenceMenuWrapper {
-                right: 50px;
+            #fenceMenuWrapper,
+            #pergolaMenuWrapper {
+                right: 40px;
             }
 
             #sliderContainer {
-                right: 6px;
+                right: 3px;
             }
 
             #buildingOuterBox,
@@ -5272,6 +5341,12 @@
             event.stopPropagation();
             if (selectedBuild === 'Trad') {
                 resetCameraHeightToDefault({ emit: true, animate: true, duration: 420 });
+                if (pergolaEditingActive) {
+                    clearTimeout(pergolaMenuOpenTimer);
+                    pergolaMenuOpenTimer = null;
+                    openPergolaMenu({ includeSliderOnEnter: getCurrentPanelName() === 'walk' || getCurrentPanelName() === 'main' });
+                    return;
+                }
                 sendToUnreal({ go_to: 'pergola' });
                 return;
             }
@@ -5999,7 +6074,45 @@
         let menuCleanupTimer = null;
         let lastPointerClientX = null;
         let lastPointerClientY = null;
+        let fullscreenToggleButtonEl = null;
 
+
+        function getFullscreenTargetElement() {
+            return document.documentElement;
+        }
+        function getCurrentFullscreenElement() {
+            return document.fullscreenElement || document.webkitFullscreenElement || null;
+        }
+        function browserSupportsFullscreenToggle() {
+            const ua = navigator.userAgent || '';
+            const isIOS = /iPhone|iPod/i.test(ua) || (/iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+            if (isIOS) return false;
+            return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || getFullscreenTargetElement().requestFullscreen || getFullscreenTargetElement().webkitRequestFullscreen);
+        }
+        function updateFullscreenToggleIcon() {
+            if (!fullscreenToggleButtonEl) return;
+            const icon = fullscreenToggleButtonEl.querySelector('img');
+            if (!icon) return;
+            const isFullscreen = !!getCurrentFullscreenElement();
+            icon.src = isFullscreen ? 'EXIT FULLSCREEN.png' : 'ENTER FULLSCREEN.png';
+            icon.alt = isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen';
+            fullscreenToggleButtonEl.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen');
+        }
+        async function toggleFullscreenMode() {
+            const target = getFullscreenTargetElement();
+            try {
+                if (getCurrentFullscreenElement()) {
+                    if (document.exitFullscreen) await document.exitFullscreen();
+                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                } else {
+                    if (target.requestFullscreen) await target.requestFullscreen({ navigationUI: 'hide' });
+                    else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+                }
+            } catch (error) {
+                console.warn('Fullscreen toggle failed:', error);
+            }
+            updateFullscreenToggleIcon();
+        }
         function clearModes() { bodyEl.classList.remove(...uiModeClasses); }
         function rememberPointerPosition(event) {
             if (!event) return;
@@ -6653,9 +6766,10 @@
         }
         function closeFinishTypeMenu() {
             const exitTarget = getFinishMenuExitTarget();
+            const includeSliderOnEnter = exitTarget === 'fence' || exitTarget === 'pergola';
             if (exitTarget === 'main') colorTypeRouteActive = false;
             if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
-            switchPanel(exitTarget);
+            switchPanel(exitTarget, { includeSliderOnEnter });
         }
         function openSolidColoursMenu() {
             hydrateSolidColourMenuThumbnails();
@@ -7735,6 +7849,7 @@
 
             const scaleSlider = document.getElementById('scaleSlider');
             const sliderContainer = document.getElementById('sliderContainer');
+            fullscreenToggleButtonEl = document.getElementById('fullscreenToggleButton');
             const dockMenuButton = document.getElementById('dockMenuButton');
             const soloDockButton = document.getElementById('soloDockButton');
             const cameraSettingsButton = document.getElementById('cameraSettingsButton');
@@ -7809,6 +7924,18 @@
             setCameraSlidersInteractive(false);
 
             setUIScale(scaleSlider.value);
+            if (fullscreenToggleButtonEl) {
+                if (browserSupportsFullscreenToggle()) {
+                    fullscreenToggleButtonEl.classList.add('is-supported');
+                    updateFullscreenToggleIcon();
+                    fullscreenToggleButtonEl.addEventListener('click', toggleFullscreenMode);
+                    document.addEventListener('fullscreenchange', updateFullscreenToggleIcon);
+                    document.addEventListener('webkitfullscreenchange', updateFullscreenToggleIcon);
+                } else {
+                    fullscreenToggleButtonEl.remove();
+                    fullscreenToggleButtonEl = null;
+                }
+            }
             window.addEventListener('resize', () => setUIScale(scaleSlider.value));
             window.addEventListener('orientationchange', () => setTimeout(() => setUIScale(scaleSlider.value), 120));
             buildJumpTargets();
@@ -8085,6 +8212,7 @@
     </div>
 
     <div id="editUiRoot">
+        <button id="fullscreenToggleButton" class="uiInteractive" type="button" aria-label="Enter fullscreen"><img src="ENTER FULLSCREEN.png" alt="Enter fullscreen"></button>
         <!-- MAIN MENU -->
         <div id="uiWrapper" class="uiInteractive">
             <div id="outerBox" class="glassPanel">
