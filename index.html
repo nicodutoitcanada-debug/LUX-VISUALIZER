@@ -5,6 +5,8 @@
     <title>LUX VISUALIZER</title>
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <style>
         :root {
             --app-height: 100vh;
@@ -43,6 +45,7 @@
             --jump-enter-time: 420ms;
             --jump-fade-time: 260ms;
             --edit-mode-intro-time: 5200ms;
+            --slider-control-scale: 1;
         }
 
         html,
@@ -3692,7 +3695,8 @@
             position: absolute;
             width: 400px;
             height: 82px;
-            transform: rotate(-90deg);
+            transform: rotate(-90deg) scale(var(--slider-control-scale));
+            transform-origin: center center;
             appearance: none;
             -webkit-appearance: none;
             background: transparent;
@@ -4814,32 +4818,24 @@
             #woodgrainsMenuWrapper,
             #westCoastNaturalsMenuWrapper,
             #texturedColoursMenuWrapper {
-                right: 112px;
+                right: 98px;
             }
 
             #sliderContainer {
-                right: 10px;
-                width: 50px;
-                height: 320px;
-                border-radius: 25px;
+                right: 12px;
+                width: 42px;
+                height: 290px;
+                border-radius: 21px;
             }
 
-            #scaleSlider {
-                width: 254px;
-                height: 50px;
-            }
-
-            #scaleSlider::-webkit-slider-thumb,
-            #scaleSlider::-moz-range-thumb {
-                width: 100px;
-                height: 100px;
-                margin-top: -25px;
+            :root {
+                --slider-control-scale: 0.56;
             }
 
             #soloDockButton {
-                right: 10px;
-                width: 54px;
-                height: 54px;
+                right: 12px;
+                width: 50px;
+                height: 50px;
             }
         }
 
@@ -4924,46 +4920,103 @@
             #woodgrainsMenuWrapper,
             #westCoastNaturalsMenuWrapper,
             #texturedColoursMenuWrapper {
-                right: 46px;
                 transform-origin: right center;
             }
 
             #sliderContainer {
-                right: 4px;
-                height: 200px;
-                width: 34px;
-                border-radius: 17px;
+                height: 182px;
+                width: 28px;
+                border-radius: 14px;
+            }
+
+            :root {
+                --slider-control-scale: 0.35;
             }
 
             #sliderContainer.engaged::before {
-                top: 6px;
-                right: 6px;
-                bottom: 6px;
-                left: 6px;
-                border-radius: 15px;
-            }
-
-            #scaleSlider {
-                width: 160px;
-                height: 34px;
-            }
-
-            #scaleSlider::-webkit-slider-thumb,
-            #scaleSlider::-moz-range-thumb {
-                width: 68px;
-                height: 68px;
-                margin-top: -17px;
+                top: 5px;
+                right: 5px;
+                bottom: 5px;
+                left: 5px;
+                border-radius: 12px;
             }
 
             #soloDockButton {
-                right: 4px;
-                width: 40px;
-                height: 40px;
+                width: 34px;
+                height: 34px;
             }
 
             #soloDockButton img {
-                width: 24px;
-                height: 24px;
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        @media (max-width:680px) and (orientation: portrait) {
+            :root {
+                --slider-control-scale: 0.35;
+            }
+
+            #uiWrapper,
+            #cameraMenuWrapper,
+            #buildingMenuWrapper,
+            #environmentMenuWrapper,
+            #confirmMenuWrapper,
+            #teleportMenuWrapper,
+            #profileMenuWrapper,
+            #finishTypeMenuWrapper,
+            #solidColoursMenuWrapper,
+            #woodgrainsMenuWrapper,
+            #westCoastNaturalsMenuWrapper,
+            #texturedColoursMenuWrapper,
+            #archesMenuWrapper,
+            #fenceMenuWrapper,
+            #pergolaMenuWrapper {
+                right: 56px;
+            }
+
+            #sliderContainer {
+                right: 10px;
+                width: 28px;
+                height: 182px;
+            }
+
+            #soloDockButton {
+                right: 10px;
+            }
+        }
+
+        @media (max-width:680px) and (orientation: landscape) {
+            :root {
+                --slider-control-scale: 0.40;
+            }
+
+            #uiWrapper,
+            #cameraMenuWrapper,
+            #buildingMenuWrapper,
+            #environmentMenuWrapper,
+            #confirmMenuWrapper,
+            #teleportMenuWrapper,
+            #profileMenuWrapper,
+            #finishTypeMenuWrapper,
+            #solidColoursMenuWrapper,
+            #woodgrainsMenuWrapper,
+            #westCoastNaturalsMenuWrapper,
+            #texturedColoursMenuWrapper,
+            #archesMenuWrapper,
+            #fenceMenuWrapper,
+            #pergolaMenuWrapper {
+                right: 40px;
+            }
+
+            #sliderContainer {
+                right: 8px;
+                width: 32px;
+                height: 210px;
+            }
+
+            #soloDockButton {
+                right: 8px;
             }
         }
 
@@ -4998,28 +5051,6 @@
                 min-height: 90px;
             }
 
-            #uiWrapper,
-            #cameraMenuWrapper,
-            #buildingMenuWrapper,
-            #environmentMenuWrapper,
-            #howToMenuWrapper,
-            #confirmMenuWrapper,
-            #teleportMenuWrapper,
-            #profileMenuWrapper,
-            #finishTypeMenuWrapper,
-            #solidColoursMenuWrapper,
-            #woodgrainsMenuWrapper,
-            #westCoastNaturalsMenuWrapper,
-            #texturedColoursMenuWrapper,
-            #archesMenuWrapper,
-            #fenceMenuWrapper,
-            #pergolaMenuWrapper {
-                right: 40px;
-            }
-
-            #sliderContainer {
-                right: 3px;
-            }
 
             #buildingOuterBox,
             #environmentOuterBox,
@@ -5341,10 +5372,10 @@
             event.stopPropagation();
             if (selectedBuild === 'Trad') {
                 resetCameraHeightToDefault({ emit: true, animate: true, duration: 420 });
-                if (pergolaEditingActive) {
+                if (pergolaZoneActive) {
                     clearTimeout(pergolaMenuOpenTimer);
                     pergolaMenuOpenTimer = null;
-                    openPergolaMenu({ includeSliderOnEnter: getCurrentPanelName() === 'walk' || getCurrentPanelName() === 'main' });
+                    openPergolaMenu({ includeSliderOnEnter: true });
                     return;
                 }
                 sendToUnreal({ go_to: 'pergola' });
@@ -5851,6 +5882,7 @@
         let colourMenuReturnTarget = 'profile';
         let fenceEditingActive = false;
         let pergolaEditingActive = false;
+        let pergolaZoneActive = false;
         let fenceMenuOpenTimer = null;
         let pergolaMenuOpenTimer = null;
         let currentFenceVariant = '02';
@@ -6083,11 +6115,21 @@
         function getCurrentFullscreenElement() {
             return document.fullscreenElement || document.webkitFullscreenElement || null;
         }
+        function isIosLikeDevice() {
+            return /iPhone|iPad|iPod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+        function isStandaloneDisplayMode() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
         function browserSupportsFullscreenToggle() {
-            const ua = navigator.userAgent || '';
-            const isIOS = /iPhone|iPod/i.test(ua) || (/iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
-            if (isIOS) return false;
-            return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || getFullscreenTargetElement().requestFullscreen || getFullscreenTargetElement().webkitRequestFullscreen);
+            const target = getFullscreenTargetElement();
+            return !!(
+                document.fullscreenEnabled ||
+                document.webkitFullscreenEnabled ||
+                target.requestFullscreen ||
+                target.webkitRequestFullscreen ||
+                (isIosLikeDevice() && !isStandaloneDisplayMode())
+            );
         }
         function updateFullscreenToggleIcon() {
             if (!fullscreenToggleButtonEl) return;
@@ -6104,12 +6146,17 @@
                 if (getCurrentFullscreenElement()) {
                     if (document.exitFullscreen) await document.exitFullscreen();
                     else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                } else {
+                } else if (target.requestFullscreen || target.webkitRequestFullscreen) {
                     if (target.requestFullscreen) await target.requestFullscreen({ navigationUI: 'hide' });
                     else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+                } else if (isIosLikeDevice() && !isStandaloneDisplayMode()) {
+                    window.alert('On iPhone and iPad, the best full-screen option is to add this app to your Home Screen and launch it from there. That opens it in a standalone app-style view without the usual browser bars.');
                 }
             } catch (error) {
                 console.warn('Fullscreen toggle failed:', error);
+                if (isIosLikeDevice() && !isStandaloneDisplayMode()) {
+                    window.alert('This browser did not allow fullscreen here. On iPhone and iPad, add the app to your Home Screen and launch it from there for the closest true full-screen experience.');
+                }
             }
             updateFullscreenToggleIcon();
         }
@@ -6316,6 +6363,17 @@
             const isDockTransition = currentPanel === 'main' && panelName === 'walk';
             const isUndockTransition = currentPanel === 'walk' && panelName === 'main';
             const includeSliderOnEnter = options.includeSliderOnEnter === true || isUndockTransition;
+
+            if (includeSliderOnEnter && currentPanel !== 'main' && currentPanel !== 'walk') {
+                const sliderEl = document.getElementById('sliderContainer');
+                if (sliderEl) {
+                    sliderEl.style.opacity = '0';
+                    sliderEl.style.visibility = 'hidden';
+                    sliderEl.style.pointerEvents = 'none';
+                    sliderEl.style.transitionDelay = '0s, 0s, 0s';
+                    sliderEl.style.transform = 'translate3d(140px, -50%, 0)';
+                }
+            }
 
             if (currentPanel === 'main') {
                 animateElementOut(
@@ -6745,7 +6803,7 @@
             finishMenuReturnTarget = 'profile';
             currentFinishTypeSource = 'profile';
             colorTypeRouteActive = false;
-            switchPanel('main');
+            switchPanel('main', { includeSliderOnEnter: true });
         }
         function closeConfirmMenu() { setConfirmMenuVariant('end-session'); switchPanel('main'); }
         function toggleTreesVisibility() {
@@ -7433,6 +7491,8 @@
             }
             if (parsed.pergola === 'enter') {
                 clearTimeout(pergolaMenuOpenTimer);
+                pergolaMenuOpenTimer = null;
+                pergolaZoneActive = true;
                 pergolaEditingActive = true;
                 finishMenuReturnTarget = 'pergola';
                 currentFinishTypeSource = 'pergola';
@@ -7441,10 +7501,10 @@
                 syncPergolaMenuState();
                 const currentPanel = getCurrentPanelName();
                 if (currentPanel !== 'pergola') {
-                    const includeSliderOnEnter = currentPanel === 'walk';
+                    const includeSliderOnEnter = currentPanel === 'walk' || currentPanel === 'main';
                     pergolaMenuOpenTimer = setTimeout(() => {
                         pergolaMenuOpenTimer = null;
-                        if (!pergolaEditingActive) return;
+                        if (!pergolaZoneActive) return;
                         openPergolaMenu({ includeSliderOnEnter });
                     }, 500);
                 }
@@ -7452,6 +7512,7 @@
             if (parsed.pergola === 'exit') {
                 clearTimeout(pergolaMenuOpenTimer);
                 pergolaMenuOpenTimer = null;
+                pergolaZoneActive = false;
                 pergolaEditingActive = false;
                 finishMenuReturnTarget = 'profile';
                 colourMenuReturnTarget = 'profile';
