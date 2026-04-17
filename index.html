@@ -2977,18 +2977,6 @@
             grid-template-columns: repeat(5, minmax(0, 1fr));
         }
 
-        .woodgrainsButtonRow--knotty .woodgrainButton:nth-child(1) {
-            grid-column: 2;
-        }
-
-        .woodgrainsButtonRow--knotty .woodgrainButton:nth-child(2) {
-            grid-column: 3;
-        }
-
-        .woodgrainsButtonRow--knotty .woodgrainButton:nth-child(3) {
-            grid-column: 4;
-        }
-
         .woodgrainButton {
             appearance: none;
             border: 0;
@@ -3160,14 +3148,6 @@
 
         .texturedColoursButtonRow--textured {
             grid-template-columns: repeat(5, minmax(0, 1fr));
-        }
-
-        .texturedColoursButtonRow--textured .texturedColoursButton:nth-child(1) {
-            grid-column: 2;
-        }
-
-        .texturedColoursButtonRow--textured .texturedColoursButton:nth-child(2) {
-            grid-column: 3;
         }
 
         #texturedColoursButtonGrid {
@@ -3628,8 +3608,8 @@
             line-height: 1.15;
             opacity: 0;
             visibility: hidden;
-            transform: translate(-50%, calc(-100% + 8px));
-            transition: opacity 720ms cubic-bezier(0.22, 1, 0.36, 1), transform 720ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 720ms;
+            transform: translate(-50%, calc(-100% + 9px));
+            transition: opacity 980ms cubic-bezier(0.22, 1, 0.36, 1), transform 980ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 980ms;
             text-shadow: none;
             white-space: normal;
             width: max-content;
@@ -3641,7 +3621,7 @@
         .mainMenuTooltip.active {
             opacity: 1;
             visibility: visible;
-            transform: translate(-50%, calc(-100% - 4px));
+            transform: translate(-50%, calc(-100% - 2px));
             transition-delay: 0s;
         }
 
@@ -3650,9 +3630,9 @@
             display: block;
             padding: 8px 12px;
             border-radius: 12px;
-            background: rgba(0, 0, 0, 0.24);
+            background: rgba(0, 0, 0, 0.16);
             text-align: center;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
             overflow: hidden;
             isolation: isolate;
         }
@@ -3667,14 +3647,14 @@
         }
 
         .mainMenuTooltip__label::before {
-            background: rgba(0, 0, 0, 0.16);
+            background: rgba(0, 0, 0, 0.10);
             -webkit-backdrop-filter: blur(10px) saturate(120%);
             backdrop-filter: blur(10px) saturate(120%);
             z-index: -2;
         }
 
         .mainMenuTooltip__label::after {
-            background: rgba(0, 0, 0, 0.18);
+            background: rgba(0, 0, 0, 0.08);
             z-index: -1;
         }
 
@@ -5793,8 +5773,11 @@
         let currentColourDisplayTitle = '';
         let colorTypeRouteActive = false;
         let finishMenuReturnTarget = 'profile';
+        let colourMenuReturnTarget = 'profile';
         let fenceEditingActive = false;
         let pergolaEditingActive = false;
+        let fenceMenuOpenTimer = null;
+        let pergolaMenuOpenTimer = null;
         let currentFenceVariant = '02';
         const pergolaScreenState = { A: false, B: false, C: false, D: false };
         let currentProfileVariant = 'BOARD_AND_BATTEN';
@@ -6474,6 +6457,28 @@
                 activeMainMenuTooltipId = tooltipId;
             }, 1320);
         }
+        function getColourMenuExitTarget() {
+            if (colourMenuReturnTarget === 'finish-type') return 'finish-type';
+            if (colourMenuReturnTarget === 'main') return 'main';
+            if (colourMenuReturnTarget === 'fence') return 'fence';
+            if (colourMenuReturnTarget === 'pergola') return 'pergola';
+            return 'profile';
+        }
+        function setColourMenuReturnTargetForCurrentRoute() {
+            if (colorTypeRouteActive) {
+                colourMenuReturnTarget = 'main';
+                return;
+            }
+            if (currentFinishTypeSource === 'pergola') {
+                colourMenuReturnTarget = 'finish-type';
+                return;
+            }
+            if (currentFinishTypeSource === 'fence') {
+                colourMenuReturnTarget = 'fence';
+                return;
+            }
+            colourMenuReturnTarget = 'profile';
+        }
         function bindMainMenuTooltip(button, tooltipId) {
             if (!button || !tooltipId) return;
             const tooltip = document.querySelector(`.mainMenuTooltip[data-tooltip-id="${tooltipId}"]`);
@@ -6636,7 +6641,10 @@
         }
         function openProfileMenu() { finishMenuReturnTarget = 'profile'; colorTypeRouteActive = false; switchPanel('profile'); }
         function closeProfileMenu() { switchPanel('main'); }
-        function openFinishTypeMenu() { switchPanel('finish-type'); }
+        function openFinishTypeMenu() {
+            colourMenuReturnTarget = colorTypeRouteActive ? 'main' : finishMenuReturnTarget;
+            switchPanel('finish-type');
+        }
         function getFinishMenuExitTarget() {
             if (finishMenuReturnTarget === 'fence') return 'fence';
             if (finishMenuReturnTarget === 'pergola') return 'pergola';
@@ -6656,9 +6664,8 @@
             setTimeout(() => animateColourMenuButtons('solid-colours'), 110);
         }
         function closeSolidColoursMenu() {
-            const exitTarget = getFinishMenuExitTarget();
+            const exitTarget = getColourMenuExitTarget();
             if (exitTarget === 'main') colorTypeRouteActive = false;
-            if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
             switchPanel(exitTarget);
         }
         function openWoodgrainsMenu() {
@@ -6671,9 +6678,8 @@
             }, 110);
         }
         function closeWoodgrainsMenu() {
-            const exitTarget = getFinishMenuExitTarget();
+            const exitTarget = getColourMenuExitTarget();
             if (exitTarget === 'main') colorTypeRouteActive = false;
-            if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
             switchPanel(exitTarget);
         }
         function openWestCoastNaturalsMenu() {
@@ -6683,9 +6689,8 @@
             setTimeout(() => animateColourMenuButtons('west-coast-naturals'), 110);
         }
         function closeWestCoastNaturalsMenu() {
-            const exitTarget = getFinishMenuExitTarget();
+            const exitTarget = getColourMenuExitTarget();
             if (exitTarget === 'main') colorTypeRouteActive = false;
-            if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
             switchPanel(exitTarget);
         }
         function openTexturedColoursMenu() {
@@ -6698,9 +6703,8 @@
             }, 110);
         }
         function closeTexturedColoursMenu() {
-            const exitTarget = getFinishMenuExitTarget();
+            const exitTarget = getColourMenuExitTarget();
             if (exitTarget === 'main') colorTypeRouteActive = false;
-            if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
             switchPanel(exitTarget);
         }
         function getActiveFinishSelectionSet() {
@@ -7314,6 +7318,7 @@
                 openArchesMenu();
             }
             if (parsed.pergola === 'enter') {
+                clearTimeout(pergolaMenuOpenTimer);
                 pergolaEditingActive = true;
                 finishMenuReturnTarget = 'pergola';
                 currentFinishTypeSource = 'pergola';
@@ -7322,12 +7327,20 @@
                 syncPergolaMenuState();
                 const currentPanel = getCurrentPanelName();
                 if (currentPanel !== 'pergola') {
-                    openPergolaMenu({ includeSliderOnEnter: currentPanel === 'walk' });
+                    const includeSliderOnEnter = currentPanel === 'walk';
+                    pergolaMenuOpenTimer = setTimeout(() => {
+                        pergolaMenuOpenTimer = null;
+                        if (!pergolaEditingActive) return;
+                        openPergolaMenu({ includeSliderOnEnter });
+                    }, 500);
                 }
             }
             if (parsed.pergola === 'exit') {
+                clearTimeout(pergolaMenuOpenTimer);
+                pergolaMenuOpenTimer = null;
                 pergolaEditingActive = false;
                 finishMenuReturnTarget = 'profile';
+                colourMenuReturnTarget = 'profile';
                 currentFinishTypeSource = 'profile';
                 colorTypeRouteActive = false;
                 const currentPanel = getCurrentPanelName();
@@ -7336,6 +7349,7 @@
                 }
             }
             if (parsed.fence === 'enter' && selectedBuild === 'Trad') {
+                clearTimeout(fenceMenuOpenTimer);
                 fenceEditingActive = true;
                 finishMenuReturnTarget = 'fence';
                 currentFinishTypeSource = 'fence';
@@ -7344,15 +7358,23 @@
                 updateFenceButtonStates('02');
                 const currentPanel = getCurrentPanelName();
                 if (currentPanel !== 'fence') {
-                    openFenceMenu({ includeSliderOnEnter: currentPanel === 'walk' });
+                    const includeSliderOnEnter = currentPanel === 'walk';
+                    fenceMenuOpenTimer = setTimeout(() => {
+                        fenceMenuOpenTimer = null;
+                        if (!fenceEditingActive) return;
+                        openFenceMenu({ includeSliderOnEnter });
+                    }, 500);
                 }
             }
             if (parsed.fence === 'exit' && selectedBuild === 'Trad') {
+                clearTimeout(fenceMenuOpenTimer);
+                fenceMenuOpenTimer = null;
                 fenceEditingActive = false;
                 currentFinishTypeSource = 'profile';
                 const currentPanel = getCurrentPanelName();
                 if (currentPanel !== 'main') {
                     finishMenuReturnTarget = 'profile';
+                    colourMenuReturnTarget = 'profile';
                     colorTypeRouteActive = false;
                     switchPanel('main');
                 }
@@ -7581,13 +7603,9 @@
             document.body.classList.toggle('movie-ui-hidden', !!hidden);
         }
         function animateMovieUiBackIn() {
-            document.body.classList.remove('movie-ui-hidden');
-            document.body.classList.add('movie-ui-restoring');
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    document.body.classList.remove('movie-ui-restoring');
-                });
-            });
+            document.body.classList.remove('movie-ui-hidden', 'movie-ui-restoring');
+            resetPanelInlineStyles();
+            animateEditMenuReturn(true);
         }
         function setMovieControlMenuVisible(visible) {
             movieControlsVisible = !!visible;
@@ -7882,6 +7900,7 @@
             document.querySelectorAll('.finishTypeButton').forEach((button) => {
                 button.addEventListener('click', () => {
                     const finishMenu = button.dataset.finishMenu || '';
+                    setColourMenuReturnTargetForCurrentRoute();
                     if (finishMenu === 'SOLID_COLOURS') {
                         openSolidColoursMenu();
                         return;
