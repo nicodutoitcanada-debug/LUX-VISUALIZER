@@ -5131,9 +5131,9 @@
             }
 
             const shareIds = [
-                "share-ba04e7bb-3b1c-4c4f-89f4-dddfae1001e5",
-                "share-53e1b508-2ea9-43cc-900f-b160b7654fdb",
-                "share-26d724db-7a70-40f2-893c-25c18deb0e29"
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35"
             ];
             const selectedShareId = shareIds[Math.floor(Math.random() * shareIds.length)];
             console.log("Arcware seat selected:", selectedShareId);
@@ -6123,12 +6123,13 @@
         }
         function browserSupportsFullscreenToggle() {
             const target = getFullscreenTargetElement();
+            if (isIosLikeDevice()) return false;
+            if (isStandaloneDisplayMode()) return false;
             return !!(
                 document.fullscreenEnabled ||
                 document.webkitFullscreenEnabled ||
                 target.requestFullscreen ||
-                target.webkitRequestFullscreen ||
-                (isIosLikeDevice() && !isStandaloneDisplayMode())
+                target.webkitRequestFullscreen
             );
         }
         function updateFullscreenToggleIcon() {
@@ -6149,14 +6150,9 @@
                 } else if (target.requestFullscreen || target.webkitRequestFullscreen) {
                     if (target.requestFullscreen) await target.requestFullscreen({ navigationUI: 'hide' });
                     else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
-                } else if (isIosLikeDevice() && !isStandaloneDisplayMode()) {
-                    window.alert('On iPhone and iPad, the best full-screen option is to add this app to your Home Screen and launch it from there. That opens it in a standalone app-style view without the usual browser bars.');
                 }
             } catch (error) {
                 console.warn('Fullscreen toggle failed:', error);
-                if (isIosLikeDevice() && !isStandaloneDisplayMode()) {
-                    window.alert('This browser did not allow fullscreen here. On iPhone and iPad, add the app to your Home Screen and launch it from there for the closest true full-screen experience.');
-                }
             }
             updateFullscreenToggleIcon();
         }
