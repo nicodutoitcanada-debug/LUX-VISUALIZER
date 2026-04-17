@@ -6358,7 +6358,7 @@
             const currentScale = getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim() || '1';
             const isDockTransition = currentPanel === 'main' && panelName === 'walk';
             const isUndockTransition = currentPanel === 'walk' && panelName === 'main';
-            const includeSliderOnEnter = options.includeSliderOnEnter === true || isUndockTransition;
+            const includeSliderOnEnter = isUndockTransition;
 
             if (includeSliderOnEnter && currentPanel !== 'main' && currentPanel !== 'walk') {
                 const sliderEl = document.getElementById('sliderContainer');
@@ -6799,7 +6799,7 @@
             finishMenuReturnTarget = 'profile';
             currentFinishTypeSource = 'profile';
             colorTypeRouteActive = false;
-            switchPanel('main', { includeSliderOnEnter: true });
+            switchPanel('main');
         }
         function closeConfirmMenu() { setConfirmMenuVariant('end-session'); switchPanel('main'); }
         function toggleTreesVisibility() {
@@ -6820,10 +6820,9 @@
         }
         function closeFinishTypeMenu() {
             const exitTarget = getFinishMenuExitTarget();
-            const includeSliderOnEnter = exitTarget === 'fence' || exitTarget === 'pergola';
             if (exitTarget === 'main') colorTypeRouteActive = false;
             if (exitTarget !== 'fence' && exitTarget !== 'pergola') finishMenuReturnTarget = 'profile';
-            switchPanel(exitTarget, { includeSliderOnEnter });
+            switchPanel(exitTarget);
         }
         function openSolidColoursMenu() {
             hydrateSolidColourMenuThumbnails();
