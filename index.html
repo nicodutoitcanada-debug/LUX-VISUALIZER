@@ -306,6 +306,40 @@
             padding: 0 10px;
         }
 
+        #buildMenuEndSessionButton {
+            appearance: none;
+            min-width: 188px;
+            height: 44px;
+            padding: 0 26px;
+            border: 1px solid rgba(255, 255, 255, 0.40);
+            background: rgba(255, 255, 255, 0.10);
+            color: white;
+            border-radius: 999px;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            pointer-events: auto;
+            opacity: 0;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.18s ease, opacity 0.18s ease;
+            animation-delay: 0.64s;
+        }
+
+        #buildMenuEndSessionButton:hover,
+        #buildMenuEndSessionButton:focus-visible {
+            background: rgba(255, 255, 255, 0.38);
+            border-color: rgba(255, 255, 255, 0.52);
+            transform: scale(1.02);
+            opacity: 1;
+        }
+
+        #buildMenuEndSessionButton:active {
+            transform: scale(0.98);
+            opacity: 1;
+        }
+
         #menuUnrealLogo {
             position: absolute;
             left: 50%;
@@ -543,10 +577,18 @@
             overflow: hidden;
         }
 
+        #attentionBgVideo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .attentionShade {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.1) 35%, rgba(0, 0, 0, 0.72) 100%);
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.04) 0%, rgba(0, 0, 0, 0.16) 34%, rgba(0, 0, 0, 0.78) 100%);
         }
 
         .attentionInner {
@@ -585,22 +627,28 @@
 
         #retryButton {
             margin-top: 28px;
-            padding: 14px 26px;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            background: rgba(255, 255, 255, 0.08);
+            min-width: 188px;
+            height: 44px;
+            padding: 0 26px;
+            border: 1px solid rgba(255, 255, 255, 0.40);
+            background: rgba(255, 255, 255, 0.10);
             color: white;
+            border-radius: 999px;
             font: inherit;
-            font-size: 14px;
-            letter-spacing: 0.18em;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
             text-transform: uppercase;
             cursor: pointer;
             pointer-events: auto;
-            transition: background 0.2s ease, transform 0.18s ease, border-color 0.2s ease;
+            transition: background 0.2s ease, transform 0.18s ease, border-color 0.2s ease, opacity 0.18s ease;
         }
 
-        #retryButton:hover {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 255, 255, 0.5);
+        #retryButton:hover,
+        #retryButton:focus-visible {
+            background: rgba(255, 255, 255, 0.38);
+            border-color: rgba(255, 255, 255, 0.52);
+            transform: scale(1.02);
         }
 
         #retryButton:active {
@@ -1730,8 +1778,8 @@
             background: transparent;
             padding: 0;
             margin: 0;
-            width: 34px;
-            height: 34px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2041,19 +2089,17 @@
 
         #cameraControls {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            column-gap: 15px;
-            row-gap: 30px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            column-gap: 18px;
+            row-gap: 22px;
             align-items: start;
             justify-items: center;
-            padding-top: 10px;
-            padding-left: 10px;
-            padding-right: 10px;
+            padding: 8px 14px 0 14px;
         }
 
         .cameraIcon {
-            width: 34px;
-            height: 34px;
+            width: 28px;
+            height: 28px;
             object-fit: contain;
             opacity: 0.92;
             display: block;
@@ -2062,7 +2108,7 @@
         .cameraSliderWrap {
             position: relative;
             width: 100%;
-            height: 100px;
+            height: 286px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -2070,25 +2116,28 @@
 
         .cameraTrack {
             position: absolute;
-            width: 8px;
-            height: 286px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 999px;
+            left: 50%;
             top: 0;
+            width: 10px;
+            height: 286px;
+            background: rgba(255, 255, 255, 0.24);
+            border-radius: 999px;
+            transform: translateX(-50%);
         }
 
         .cameraSlider {
             -webkit-appearance: none;
             appearance: none;
             position: absolute;
+            left: calc(50% - 2px);
+            top: 122px;
             width: 286px;
-            height: 40px;
-            transform: rotate(-90deg);
-            transform-origin: center;
+            height: 52px;
+            transform: translateX(-50%) rotate(-90deg);
+            transform-origin: center center;
             background: transparent;
             cursor: pointer;
             touch-action: manipulation;
-            top: 123px;
         }
 
         .cameraSlider::-webkit-slider-runnable-track {
@@ -2099,13 +2148,13 @@
         .cameraSlider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 34px;
-            height: 34px;
-            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
             background: linear-gradient(to bottom, rgb(235, 57, 0), rgb(188, 31, 0));
             border: 1px solid rgba(0, 0, 0, 0.35);
             box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset, 0 2px 5px rgba(0, 0, 0, 0.25);
-            margin-top: -15.5px;
+            margin-top: -13.5px;
         }
 
         .cameraSlider::-moz-range-track {
@@ -2115,9 +2164,9 @@
         }
 
         .cameraSlider::-moz-range-thumb {
-            width: 34px;
-            height: 34px;
-            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
             background: linear-gradient(to bottom, rgb(235, 57, 0), rgb(188, 31, 0));
             border: 1px solid rgba(0, 0, 0, 0.35);
             box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset, 0 2px 5px rgba(0, 0, 0, 0.25);
@@ -2286,13 +2335,13 @@
         }
 
         #howToDesktopIcon {
-            width: 34px;
-            height: 34px;
+            width: 20px;
+            height: 20px;
         }
 
         #howToTouchIcon {
-            width: 34px;
-            height: 34px;
+            width: 20px;
+            height: 20px;
         }
 
         #confirmButtons {
@@ -2466,10 +2515,74 @@
             opacity: 1;
         }
 
+        #teleportYouAreHereLayer {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .teleportYouAreHereWrap {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 220ms ease;
+            pointer-events: none;
+            will-change: left, top, opacity;
+        }
+
+        .teleportYouAreHereWrap.is-visible {
+            opacity: var(--teleport-you-are-here-opacity, 1);
+        }
+
+        .teleportYouAreHereLabel {
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        .teleportYouAreHereWrap:hover .teleportYouAreHereLabel {
+            opacity: 1;
+            transform: translateY(-1px) scale(1.05);
+        }
+
+        .teleportYouAreHereIcon {
+            width: 40px;
+            height: 40px;
+            opacity: inherit;
+            pointer-events: none;
+            transform: rotate(0deg);
+            transform-origin: center center;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.08));
+            will-change: transform;
+        }
+
+        .teleportYouAreHereIcon>svg,
+        .teleportYouAreHereIcon canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+
+        #teleportMapStage[data-teleport-build="Multi"] .teleportYouAreHereLabel {
+            font-size: 7px;
+        }
+
+        #teleportMapStage[data-teleport-build="Multi"] .teleportYouAreHereIcon {
+            width: 36px;
+            height: 36px;
+        }
+
         #teleportJumpTargetsLayer {
             position: absolute;
             inset: 0;
-            z-index: 4;
+            z-index: 6;
             pointer-events: none;
         }
 
@@ -3957,8 +4070,8 @@
         }
 
         #fullscreenToggleButton img {
-            width: 34px;
-            height: 34px;
+            width: 20px;
+            height: 20px;
             object-fit: contain;
             opacity: 0.84;
             transition: opacity 0.24s ease, transform 0.24s ease;
@@ -4879,8 +4992,8 @@
             }
 
             .menuButton img {
-                width: clamp(46px, 16vw, 68px);
-                max-width: 20vw;
+                width: clamp(42px, 14vw, 62px);
+                max-width: 18vw;
             }
 
             #menuLogo {
@@ -4895,6 +5008,14 @@
 
             #menuUnrealLogo {
                 width: clamp(36px, 10vw, 52px);
+            }
+
+            #buildMenuEndSessionButton {
+                min-width: 166px;
+                height: 38px;
+                padding: 0 20px;
+                font-size: 11px;
+                letter-spacing: 0.14em;
             }
 
             .levelLoadingContent {
@@ -5131,9 +5252,9 @@
             }
 
             const shareIds = [
-                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
-                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
-                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35"
+                "share-ba04e7bb-3b1c-4c4f-89f4-dddfae1001e5",
+                "share-53e1b508-2ea9-43cc-900f-b160b7654fdb",
+                "share-26d724db-7a70-40f2-893c-25c18deb0e29"
             ];
             const selectedShareId = shareIds[Math.floor(Math.random() * shareIds.length)];
             console.log("Arcware seat selected:", selectedShareId);
@@ -5178,6 +5299,7 @@
                     if (parsed.camera === 'UNlimit') {
                         setCameraHeightSliderMax(300);
                     }
+                    handleTeleportLocationBackendPayload(parsed);
                     handleProfileBackendPayload(parsed);
                 } catch (e) { }
                 if (response.startsWith("CreateScreenshot")) {
@@ -5242,12 +5364,28 @@
         function playLottie() { if (lottieInstance) lottieInstance.play(); }
         function stopLottie() { if (lottieInstance) lottieInstance.stop(); }
         function hideAllUiScreens() { document.querySelectorAll(".uiScreen").forEach(screen => screen.classList.remove("visible")); }
+        function setAttentionButtonLabel(label) {
+            const retryButton = document.getElementById('retryButton');
+            if (!retryButton) return;
+            retryButton.textContent = label;
+            retryButton.setAttribute('aria-label', label);
+        }
+        function playAttentionBackground() {
+            const video = document.getElementById('attentionBgVideo');
+            if (!video) return;
+            try {
+                video.currentTime = 0;
+                video.play().catch(() => { });
+            } catch (e) { }
+        }
         function restartMenuAnimations() {
             const animated = document.querySelectorAll("#buildMenu .menuFadeIn, #menuUnrealLogo");
             animated.forEach(el => { el.style.animation = "none"; void el.offsetWidth; });
             document.getElementById("menuLogo").style.animation = "menuFadeIn 1.2s ease 0.18s forwards";
             document.querySelector(".buttonRow").style.animation = "menuFadeIn 1.2s ease 0.35s forwards";
             document.querySelector(".menuSubtitle").style.animation = "menuFadeIn 1.2s ease 0.52s forwards";
+            const buildMenuEndSessionButton = document.getElementById("buildMenuEndSessionButton");
+            if (buildMenuEndSessionButton) buildMenuEndSessionButton.style.animation = "menuFadeIn 1.2s ease 0.64s forwards";
             document.getElementById("menuUnrealLogo").style.animation = "menuFadeInLogo 1.2s ease 0.68s forwards";
         }
         function showInitialLoadingScreen() { hideAllUiScreens(); const screen = document.getElementById("loadingScreen"); const video = document.getElementById("loadingBgVideo"); screen.classList.add("visible"); playLottie(); try { video.currentTime = 0; video.play().catch(() => { }); } catch (e) { } }
@@ -5699,9 +5837,11 @@
             await fadeToBlack(350);
             const retryButton = document.getElementById('retryButton');
             const attentionMessage = document.getElementById('attentionMessage');
-            if (retryButton) retryButton.style.display = 'none';
+            if (retryButton) retryButton.style.display = '';
+            setAttentionButtonLabel('RELAUNCH');
             if (attentionMessage) attentionMessage.textContent = message;
             document.getElementById('attentionScreen').classList.add('visible');
+            playAttentionBackground();
             await fadeFromBlack(350);
         }
         async function endSessionByUser(message = 'Your session has ended.') {
@@ -5722,7 +5862,7 @@
         }
         function shouldSurfaceAttention(message) { if (suppressReconnect || sessionEndedByUser) return false; if (!message) return false; const lower = String(message).toLowerCase(); if (lower.includes("xr-spatial-tracking")) return false; if (lower.includes("issessionsupported")) return false; if (lower.includes("securityerror") && lower.includes("xr")) return false; return lower.includes("failed") || lower.includes("timeout") || lower.includes("disconnected") || lower.includes("disconnect") || lower.includes("unable") || lower.includes("cannot send") || lower.includes("allocation") || lower.includes("runner resources") || lower.includes("connection failed"); }
         function brandMessage(message) { let branded = String(message || "Connection issue. Please retry."); branded = branded.replace(/arcware/gi, "Lux"); branded = branded.replace(/\s+/g, " ").trim(); return branded; }
-        async function showAttentionScreen(message) { if (suppressReconnect || sessionEndedByUser || appInAttentionState) return; appInAttentionState = true; hideAfkPrompt(); clearAfkIdleTimer(); hidePreloadSpinner(); const brandedMessage = brandMessage(message); const retryButton = document.getElementById("retryButton"); if (retryButton) retryButton.style.display = ''; document.getElementById("attentionMessage").textContent = brandedMessage; await fadeToBlack(500); hideAllUiScreens(); hideInGameUi(); document.getElementById("attentionScreen").classList.add("visible"); await fadeFromBlack(700); }
+        async function showAttentionScreen(message) { if (suppressReconnect || sessionEndedByUser || appInAttentionState) return; appInAttentionState = true; hideAfkPrompt(); clearAfkIdleTimer(); hidePreloadSpinner(); const brandedMessage = brandMessage(message); const retryButton = document.getElementById("retryButton"); if (retryButton) retryButton.style.display = ''; setAttentionButtonLabel('RETRY'); document.getElementById("attentionMessage").textContent = brandedMessage; await fadeToBlack(500); hideAllUiScreens(); hideInGameUi(); document.getElementById("attentionScreen").classList.add("visible"); playAttentionBackground(); await fadeFromBlack(700); }
         function registerArcwareAttentionHandlers() {
             if (typeof Application?.on === "function") {
                 ["error", "disconnect", "close"].forEach(eventName => {
@@ -5867,6 +6007,22 @@
         let teleportFloorTransitionId = 0;
         let teleportMapTitle;
         let teleportJumpTargetsLayer;
+        let teleportYouAreHereLayer;
+        let teleportYouAreHereWrap;
+        let teleportYouAreHereLabel;
+        let teleportYouAreHereIconEl;
+        let teleportYouAreHereLottie = null;
+        let teleportLocationTrackingActive = false;
+        let latestTeleportPose = null;
+        let teleportRenderedYaw = 0;
+        let teleportHasRenderedYaw = false;
+        let teleportMarkerDisplayPosition = null;
+        let teleportMarkerTargetPosition = null;
+        let teleportMarkerAnimationFrame = 0;
+        let teleportMarkerLastFrameTime = 0;
+        let teleportMarkerPendingFloorLabel = 'GROUND FLOOR';
+        let teleportMarkerPendingSameFloor = true;
+        let teleportMarkerVisible = false;
         let teleportBasementButton;
         let teleportGroundButton;
         let teleportFirstButton;
@@ -6172,6 +6328,14 @@
                 clientY: lastPointerClientY,
                 view: window
             };
+            const target = document.elementFromPoint(lastPointerClientX, lastPointerClientY);
+            if (target instanceof HTMLElement) {
+                const hoverTarget = target.closest('button, [role="button"], a, input, label, .uiInteractive') || target;
+                try { hoverTarget.dispatchEvent(new MouseEvent('mouseenter', { ...pointerEventInit, bubbles: false })); } catch (e) { }
+                try { hoverTarget.dispatchEvent(new MouseEvent('mouseover', pointerEventInit)); } catch (e) { }
+                try { hoverTarget.dispatchEvent(new MouseEvent('mousemove', pointerEventInit)); } catch (e) { }
+                document.body.style.cursor = hoverTarget.closest('button, [role="button"], a, input, label') ? 'pointer' : '';
+            }
             document.dispatchEvent(new MouseEvent('mousemove', pointerEventInit));
         }
 
@@ -6229,6 +6393,8 @@
                 resetPanelInlineStyles();
                 bodyEl.classList.remove('menu-switching');
                 refreshHoverStateUnderPointer();
+                requestAnimationFrame(() => refreshHoverStateUnderPointer());
+                setTimeout(() => refreshHoverStateUnderPointer(), 80);
             }, duration);
         }
         function animateElementsFromRight(entries) {
@@ -7209,6 +7375,7 @@
         function openTeleportMenu() {
             syncTeleportMenuForBuild(selectedBuild || currentTeleportBuild || 'Mod');
             resetCameraHeightToDefault({ emit: true, animate: true, duration: 420 });
+            startTeleportLocationTracking();
             switchPanel('teleport');
             teleportFloorButtons.forEach((button) => { if (button) button.disabled = true; });
             teleportTitleAnimationId += 1;
@@ -7234,6 +7401,7 @@
             }, TELEPORT_MENU_OPEN_ANIMATION_DELAY);
         }
         function closeTeleportMenu() {
+            stopTeleportLocationTracking();
             teleportFloorTransitionId += 1;
             const transitionId = teleportFloorTransitionId;
             teleportFloorButtons.forEach((button) => { if (button) button.disabled = true; });
@@ -7263,6 +7431,7 @@
             setActiveTeleportPlan(floor);
             setActiveFloorButton(floor);
             animateTeleportTitle(teleportConfig.floorTitles[floor] || 'GROUND FLOOR');
+            updateTeleportYouAreHereFromPose();
             showJumpTargets(floor);
             const inDuration = getTargetSequenceDuration(floor);
             await wait(Math.max(outDuration, inDuration) + 120);
@@ -7711,6 +7880,430 @@
             setActiveTeleportPlan(currentTeleportFloor);
             setActiveFloorButton(currentTeleportFloor);
             if (teleportMapTitle) animateTeleportTitle(teleportConfig.floorTitles[currentTeleportFloor] || 'GROUND FLOOR', { immediate: true });
+            updateTeleportYouAreHereFromPose();
+        }
+
+        const teleportLocationAnchors = {
+            Mod: [
+                { floor: 'ground', worldX: -1103.81460, worldY: -653.782749, mapX: 39.405, mapY: 6.706 },
+                { floor: 'ground', worldX: -565.032001, worldY: -653.782749, mapX: 58.463, mapY: 6.704 },
+                { floor: 'ground', worldX: -565.032001, worldY: -521.687126, mapX: 58.657, mapY: 13.664 },
+                { floor: 'ground', worldX: -1103.81460, worldY: -485.632485, mapX: 39.397, mapY: 14.976 },
+                { floor: 'ground', worldX: -535.515969, worldY: -323.304672, mapX: 59.635, mapY: 19.817 },
+                { floor: 'ground', worldX: -1103.81460, worldY: 4.317022, mapX: 39.398, mapY: 38.962 },
+                { floor: 'ground', worldX: -612.525553, worldY: 4.317022, mapX: 57.194, mapY: 38.956 },
+                { floor: 'ground', worldX: -278.565536, worldY: 4.317022, mapX: 69.171, mapY: 38.983 },
+                { floor: 'ground', worldX: -135.374389, worldY: 4.317022, mapX: 74.415, mapY: 38.957 },
+                { floor: 'ground', worldX: -133.150289, worldY: 293.671530, mapX: 75.030, mapY: 46.855 },
+                { floor: 'ground', worldX: 480.303792, worldY: 293.671517, mapX: 97.727, mapY: 46.875 },
+                { floor: 'ground', worldX: -307.618679, worldY: 540.834196, mapX: 68.615, mapY: 64.027 },
+                { floor: 'ground', worldX: 480.303794, worldY: 540.834191, mapX: 97.722, mapY: 64.024 },
+                { floor: 'ground', worldX: -1275.12970, worldY: 1219.711340, mapX: 32.455, mapY: 95.082 },
+
+                { floor: 'basement', worldX: -2083.331300, worldY: 217.499341, mapX: 3.902, mapY: 49.261 },
+                { floor: 'basement', worldX: -1319.781720, worldY: 245.832104, mapX: 30.815, mapY: 51.203 },
+                { floor: 'basement', worldX: -2083.331290, worldY: 813.667647, mapX: 3.885, mapY: 74.904 }
+            ],
+            Multi: [
+                { floor: 'ground', worldX: -1340.505191, worldY: -4080.086489, mapX: 43.802, mapY: 8.252 },
+                { floor: 'ground', worldX: -897.933297, worldY: -4080.086489, mapX: 52.680, mapY: 8.203 },
+                { floor: 'ground', worldX: -897.933296, worldY: -3776.685756, mapX: 52.680, mapY: 11.621 },
+                { floor: 'ground', worldX: 260.834987, worldY: -2258.120810, mapX: 76.298, mapY: 29.297 },
+                { floor: 'ground', worldX: -1049.562222, worldY: -1041.555078, mapX: 49.581, mapY: 43.750 },
+                { floor: 'ground', worldX: -1324.535883, worldY: -621.948336, mapX: 44.472, mapY: 48.633 },
+                { floor: 'ground', worldX: -1324.535885, worldY: -58.054497, mapX: 44.472, mapY: 55.518 },
+                { floor: 'ground', worldX: 260.834997, worldY: -955.476232, mapX: 76.298, mapY: 44.482 },
+                { floor: 'ground', worldX: -759.521137, worldY: 364.116092, mapX: 55.528, mapY: 60.107 },
+                { floor: 'ground', worldX: -759.521137, worldY: 666.095061, mapX: 55.528, mapY: 63.965 },
+                { floor: 'ground', worldX: -1858.878916, worldY: 1440.651246, mapX: 29.732, mapY: 77.051 },
+                { floor: 'ground', worldX: -2306.167429, worldY: 2847.682922, mapX: 24.874, mapY: 90.088 },
+                { floor: 'ground', worldX: -1324.535895, worldY: 2847.682928, mapX: 44.556, mapY: 90.088 },
+                { floor: 'ground', worldX: -759.296843, worldY: 2847.682929, mapX: 55.863, mapY: 90.088 }
+            ]
+        };
+
+        const teleportMarkerCalibration = {
+            Mod: [],
+            Multi: []
+        };
+
+        const teleportGroundAllowedRegions = {
+            Mod: [],
+            Multi: []
+        };
+
+        function parseAxisString(value) {
+            if (typeof value !== 'string') return null;
+            const axes = {};
+            const regex = /([A-Z])=(-?\d+(?:\.\d+)?)/g;
+            let match = null;
+            while ((match = regex.exec(value)) !== null) {
+                axes[match[1]] = parseFloat(match[2]);
+            }
+            return Object.keys(axes).length ? axes : null;
+        }
+        function parseTeleportLocationPayload(payload) {
+            if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
+            const entries = Object.entries(payload);
+            if (entries.length !== 1) return null;
+            const [rotationString, locationString] = entries[0];
+            if (typeof rotationString !== 'string' || typeof locationString !== 'string') return null;
+            const rotation = parseAxisString(rotationString);
+            const location = parseAxisString(locationString);
+            if (!rotation || !location) return null;
+            if (!('Y' in rotation) || !('X' in location) || !('Y' in location) || !('Z' in location)) return null;
+            return {
+                pitch: rotation.P ?? 0,
+                yaw: rotation.Y ?? 0,
+                roll: rotation.R ?? 0,
+                x: location.X,
+                y: location.Y,
+                z: location.Z
+            };
+        }
+        function classifyTeleportPoseFloor(zValue) {
+            const z = Number(zValue);
+            if (!Number.isFinite(z)) return 'ground';
+            if (z < -80) return 'basement';
+            if (z > 125) return 'first';
+            return 'ground';
+        }
+        function getTeleportPoseFloorLabel(floor) {
+            const teleportConfig = getTeleportConfig();
+            return teleportConfig.floorTitles[floor] || (floor === 'first' ? 'FIRST FLOOR' : floor === 'basement' ? 'BASEMENT' : 'GROUND FLOOR');
+        }
+        function clampTeleportMarkerPosition(position) {
+            return position ? {
+                x: Math.min(99, Math.max(1, position.x)),
+                y: Math.min(99, Math.max(1, position.y))
+            } : position;
+        }
+        function getTeleportTriangleArea(ax, ay, bx, by, cx, cy) {
+            return ((bx - ax) * (cy - ay)) - ((by - ay) * (cx - ax));
+        }
+        function estimateTeleportMarkerPositionFromTriangle(pose, anchors) {
+            if (!pose || !anchors || anchors.length < 3) return null;
+            let best = null;
+            for (let i = 0; i < anchors.length - 2; i += 1) {
+                for (let j = i + 1; j < anchors.length - 1; j += 1) {
+                    for (let k = j + 1; k < anchors.length; k += 1) {
+                        const a = anchors[i];
+                        const b = anchors[j];
+                        const c = anchors[k];
+                        const denom = getTeleportTriangleArea(a.worldX, a.worldY, b.worldX, b.worldY, c.worldX, c.worldY);
+                        if (Math.abs(denom) < 0.001) continue;
+                        const w1 = getTeleportTriangleArea(pose.x, pose.y, b.worldX, b.worldY, c.worldX, c.worldY) / denom;
+                        const w2 = getTeleportTriangleArea(a.worldX, a.worldY, pose.x, pose.y, c.worldX, c.worldY) / denom;
+                        const w3 = 1 - w1 - w2;
+                        const minWeight = Math.min(w1, w2, w3);
+                        const maxWeight = Math.max(w1, w2, w3);
+                        const penalty = Math.max(0, -minWeight) + Math.max(0, maxWeight - 1);
+                        const edge = Math.min(a.distance, b.distance, c.distance);
+                        const score = penalty * 100000 + edge + (a.distance + b.distance + c.distance) * 0.01;
+                        if (!best || score < best.score) {
+                            best = {
+                                score,
+                                x: (a.mapX * w1) + (b.mapX * w2) + (c.mapX * w3),
+                                y: (a.mapY * w1) + (b.mapY * w2) + (c.mapY * w3)
+                            };
+                        }
+                    }
+                }
+            }
+            return best ? { x: best.x, y: best.y } : null;
+        }
+        function estimateTeleportMarkerPositionByDistance(pose, anchors) {
+            if (!pose || !anchors || !anchors.length) return null;
+            const neighborCount = anchors.length > 8 ? 5 : Math.min(4, anchors.length);
+            const workingSet = anchors.slice(0, Math.max(1, neighborCount));
+            let totalWeight = 0;
+            let weightedX = 0;
+            let weightedY = 0;
+            for (const anchor of workingSet) {
+                const safeDistance = Math.max(anchor.distance, 0.001);
+                const weight = 1 / Math.pow(safeDistance, 2.85);
+                totalWeight += weight;
+                weightedX += anchor.mapX * weight;
+                weightedY += anchor.mapY * weight;
+            }
+            if (!totalWeight) return null;
+            return { x: weightedX / totalWeight, y: weightedY / totalWeight };
+        }
+        function estimateTeleportMarkerPosition(pose, buildName = currentTeleportBuild, floor = null) {
+            const allAnchors = teleportLocationAnchors[buildName] || [];
+            let effectiveFloor = floor;
+
+            if (buildName === 'Mod' && floor === 'basement') {
+                effectiveFloor = 'ground';
+            }
+
+            let anchors = allAnchors.filter((anchor) => {
+                if (!effectiveFloor || !anchor.floor) return true;
+                return anchor.floor === effectiveFloor;
+            });
+            if (!anchors.length && effectiveFloor === 'first') {
+                anchors = allAnchors.filter((anchor) => anchor.floor === 'ground');
+            }
+            if (!anchors.length) {
+                anchors = allAnchors;
+            }
+            if (!anchors.length) return null;
+            const localizedAnchors = anchors.map((anchor) => ({
+                ...anchor,
+                distance: Math.hypot(anchor.worldX - pose.x, anchor.worldY - pose.y)
+            })).sort((a, b) => a.distance - b.distance);
+
+            if (localizedAnchors.length === 1) {
+                return { x: localizedAnchors[0].mapX, y: localizedAnchors[0].mapY };
+            }
+
+            const triangleEstimate = estimateTeleportMarkerPositionFromTriangle(pose, localizedAnchors.slice(0, Math.min(7, localizedAnchors.length)));
+            const distanceEstimate = estimateTeleportMarkerPositionByDistance(pose, localizedAnchors);
+            if (triangleEstimate && distanceEstimate) {
+                return clampTeleportMarkerPosition({
+                    x: (triangleEstimate.x * 0.82) + (distanceEstimate.x * 0.18),
+                    y: (triangleEstimate.y * 0.82) + (distanceEstimate.y * 0.18)
+                });
+            }
+            return clampTeleportMarkerPosition(triangleEstimate || distanceEstimate);
+        }
+        function applyTeleportMarkerCalibration(position, buildName = currentTeleportBuild, floor = currentTeleportFloor) {
+            if (!position) return position;
+
+            const clamp01 = (value) => Math.max(0, Math.min(1, value));
+            let calibrated = { x: position.x, y: position.y };
+
+            if (buildName === 'Mod') {
+                if (floor === 'ground' || floor === 'basement') {
+                    const leftBias = clamp01((34 - calibrated.x) / 20);
+                    const extremeLeftBias = clamp01((21 - calibrated.x) / 9);
+                    const stairUnlock = clamp01((25 - calibrated.x) / 9) * clamp01((calibrated.y - 22) / 18);
+                    const lowerAreaBias = clamp01((calibrated.y - 58) / 16);
+
+                    calibrated.x += (3.2 * leftBias) + (1.15 * extremeLeftBias) + (0.35 * stairUnlock);
+                    calibrated.y += (0.12 * leftBias) + (0.25 * stairUnlock) + (0.9 * lowerAreaBias);
+
+                    const rightBias = clamp01((calibrated.x - 56) / 18);
+                    const farRightBias = clamp01((calibrated.x - 71) / 11);
+                    const extremeRightBias = clamp01((calibrated.x - 85) / 7);
+
+                    calibrated.x -= (2.1 * rightBias) + (1.35 * farRightBias);
+                    calibrated.y -= (0.08 * rightBias);
+
+                    if (floor === 'ground') {
+                        calibrated.x -= (0.9 * farRightBias) + (1.25 * extremeRightBias);
+                        calibrated.y += 0.06 * farRightBias;
+                    }
+                } else if (floor === 'first') {
+                    calibrated.y -= 1.25;
+                }
+            } else if (buildName === 'Trad') {
+                if (floor === 'ground') {
+                    const leftBias = clamp01((34 - calibrated.x) / 20);
+                    const extremeLeftBias = clamp01((21 - calibrated.x) / 9);
+                    const stairUnlock = clamp01((25 - calibrated.x) / 9) * clamp01((calibrated.y - 22) / 18);
+
+                    calibrated.x += (3.2 * leftBias) + (1.15 * extremeLeftBias) + (0.35 * stairUnlock);
+                    calibrated.y += (0.12 * leftBias) + (0.25 * stairUnlock);
+                } else if (floor === 'basement') {
+                    calibrated.x += 2.8;
+                    calibrated.y += 0.35;
+                } else if (floor === 'first') {
+                    calibrated.y -= 1.25;
+                }
+            }
+
+            return clampTeleportMarkerPosition(calibrated);
+        }
+        function clampTeleportMarkerToAllowedRegions(position, floor = currentTeleportFloor, buildName = currentTeleportBuild) {
+            if (!position) return position;
+            const regionsByBuild = teleportGroundAllowedRegions[buildName] || [];
+            if (!regionsByBuild.length || floor !== 'ground') {
+                return {
+                    x: Math.min(99, Math.max(1, position.x)),
+                    y: Math.min(99, Math.max(1, position.y))
+                };
+            }
+            let isInside = false;
+            let bestPoint = null;
+            let bestDistance = Infinity;
+            for (const region of regionsByBuild) {
+                const clampedX = Math.min(region.x2, Math.max(region.x1, position.x));
+                const clampedY = Math.min(region.y2, Math.max(region.y1, position.y));
+                const distance = Math.hypot(position.x - clampedX, position.y - clampedY);
+                if (distance < 0.001) {
+                    isInside = true;
+                    bestPoint = { x: clampedX, y: clampedY };
+                    break;
+                }
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestPoint = { x: clampedX, y: clampedY };
+                }
+            }
+            const resolved = isInside ? { x: position.x, y: position.y } : (bestPoint || position);
+            return {
+                x: Math.min(98, Math.max(2, resolved.x)),
+                y: Math.min(98, Math.max(2, resolved.y))
+            };
+        }
+        function normalizeTeleportYawAngle(angle) {
+            let normalized = Number(angle) || 0;
+            while (normalized > 180) normalized -= 360;
+            while (normalized <= -180) normalized += 360;
+            return normalized;
+        }
+        const TELEPORT_MARKER_ROTATION_OFFSET = 90;
+        function setTeleportMarkerRotation(yaw) {
+            if (!teleportYouAreHereIconEl) return;
+            const normalizedYaw = normalizeTeleportYawAngle((Number(yaw) || 0) + TELEPORT_MARKER_ROTATION_OFFSET);
+            if (!teleportHasRenderedYaw) {
+                teleportRenderedYaw = normalizedYaw;
+                teleportHasRenderedYaw = true;
+            } else {
+                let delta = normalizedYaw - teleportRenderedYaw;
+                while (delta > 180) delta -= 360;
+                while (delta < -180) delta += 360;
+                teleportRenderedYaw += delta;
+            }
+            teleportYouAreHereIconEl.style.transform = `rotate(${teleportRenderedYaw}deg)`;
+        }
+        function ensureTeleportYouAreHereLottie() {
+            if (teleportYouAreHereLottie || !teleportYouAreHereIconEl || !window.lottie) return;
+            teleportYouAreHereLottie = window.lottie.loadAnimation({
+                container: teleportYouAreHereIconEl,
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: 'you are here.json'
+            });
+        }
+        function cancelTeleportMarkerAnimation() {
+            if (!teleportMarkerAnimationFrame) return;
+            cancelAnimationFrame(teleportMarkerAnimationFrame);
+            teleportMarkerAnimationFrame = 0;
+        }
+        function runTeleportMarkerAnimation(now = performance.now()) {
+            teleportMarkerAnimationFrame = 0;
+            if (!teleportYouAreHereWrap || !teleportYouAreHereIconEl || !teleportMarkerTargetPosition) return;
+            const deltaMs = teleportMarkerLastFrameTime ? Math.min(64, Math.max(10, now - teleportMarkerLastFrameTime)) : 16.6667;
+            teleportMarkerLastFrameTime = now;
+            const positionAlpha = 1 - Math.pow(0.12, deltaMs / 1000);
+            const rotationAlpha = 1 - Math.pow(0.06, deltaMs / 1000);
+            const maxPositionStep = 48 * (deltaMs / 1000);
+            const maxYawStep = 420 * (deltaMs / 1000);
+
+            if (!teleportMarkerDisplayPosition) {
+                teleportMarkerDisplayPosition = {
+                    x: teleportMarkerTargetPosition.x,
+                    y: teleportMarkerTargetPosition.y
+                };
+            } else {
+                const dx = teleportMarkerTargetPosition.x - teleportMarkerDisplayPosition.x;
+                const dy = teleportMarkerTargetPosition.y - teleportMarkerDisplayPosition.y;
+                const targetStepX = dx * positionAlpha;
+                const targetStepY = dy * positionAlpha;
+                const stepDistance = Math.hypot(targetStepX, targetStepY);
+                const stepScale = stepDistance > maxPositionStep && stepDistance > 0 ? (maxPositionStep / stepDistance) : 1;
+                teleportMarkerDisplayPosition.x += targetStepX * stepScale;
+                teleportMarkerDisplayPosition.y += targetStepY * stepScale;
+            }
+
+            const normalizedTargetYaw = normalizeTeleportYawAngle((Number(latestTeleportPose?.yaw) || 0) + TELEPORT_MARKER_ROTATION_OFFSET);
+            if (!teleportHasRenderedYaw) {
+                teleportRenderedYaw = normalizedTargetYaw;
+                teleportHasRenderedYaw = true;
+            } else {
+                let deltaYaw = normalizedTargetYaw - teleportRenderedYaw;
+                while (deltaYaw > 180) deltaYaw -= 360;
+                while (deltaYaw < -180) deltaYaw += 360;
+                const yawStep = Math.sign(deltaYaw) * Math.min(Math.abs(deltaYaw * rotationAlpha), maxYawStep);
+                teleportRenderedYaw += yawStep;
+            }
+
+            teleportYouAreHereWrap.style.left = `${teleportMarkerDisplayPosition.x}%`;
+            teleportYouAreHereWrap.style.top = `${teleportMarkerDisplayPosition.y}%`;
+            const sameFloorOpacity = currentTeleportBuild === 'Multi' ? '1' : (teleportMarkerPendingSameFloor ? '1' : '0.5');
+            teleportYouAreHereWrap.style.opacity = sameFloorOpacity;
+            teleportYouAreHereWrap.style.setProperty('--teleport-you-are-here-opacity', sameFloorOpacity);
+            teleportYouAreHereWrap.style.setProperty('--teleport-you-are-here-label-opacity', '0');
+            teleportYouAreHereLabel.textContent = '';
+            teleportYouAreHereIconEl.style.transform = `rotate(${teleportRenderedYaw}deg)`;
+            teleportYouAreHereWrap.classList.toggle('is-visible', teleportMarkerVisible);
+
+            const remainingDistance = Math.hypot(
+                teleportMarkerTargetPosition.x - teleportMarkerDisplayPosition.x,
+                teleportMarkerTargetPosition.y - teleportMarkerDisplayPosition.y
+            );
+            let remainingYaw = normalizedTargetYaw - teleportRenderedYaw;
+            while (remainingYaw > 180) remainingYaw -= 360;
+            while (remainingYaw < -180) remainingYaw += 360;
+            if (teleportMarkerVisible && (remainingDistance > 0.02 || Math.abs(remainingYaw) > 0.25)) {
+                teleportMarkerAnimationFrame = requestAnimationFrame(runTeleportMarkerAnimation);
+            }
+        }
+        function queueTeleportMarkerAnimation() {
+            if (teleportMarkerAnimationFrame) return;
+            teleportMarkerAnimationFrame = requestAnimationFrame(runTeleportMarkerAnimation);
+        }
+        function hideTeleportYouAreHere() {
+            teleportMarkerVisible = false;
+            teleportMarkerTargetPosition = null;
+            teleportMarkerDisplayPosition = null;
+            teleportMarkerLastFrameTime = 0;
+            cancelTeleportMarkerAnimation();
+            if (!teleportYouAreHereWrap) return;
+            teleportYouAreHereWrap.classList.remove('is-visible');
+        }
+        function updateTeleportYouAreHereFromPose() {
+            if (!teleportYouAreHereWrap || !teleportYouAreHereLabel || !teleportYouAreHereIconEl) return;
+            if (!teleportLocationTrackingActive || !latestTeleportPose || !bodyEl.classList.contains('teleport-mode')) {
+                hideTeleportYouAreHere();
+                return;
+            }
+            const actualFloor = classifyTeleportPoseFloor(latestTeleportPose.z);
+            const estimatedPosition = estimateTeleportMarkerPosition(latestTeleportPose, currentTeleportBuild, actualFloor);
+            if (!estimatedPosition) {
+                hideTeleportYouAreHere();
+                return;
+            }
+            const calibratedPosition = applyTeleportMarkerCalibration(estimatedPosition, currentTeleportBuild, actualFloor);
+            ensureTeleportYouAreHereLottie();
+            teleportMarkerPendingSameFloor = currentTeleportBuild === 'Multi' ? true : (actualFloor === currentTeleportFloor);
+            if (currentTeleportBuild === 'Mod' && currentTeleportFloor === 'ground' && actualFloor === 'first' && latestTeleportPose.z <= 125) {
+                teleportMarkerPendingSameFloor = true;
+            }
+            teleportMarkerPendingFloorLabel = '';
+            teleportMarkerTargetPosition = calibratedPosition;
+            teleportMarkerVisible = true;
+            queueTeleportMarkerAnimation();
+        }
+        function startTeleportLocationTracking() {
+            if (teleportLocationTrackingActive) {
+                updateTeleportYouAreHereFromPose();
+                return;
+            }
+            teleportLocationTrackingActive = true;
+            sendToUnreal({ location: 'start' });
+            updateTeleportYouAreHereFromPose();
+        }
+        function stopTeleportLocationTracking() {
+            if (!teleportLocationTrackingActive) return;
+            teleportLocationTrackingActive = false;
+            teleportHasRenderedYaw = false;
+            teleportRenderedYaw = 0;
+            teleportMarkerLastFrameTime = 0;
+            cancelTeleportMarkerAnimation();
+            if (teleportYouAreHereIconEl) teleportYouAreHereIconEl.style.transform = 'rotate(0deg)';
+            sendToUnreal({ location: 'stop' });
+            hideTeleportYouAreHere();
+        }
+        function handleTeleportLocationBackendPayload(payload) {
+            const parsedPose = parseTeleportLocationPayload(payload);
+            if (!parsedPose) return false;
+            latestTeleportPose = parsedPose;
+            updateTeleportYouAreHereFromPose();
+            return true;
         }
         function handleJumpTargetClick(targetId, floor) {
             const payload = getTeleportConfig().jumpTargetMessages[floor]?.[targetId];
@@ -7897,6 +8490,8 @@
             document.getElementById("btnTrad").addEventListener("click", () => selectBuild("Trad"));
             document.getElementById("btnMod").addEventListener("click", () => selectBuild("Mod"));
             document.getElementById("btnMulti").addEventListener("click", () => selectBuild("Multi"));
+            const buildMenuEndSessionButton = document.getElementById('buildMenuEndSessionButton');
+            if (buildMenuEndSessionButton) buildMenuEndSessionButton.addEventListener('click', () => endSessionByUser('Your session has ended.'));
             updateLevelButtonStates();
             syncEnvironmentMenuForBuild(selectedBuild || 'Mod');
             syncHowToMenuForBuild(selectedBuild || 'Mod');
@@ -7967,6 +8562,10 @@
             texturedColoursTexturedTitleEl = document.getElementById('texturedColoursTexturedTitle');
             teleportMapTitle = document.getElementById('teleportMapTitle');
             teleportJumpTargetsLayer = document.getElementById('teleportJumpTargetsLayer');
+            teleportYouAreHereLayer = document.getElementById('teleportYouAreHereLayer');
+            teleportYouAreHereWrap = document.getElementById('teleportYouAreHereWrap');
+            teleportYouAreHereLabel = document.getElementById('teleportYouAreHereLabel');
+            teleportYouAreHereIconEl = document.getElementById('teleportYouAreHereIcon');
             teleportBasementButton = document.getElementById('teleportBasementButton');
             teleportGroundButton = document.getElementById('teleportGroundButton');
             teleportFirstButton = document.getElementById('teleportFirstButton');
@@ -8229,6 +8828,7 @@
                                 alt="Load Multi"></button>
                     </div>
                     <div class="menuSubtitle menuFadeIn">CHOOSE BUILDING</div>
+                    <button id="buildMenuEndSessionButton" class="menuFadeIn" type="button">END SESSION</button>
                 </div>
                 <img id="menuUnrealLogo" src="UNREAL LOGO.png" alt="Unreal Logo">
             </div>
@@ -8258,6 +8858,7 @@
             <div id="readyText" class="readyText">GAME READY !</div>
         </div>
         <div id="attentionScreen" class="uiScreen">
+            <video id="attentionBgVideo" src="LOADING_BG.mp4" muted playsinline loop></video>
             <div class="attentionShade"></div>
             <div class="attentionInner"><img id="attentionLogo" src="LOGO.png" alt="Lux Logo">
                 <div class="attentionTitle">Connection Issue</div>
@@ -8408,6 +9009,12 @@
                                 alt="Modern home ground floor plan"><img class="teleportPlanImage"
                                 id="teleportPlanFirst" src="PLAN_MODERN_FIRST_FLOOR.png"
                                 alt="Modern home first floor plan">
+                            <div id="teleportYouAreHereLayer">
+                                <div class="teleportYouAreHereWrap" id="teleportYouAreHereWrap">
+                                    <div class="teleportYouAreHereLabel" id="teleportYouAreHereLabel">GROUND FLOOR</div>
+                                    <div class="teleportYouAreHereIcon" id="teleportYouAreHereIcon" aria-hidden="true"></div>
+                                </div>
+                            </div>
                             <div id="teleportJumpTargetsLayer"></div>
                         </div>
                     </div>
@@ -8789,6 +9396,40 @@
             </div>
         </div>
     </div>
+
+<style>
+#youAreHereLabel,
+#youAreHereText,
+#markerLabel,
+#locationLabel {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+</style>
+<script>
+(function(){
+  const ids = ["youAreHereLabel","youAreHereText","markerLabel","locationLabel"];
+  function hideLabels(){
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = "none";
+        el.style.opacity = "0";
+        el.style.visibility = "hidden";
+        if ("textContent" in el) el.textContent = "";
+      }
+    });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hideLabels);
+  } else {
+    hideLabels();
+  }
+  setInterval(hideLabels, 500);
+})();
+</script>
+
 </body>
 
 </html>
