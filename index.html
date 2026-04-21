@@ -1356,16 +1356,10 @@
             }
         }
 
-        @media (max-width:680px) and (orientation: landscape) {
-            #menuUnrealLogo {
-                display: none !important;
-            }
-        }
-
-        @media (max-width:680px) and (orientation: portrait) {
-            #menuUnrealLogo {
-                display: block !important;
-            }
+        #menuUnrealLogo.is-hidden-for-proximity {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         @media (max-width:680px) {
@@ -5589,6 +5583,43 @@
             if (group) group.classList.remove('is-exiting');
             if (unrealLogo) unrealLogo.classList.remove('is-exiting');
         }
+        function updateBuildMenuUnrealLogoVisibility() {
+            const unrealLogo = document.getElementById('menuUnrealLogo');
+            const endSessionButton = document.getElementById('buildMenuEndSessionButton');
+            const buildMenu = document.getElementById('buildMenu');
+            if (!unrealLogo || !endSessionButton || !buildMenu) return;
+
+            const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+            const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const isLandscape = viewportWidth > viewportHeight;
+            const minimumSafeGap = isLandscape ? 26 : 14;
+
+            unrealLogo.classList.remove('is-hidden-for-proximity');
+
+            const buttonRect = endSessionButton.getBoundingClientRect();
+            const logoRect = unrealLogo.getBoundingClientRect();
+            if (!buttonRect.width || !buttonRect.height || !logoRect.width || !logoRect.height) return;
+
+            const verticalGap = logoRect.top - buttonRect.bottom;
+            const horizontalOverlap = Math.max(0, Math.min(buttonRect.right, logoRect.right) - Math.max(buttonRect.left, logoRect.left));
+            const horizontalCenterDistance = Math.abs((buttonRect.left + buttonRect.right) / 2 - (logoRect.left + logoRect.right) / 2);
+            const combinedHalfWidths = (buttonRect.width + logoRect.width) / 2;
+            const sameColumn = horizontalCenterDistance < combinedHalfWidths + 8;
+            const rectanglesOverlap = verticalGap < 0 && horizontalOverlap > 0;
+            const isTooClose = sameColumn && verticalGap < minimumSafeGap;
+
+            if (rectanglesOverlap || isTooClose) {
+                unrealLogo.classList.add('is-hidden-for-proximity');
+            }
+        }
+        function scheduleBuildMenuUnrealLogoVisibilityUpdate() {
+            requestAnimationFrame(() => {
+                updateBuildMenuUnrealLogoVisibility();
+                setTimeout(updateBuildMenuUnrealLogoVisibility, 80);
+                setTimeout(updateBuildMenuUnrealLogoVisibility, 220);
+                setTimeout(updateBuildMenuUnrealLogoVisibility, 520);
+            });
+        }
         function triggerViewportRefreshSequence() {
             try { updateAppHeight(); } catch (e) { }
             try { window.dispatchEvent(new Event('resize')); } catch (e) { }
@@ -8686,8 +8717,28 @@
                     fullscreenToggleButtonEl = null;
                 }
             }
-            window.addEventListener('resize', () => setUIScale(scaleSlider.value));
-            window.addEventListener('orientationchange', () => setTimeout(() => setUIScale(scaleSlider.value), 120));
+            window.addEventListener('resize', () => {
+                setUIScale(scaleSlider.value);
+                scheduleBuildMenuUnrealLogoVisibilityUpdate();
+            });
+            window.addEventListener('orientationchange', () => setTimeout(() => {
+                setUIScale(scaleSlider.value);
+                scheduleBuildMenuUnrealLogoVisibilityUpdate();
+            }, 120));
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', scheduleBuildMenuUnrealLogoVisibilityUpdate);
+                window.visualViewport.addEventListener('scroll', scheduleBuildMenuUnrealLogoVisibilityUpdate);
+            }
+            if (typeof ResizeObserver !== 'undefined') {
+                const buildMenuUnrealLogo = document.getElementById('menuUnrealLogo');
+                const buildMenuEndSessionButtonEl = document.getElementById('buildMenuEndSessionButton');
+                const buildMenuCenterGroup = document.querySelector('#buildMenu .menuCenterGroup');
+                const buildMenuLogoObserver = new ResizeObserver(() => scheduleBuildMenuUnrealLogoVisibilityUpdate());
+                [buildMenuUnrealLogo, buildMenuEndSessionButtonEl, buildMenuCenterGroup].forEach((element) => {
+                    if (element) buildMenuLogoObserver.observe(element);
+                });
+            }
+            scheduleBuildMenuUnrealLogoVisibilityUpdate();
             buildJumpTargets();
             setActiveFloorButton(currentTeleportFloor);
             animateTeleportTitle(getTeleportConfig().floorTitles[currentTeleportFloor] || 'GROUND FLOOR', { immediate: true });
