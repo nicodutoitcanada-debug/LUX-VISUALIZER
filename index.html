@@ -1356,11 +1356,19 @@
             }
         }
 
-        @media (max-width:680px) {
+        @media (max-width:680px) and (orientation: landscape) {
             #menuUnrealLogo {
                 display: none !important;
             }
+        }
 
+        @media (max-width:680px) and (orientation: portrait) {
+            #menuUnrealLogo {
+                display: block !important;
+            }
+        }
+
+        @media (max-width:680px) {
             #solidColoursOuterBox {
                 width: min(94vw, 560px);
             }
@@ -4874,29 +4882,6 @@
         }
 
 
-        body.menu-switching #uiWrapper,
-        body.menu-switching #cameraMenuWrapper,
-        body.menu-switching #buildingMenuWrapper,
-        body.menu-switching #environmentMenuWrapper,
-        body.menu-switching #confirmMenuWrapper,
-        body.menu-switching #teleportMenuWrapper,
-        body.menu-switching #profileMenuWrapper,
-        body.menu-switching #finishTypeMenuWrapper,
-        body.menu-switching #solidColoursMenuWrapper,
-        body.menu-switching #woodgrainsMenuWrapper,
-        body.menu-switching #westCoastNaturalsMenuWrapper,
-        body.menu-switching #texturedColoursMenuWrapper,
-        body.menu-switching #archesMenuWrapper,
-        body.menu-switching #fenceMenuWrapper,
-        body.menu-switching #pergolaMenuWrapper {
-            pointer-events: none !important;
-        }
-
-        body.menu-switching #sliderContainer,
-        body.menu-switching #soloDockButton {
-            pointer-events: none !important;
-        }
-
         /* responsive */
         @media (max-width:1100px) {
             :root {
@@ -6322,6 +6307,7 @@
         let lastPointerClientX = null;
         let lastPointerClientY = null;
         let fullscreenToggleButtonEl = null;
+        const interactionEnableTimers = new WeakMap();
 
 
         function getFullscreenTargetElement() {
@@ -6377,6 +6363,29 @@
             if (typeof event.clientX !== 'number' || typeof event.clientY !== 'number') return;
             lastPointerClientX = event.clientX;
             lastPointerClientY = event.clientY;
+        }
+        function clearPendingInteractionEnable(el) {
+            if (!el) return;
+            const pendingTimer = interactionEnableTimers.get(el);
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                interactionEnableTimers.delete(el);
+            }
+        }
+        function scheduleInteractionEnable(el, delay = 260) {
+            if (!el) return;
+            clearPendingInteractionEnable(el);
+            const timer = setTimeout(() => {
+                interactionEnableTimers.delete(el);
+                const panelName = getCurrentPanelName();
+                const activeWrapper = getWrapperByPanelName(panelName);
+                const allowInteraction = el === activeWrapper || (panelName === 'main' && el.id === 'sliderContainer') || (panelName === 'walk' && el.id === 'soloDockButton');
+                if (!allowInteraction) return;
+                el.style.pointerEvents = 'auto';
+                refreshHoverStateUnderPointer();
+                requestAnimationFrame(() => refreshHoverStateUnderPointer());
+            }, delay);
+            interactionEnableTimers.set(el, timer);
         }
         function refreshHoverStateUnderPointer() {
             if (lastPointerClientX === null || lastPointerClientY === null) return;
@@ -6451,6 +6460,16 @@
             menuCleanupTimer = setTimeout(() => {
                 resetPanelInlineStyles();
                 bodyEl.classList.remove('menu-switching');
+                const activeWrapper = getWrapperByPanelName(getCurrentPanelName());
+                if (activeWrapper) activeWrapper.style.pointerEvents = 'auto';
+                if (bodyEl.classList.contains('main-mode') || getCurrentPanelName() === 'main') {
+                    const sliderEl = document.getElementById('sliderContainer');
+                    if (sliderEl) sliderEl.style.pointerEvents = 'auto';
+                }
+                if (getCurrentPanelName() === 'walk') {
+                    const soloDockButton = document.getElementById('soloDockButton');
+                    if (soloDockButton) soloDockButton.style.pointerEvents = 'auto';
+                }
                 refreshHoverStateUnderPointer();
                 requestAnimationFrame(() => refreshHoverStateUnderPointer());
                 setTimeout(() => refreshHoverStateUnderPointer(), 80);
@@ -6459,6 +6478,7 @@
         function animateElementsFromRight(entries) {
             entries.forEach(({ el, enterTransform, enterOpacity = '0' }) => {
                 if (!el) return;
+                clearPendingInteractionEnable(el);
                 el.style.opacity = String(enterOpacity);
                 el.style.visibility = 'visible';
                 el.style.pointerEvents = 'none';
@@ -6471,12 +6491,14 @@
                         if (!el) return;
                         el.style.opacity = '1';
                         el.style.transform = restTransform;
+                        scheduleInteractionEnable(el, 260);
                     });
                 });
             });
         }
         function animateElementOut(el, exitTransform, startTransform) {
             if (!el) return;
+            clearPendingInteractionEnable(el);
             el.style.opacity = '1';
             el.style.visibility = 'visible';
             el.style.pointerEvents = 'none';
