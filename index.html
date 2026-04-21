@@ -5294,10 +5294,20 @@
                         handleMovieEndedMessage();
                     }
                     if (parsed.camera === 'limit') {
-                        setCameraHeightSliderMax(50);
+                        indoorCameraLimitActive = true;
+                        indoorCameraDetectedFloor = 'ground';
+                        if (selectedBuild === 'Mod') {
+                            applyIndoorCameraHeightLimitFromFloor(latestTeleportPose ? classifyTeleportPoseFloor(latestTeleportPose.z) : 'ground');
+                            refreshIndoorCameraLocationTracking();
+                        } else {
+                            setCameraHeightSliderMax(CAMERA_HEIGHT_MAX_INDOOR_GROUND);
+                        }
                     }
                     if (parsed.camera === 'UNlimit') {
-                        setCameraHeightSliderMax(300);
+                        indoorCameraLimitActive = false;
+                        indoorCameraDetectedFloor = 'ground';
+                        stopCameraIndoorLocationTracking();
+                        setCameraHeightSliderMax(CAMERA_HEIGHT_MAX_OUTDOOR);
                     }
                     handleTeleportLocationBackendPayload(parsed);
                     handleProfileBackendPayload(parsed);
@@ -5695,17 +5705,59 @@
         }
         function setCameraHeightSliderMax(maxValue) {
             const slider = document.getElementById('cameraHeightSlider');
-            if (!slider) return;
+            if (!slider) return false;
             const normalizedMax = Number(maxValue);
-            if (!Number.isFinite(normalizedMax)) return;
+            if (!Number.isFinite(normalizedMax)) return false;
             slider.max = String(normalizedMax);
             const currentValue = Number(slider.value);
+            let clamped = false;
             if (Number.isFinite(currentValue) && currentValue > normalizedMax) {
                 slider.value = String(normalizedMax);
+                clamped = true;
                 if (!slider.disabled) {
                     sendToUnreal({ camSetHeight: formatSliderValue(slider.value) });
                 }
             }
+            return clamped;
+        }
+        function getIndoorCameraHeightLimitForFloor(floor) {
+            if (floor === 'first') return CAMERA_HEIGHT_MAX_INDOOR_FIRST;
+            if (floor === 'basement') return CAMERA_HEIGHT_MAX_INDOOR_BASEMENT;
+            return CAMERA_HEIGHT_MAX_INDOOR_GROUND;
+        }
+        function applyIndoorCameraHeightLimitFromFloor(floor) {
+            const normalizedFloor = floor === 'first' || floor === 'basement' ? floor : 'ground';
+            indoorCameraDetectedFloor = normalizedFloor;
+            return setCameraHeightSliderMax(getIndoorCameraHeightLimitForFloor(normalizedFloor));
+        }
+        function shouldUseIndoorCameraLocationTracking() {
+            return indoorCameraLimitActive && selectedBuild === 'Mod' && bodyEl.classList.contains('camera-mode');
+        }
+        function startCameraIndoorLocationTracking() {
+            if (!shouldUseIndoorCameraLocationTracking()) return;
+            if (cameraIndoorLocationTrackingActive) {
+                if (latestTeleportPose) {
+                    applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(latestTeleportPose.z));
+                }
+                return;
+            }
+            cameraIndoorLocationTrackingActive = true;
+            sendToUnreal({ location: 'start' });
+            if (latestTeleportPose) {
+                applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(latestTeleportPose.z));
+            }
+        }
+        function stopCameraIndoorLocationTracking() {
+            if (!cameraIndoorLocationTrackingActive) return;
+            cameraIndoorLocationTrackingActive = false;
+            sendToUnreal({ location: 'stop' });
+        }
+        function refreshIndoorCameraLocationTracking() {
+            if (shouldUseIndoorCameraLocationTracking()) {
+                startCameraIndoorLocationTracking();
+                return;
+            }
+            stopCameraIndoorLocationTracking();
         }
         function startTraditionalProfileSelectionTransition(profileInfo) {
             if (!profileInfo) return;
@@ -6026,6 +6078,13 @@
         let teleportBasementButton;
         let teleportGroundButton;
         let teleportFirstButton;
+        let indoorCameraLimitActive = false;
+        let cameraIndoorLocationTrackingActive = false;
+        let indoorCameraDetectedFloor = 'ground';
+        const CAMERA_HEIGHT_MAX_OUTDOOR = 300;
+        const CAMERA_HEIGHT_MAX_INDOOR_GROUND = 48;
+        const CAMERA_HEIGHT_MAX_INDOOR_FIRST = 18;
+        const CAMERA_HEIGHT_MAX_INDOOR_BASEMENT = 15;
 
         let activeDockMode = 'walk';
         let currentProfileSet = '';
@@ -6515,7 +6574,10 @@
             const currentPanel = getCurrentPanelName();
             if (currentPanel === panelName) return;
             clearMainMenuTooltips();
-            if (currentPanel === 'camera' && panelName !== 'camera') setCameraSlidersInteractive(false);
+            if (currentPanel === 'camera' && panelName !== 'camera') {
+                setCameraSlidersInteractive(false);
+                stopCameraIndoorLocationTracking();
+            }
             if (panelName === 'camera') setCameraSlidersInteractive(true);
             clearTimeout(menuSwitchTimer);
             clearTimeout(menuCleanupTimer);
@@ -6879,8 +6941,16 @@
             activeDockMode = 'walk';
             switchPanel('main');
         }
-        function openCameraMenu() { setCameraSlidersInteractive(true); switchPanel('camera'); }
-        function closeCameraMenu() { setCameraSlidersInteractive(false); switchPanel('main'); }
+        function openCameraMenu() {
+            setCameraSlidersInteractive(true);
+            switchPanel('camera');
+            setTimeout(refreshIndoorCameraLocationTracking, 240);
+        }
+        function closeCameraMenu() {
+            stopCameraIndoorLocationTracking();
+            setCameraSlidersInteractive(false);
+            switchPanel('main');
+        }
         function openBuildingMenu() { updateLevelButtonStates(); switchPanel('building'); }
         function closeBuildingMenu() { switchPanel('main'); }
         function openEnvironmentMenu() { switchPanel('environment'); }
@@ -8302,6 +8372,9 @@
             const parsedPose = parseTeleportLocationPayload(payload);
             if (!parsedPose) return false;
             latestTeleportPose = parsedPose;
+            if (indoorCameraLimitActive && cameraIndoorLocationTrackingActive && selectedBuild === 'Mod') {
+                applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(parsedPose.z));
+            }
             updateTeleportYouAreHereFromPose();
             return true;
         }
