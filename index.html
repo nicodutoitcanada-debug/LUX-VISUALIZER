@@ -737,7 +737,7 @@
             z-index: 0;
         }
 
-        #afkPromptBox > * {
+        #afkPromptBox>* {
             position: relative;
             z-index: 1;
         }
@@ -5741,10 +5741,17 @@
             if (floor === 'basement') return CAMERA_HEIGHT_MAX_INDOOR_BASEMENT;
             return CAMERA_HEIGHT_MAX_INDOOR_GROUND;
         }
-        function applyIndoorCameraHeightLimitFromFloor(floor) {
+        function applyIndoorCameraHeightLimitFromFloor(floor, options = {}) {
             const normalizedFloor = floor === 'first' || floor === 'basement' ? floor : 'ground';
+            const previousFloor = indoorCameraDetectedFloor;
             indoorCameraDetectedFloor = normalizedFloor;
-            return setCameraHeightSliderMax(getIndoorCameraHeightLimitForFloor(normalizedFloor));
+            const clamped = setCameraHeightSliderMax(getIndoorCameraHeightLimitForFloor(normalizedFloor));
+            const slider = document.getElementById('cameraHeightSlider');
+            const shouldForceEmit = !!options.forceEmitOnFloorChange && previousFloor !== normalizedFloor;
+            if (shouldForceEmit && slider && !slider.disabled) {
+                sendToUnreal({ camSetHeight: formatSliderValue(slider.value) });
+            }
+            return clamped;
         }
         function shouldUseIndoorCameraLocationTracking() {
             return indoorCameraLimitActive && selectedBuild === 'Mod' && bodyEl.classList.contains('camera-mode');
@@ -5753,14 +5760,14 @@
             if (!shouldUseIndoorCameraLocationTracking()) return;
             if (cameraIndoorLocationTrackingActive) {
                 if (latestTeleportPose) {
-                    applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(latestTeleportPose.z));
+                    applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(latestTeleportPose.z), { forceEmitOnFloorChange: true });
                 }
                 return;
             }
             cameraIndoorLocationTrackingActive = true;
             sendToUnreal({ location: 'start' });
             if (latestTeleportPose) {
-                applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(latestTeleportPose.z));
+                applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(latestTeleportPose.z), { forceEmitOnFloorChange: true });
             }
         }
         function stopCameraIndoorLocationTracking() {
@@ -6100,7 +6107,7 @@
         const CAMERA_HEIGHT_MAX_OUTDOOR = 300;
         const CAMERA_HEIGHT_MAX_INDOOR_GROUND = 48;
         const CAMERA_HEIGHT_MAX_INDOOR_FIRST = 17;
-        const CAMERA_HEIGHT_MAX_INDOOR_BASEMENT = 10;
+        const CAMERA_HEIGHT_MAX_INDOOR_BASEMENT = 8;
 
         let activeDockMode = 'walk';
         let currentProfileSet = '';
@@ -8426,7 +8433,7 @@
             if (!parsedPose) return false;
             latestTeleportPose = parsedPose;
             if (indoorCameraLimitActive && cameraIndoorLocationTrackingActive && selectedBuild === 'Mod') {
-                applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(parsedPose.z));
+                applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(parsedPose.z), { forceEmitOnFloorChange: true });
             }
             updateTeleportYouAreHereFromPose();
             return true;
@@ -8944,9 +8951,11 @@
     <div id="afkPromptOverlay" aria-hidden="true">
         <div id="afkPromptBox">
             <div id="afkPromptTitle">ARE YOU STILL THERE?</div>
-            <div id="afkPromptBody">Your session will end in <span id="afkPromptCountdown">15</span> seconds due to inactivity. Would you like to continue?</div>
+            <div id="afkPromptBody">Your session will end in <span id="afkPromptCountdown">15</span> seconds due to
+                inactivity. Would you like to continue?</div>
             <div id="afkPromptActions">
-                <button id="afkContinueButton" class="afkPromptButton afkPromptButton--primary" type="button">YES</button>
+                <button id="afkContinueButton" class="afkPromptButton afkPromptButton--primary"
+                    type="button">YES</button>
                 <button id="afkDisconnectButton" class="afkPromptButton" type="button">NO</button>
             </div>
         </div>
@@ -9015,7 +9024,8 @@
     </div>
 
     <div id="editUiRoot">
-        <button id="fullscreenToggleButton" class="uiInteractive" type="button" aria-label="Enter fullscreen"><img src="ENTER FULLSCREEN.png" alt="Enter fullscreen"></button>
+        <button id="fullscreenToggleButton" class="uiInteractive" type="button" aria-label="Enter fullscreen"><img
+                src="ENTER FULLSCREEN.png" alt="Enter fullscreen"></button>
         <!-- MAIN MENU -->
         <div id="uiWrapper" class="uiInteractive">
             <div id="outerBox" class="glassPanel">
@@ -9158,7 +9168,8 @@
                             <div id="teleportYouAreHereLayer">
                                 <div class="teleportYouAreHereWrap" id="teleportYouAreHereWrap">
                                     <div class="teleportYouAreHereLabel" id="teleportYouAreHereLabel">GROUND FLOOR</div>
-                                    <div class="teleportYouAreHereIcon" id="teleportYouAreHereIcon" aria-hidden="true"></div>
+                                    <div class="teleportYouAreHereIcon" id="teleportYouAreHereIcon" aria-hidden="true">
+                                    </div>
                                 </div>
                             </div>
                             <div id="teleportJumpTargetsLayer"></div>
@@ -9543,38 +9554,38 @@
         </div>
     </div>
 
-<style>
-#youAreHereLabel,
-#youAreHereText,
-#markerLabel,
-#locationLabel {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-}
-</style>
-<script>
-(function(){
-  const ids = ["youAreHereLabel","youAreHereText","markerLabel","locationLabel"];
-  function hideLabels(){
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.style.display = "none";
-        el.style.opacity = "0";
-        el.style.visibility = "hidden";
-        if ("textContent" in el) el.textContent = "";
-      }
-    });
-  }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", hideLabels);
-  } else {
-    hideLabels();
-  }
-  setInterval(hideLabels, 500);
-})();
-</script>
+    <style>
+        #youAreHereLabel,
+        #youAreHereText,
+        #markerLabel,
+        #locationLabel {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+    </style>
+    <script>
+        (function () {
+            const ids = ["youAreHereLabel", "youAreHereText", "markerLabel", "locationLabel"];
+            function hideLabels() {
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.style.display = "none";
+                        el.style.opacity = "0";
+                        el.style.visibility = "hidden";
+                        if ("textContent" in el) el.textContent = "";
+                    }
+                });
+            }
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", hideLabels);
+            } else {
+                hideLabels();
+            }
+            setInterval(hideLabels, 500);
+        })();
+    </script>
 
 </body>
 
