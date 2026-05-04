@@ -5206,6 +5206,8 @@
         let sessionEndedByUser = false;
         let sessionTeardownStarted = false;
         let endedSessionMessage = "Your session has ended.";
+        let selectedShareIdForThisSession = null;
+        const luxFailedShareIdsKey = "lux_failed_share_ids_for_this_browser_session";
 
         function updateAppHeight() {
             const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
@@ -5231,12 +5233,21 @@
             }
 
             const shareIds = [
-                "share-ba04e7bb-3b1c-4c4f-89f4-dddfae1001e5",
-                "share-53e1b508-2ea9-43cc-900f-b160b7654fdb",
-                "share-26d724db-7a70-40f2-893c-25c18deb0e29"
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35"
             ];
-            const selectedShareId = shareIds[Math.floor(Math.random() * shareIds.length)];
-            console.log("Arcware seat selected:", selectedShareId);
+            window.__luxShareIds = shareIds;
+            const failedShareIds = getFailedShareIdsForThisBrowserSession();
+            let availableShareIds = shareIds.filter(id => !failedShareIds.includes(id));
+            if (!availableShareIds.length) {
+                clearFailedShareIdsForThisBrowserSession();
+                availableShareIds = [...shareIds];
+            }
+            const selectedShareId = availableShareIds[Math.floor(Math.random() * availableShareIds.length)];
+            selectedShareIdForThisSession = selectedShareId;
+            window.__luxSelectedShareId = selectedShareId;
+            console.log("Lux visualizer share selected:", selectedShareId);
 
             const initResult = new ArcwareInit(
                 { shareId: selectedShareId },
@@ -5782,6 +5793,86 @@
             }
             stopCameraIndoorLocationTracking();
         }
+        function shouldUseProfileWalkawayTracking() {
+            return (selectedBuild === 'Mod' || selectedBuild === 'Multi') && bodyEl.classList.contains('inGameUiVisible');
+        }
+        function getProfileWalkawayDistanceLimit() {
+            return selectedBuild === 'Multi' ? 600 : 400;
+        }
+        function isProfileWalkawayPanel(panelName) {
+            return [
+                'profile',
+                'profile-vgroove-options',
+                'finish-type',
+                'solid-colours',
+                'woodgrains',
+                'west-coast-naturals',
+                'textured-colours'
+            ].includes(panelName);
+        }
+        function startProfileWalkawayTracking() {
+            if (!shouldUseProfileWalkawayTracking()) return;
+            profileWalkawayBuild = selectedBuild;
+
+            // IMPORTANT:
+            // Do not use latestTeleportPose as the walk-away baseline here.
+            // On the first profile menu open after a level starts, latestTeleportPose can still be
+            // a stale/default position from earlier tracking. That caused the first live location
+            // packet to look hundreds of units away and close the profile menu immediately.
+            // Instead, arm tracking only after the first valid location packet received AFTER this menu opens.
+            profileWalkawayStartPose = null;
+            profileWalkawayWaitingForInitialPose = true;
+
+            if (profileWalkawayLocationTrackingActive) return;
+            profileWalkawayLocationTrackingActive = true;
+            sendToUnreal({ location: 'start' });
+        }
+        function stopProfileWalkawayTracking() {
+            if (!profileWalkawayLocationTrackingActive) {
+                profileWalkawayStartPose = null;
+                profileWalkawayBuild = '';
+                profileWalkawayWaitingForInitialPose = false;
+                return;
+            }
+            profileWalkawayLocationTrackingActive = false;
+            profileWalkawayStartPose = null;
+            profileWalkawayBuild = '';
+            profileWalkawayWaitingForInitialPose = false;
+            sendToUnreal({ location: 'stop' });
+        }
+        function closeProfileMenuFromWalkaway() {
+            stopProfileWalkawayTracking();
+            const currentPanel = getCurrentPanelName();
+            if (currentPanel !== 'main') {
+                finishMenuReturnTarget = 'profile';
+                colourMenuReturnTarget = 'profile';
+                colorTypeRouteActive = false;
+                switchPanel('main');
+            }
+        }
+        function handleProfileWalkawayPose(parsedPose) {
+            if (!profileWalkawayLocationTrackingActive || !parsedPose) return;
+            if (!shouldUseProfileWalkawayTracking() || selectedBuild === 'Trad' || profileWalkawayBuild !== selectedBuild) {
+                stopProfileWalkawayTracking();
+                return;
+            }
+            const currentPanel = getCurrentPanelName();
+            if (!isProfileWalkawayPanel(currentPanel)) {
+                stopProfileWalkawayTracking();
+                return;
+            }
+            if (profileWalkawayWaitingForInitialPose || !profileWalkawayStartPose) {
+                profileWalkawayStartPose = { ...parsedPose };
+                profileWalkawayWaitingForInitialPose = false;
+                return;
+            }
+            const deltaX = Number(parsedPose.x) - Number(profileWalkawayStartPose.x);
+            const deltaY = Number(parsedPose.y) - Number(profileWalkawayStartPose.y);
+            const distance = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
+            if (Number.isFinite(distance) && distance > getProfileWalkawayDistanceLimit()) {
+                closeProfileMenuFromWalkaway();
+            }
+        }
         function startTraditionalProfileSelectionTransition(profileInfo) {
             if (!profileInfo) return;
             awaitingTraditionalProfilePayload = true;
@@ -5935,9 +6026,141 @@
             disableReconnectAttempts();
             detachStreamingSession();
         }
-        function shouldSurfaceAttention(message) { if (suppressReconnect || sessionEndedByUser) return false; if (!message) return false; const lower = String(message).toLowerCase(); if (lower.includes("xr-spatial-tracking")) return false; if (lower.includes("issessionsupported")) return false; if (lower.includes("securityerror") && lower.includes("xr")) return false; return lower.includes("failed") || lower.includes("timeout") || lower.includes("disconnected") || lower.includes("disconnect") || lower.includes("unable") || lower.includes("cannot send") || lower.includes("allocation") || lower.includes("runner resources") || lower.includes("connection failed"); }
-        function brandMessage(message) { let branded = String(message || "Connection issue. Please retry."); branded = branded.replace(/arcware/gi, "Lux"); branded = branded.replace(/\s+/g, " ").trim(); return branded; }
-        async function showAttentionScreen(message) { if (suppressReconnect || sessionEndedByUser || appInAttentionState) return; appInAttentionState = true; hideAfkPrompt(); clearAfkIdleTimer(); hidePreloadSpinner(); const brandedMessage = brandMessage(message); const retryButton = document.getElementById("retryButton"); if (retryButton) retryButton.style.display = ''; setAttentionButtonLabel('RETRY'); document.getElementById("attentionMessage").textContent = brandedMessage; await fadeToBlack(500); hideAllUiScreens(); hideInGameUi(); document.getElementById("attentionScreen").classList.add("visible"); playAttentionBackground(); await fadeFromBlack(700); }
+        function getFailedShareIdsForThisBrowserSession() {
+            try {
+                const saved = JSON.parse(sessionStorage.getItem(luxFailedShareIdsKey) || "[]");
+                return Array.isArray(saved) ? saved.filter(Boolean) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+        function saveFailedShareIdsForThisBrowserSession(failedIds) {
+            try { sessionStorage.setItem(luxFailedShareIdsKey, JSON.stringify([...new Set(failedIds.filter(Boolean))])); } catch (e) { }
+        }
+        function clearFailedShareIdsForThisBrowserSession() {
+            try { sessionStorage.removeItem(luxFailedShareIdsKey); } catch (e) { }
+        }
+        function isMaximumConcurrencyMessage(message) {
+            const lower = String(message || "").toLowerCase();
+            return lower.includes("maximum concurrency reached") || lower.includes("max concurrency reached");
+        }
+        function markSelectedShareIdAsBusy() {
+            const failedIds = getFailedShareIdsForThisBrowserSession();
+            const selected = selectedShareIdForThisSession || window.__luxSelectedShareId;
+            if (selected && !failedIds.includes(selected)) failedIds.push(selected);
+            saveFailedShareIdsForThisBrowserSession(failedIds);
+            return failedIds;
+        }
+        function getAvailableShareCountAfterBusyMark(failedIds) {
+            const all = window.__luxShareIds || [];
+            return all.filter(id => !failedIds.includes(id)).length;
+        }
+        function shouldSurfaceAttention(message) {
+            if (suppressReconnect || sessionEndedByUser) return false;
+            if (!message) return false;
+            const lower = String(message).toLowerCase();
+
+            // Ignore normal browser/WebXR/media permission noise. These can contain scary
+            // words in the console but they are not stream-fatal Arcware/Lux failures.
+            if (lower.includes("xr-spatial-tracking")) return false;
+            if (lower.includes("issessionsupported")) return false;
+            if (lower.includes("securityerror") && lower.includes("xr")) return false;
+            if (lower.includes("enabling microphone")) return false;
+            if (lower.includes("microphone access")) return false;
+            if (lower.includes("allow microphone")) return false;
+
+            // IMPORTANT:
+            // Do not treat "Click To Restart" by itself as fatal. Arcware also injects that
+            // text into normal permission/helper UI, which caused the whole app to stop.
+            return isMaximumConcurrencyMessage(message)
+                || lower.includes("runner resources")
+                || lower.includes("allocation failed")
+                || lower.includes("webrtc connection failed")
+                || lower.includes("ice connection failed")
+                || lower.includes("connection closed")
+                || lower.includes("connection lost")
+                || lower.includes("stream disconnected")
+                || lower.includes("session not found")
+                || (lower.includes("disconnected") && lower.includes("session"));
+        }
+
+        function getFriendlyAttentionMessage(message) {
+            const lower = String(message || "").toLowerCase();
+            if (isMaximumConcurrencyMessage(message)) return "";
+            if (lower.includes("session not found") || (lower.includes("disconnected") && lower.includes("session"))) {
+                return "The visualizer connection was interrupted. Please relaunch to start a new session.";
+            }
+            if (lower.includes("connection closed") || lower.includes("connection lost") || lower.includes("stream disconnected") || lower.includes("webrtc connection failed") || lower.includes("ice connection failed")) {
+                return "The visualizer connection was interrupted. Please relaunch to start a new session.";
+            }
+            if (lower.includes("runner resources") || lower.includes("allocation failed")) {
+                return "The visualizer could not start a session. Please relaunch to try again.";
+            }
+            return "Lux connection issue. Please retry.";
+        }
+
+        function brandMessage(message) {
+            const friendly = getFriendlyAttentionMessage(message);
+            let branded = String(friendly || "Lux connection issue. Please retry.");
+            branded = branded.replace(/arcware/gi, "Lux");
+            branded = branded.replace(/\s+/g, " ").trim();
+            return branded;
+        }
+
+        function extractArcwareFatalTextFromDom(visibleText) {
+            const compact = String(visibleText || "").replace(/\s+/g, " ").trim();
+            const lower = compact.toLowerCase();
+            if (!compact) return "";
+
+            if (isMaximumConcurrencyMessage(compact)) return "Maximum concurrency reached";
+
+            // These are the specific Arcware fatal overlays we want to catch when Arcware
+            // writes text directly onto the video container instead of sending an event.
+            if (/disconnected\s*:\s*session not found/i.test(compact)) return "Disconnected: Session not found.";
+            if (lower.includes("session not found")) return "Disconnected: Session not found.";
+            if (lower.includes("webrtc connection failed")) return "WebRTC connection failed.";
+            if (lower.includes("ice connection failed")) return "ICE connection failed.";
+            if (lower.includes("stream disconnected")) return "Stream disconnected.";
+            if (lower.includes("connection lost")) return "Connection lost.";
+            if (lower.includes("connection closed")) return "Connection closed.";
+            if (lower.includes("runner resources") || lower.includes("allocation failed")) return "Connection allocation failed.";
+
+            return "";
+        }
+
+        function setAttentionTitle(title) {
+            const titleEl = document.getElementById("attentionTitle");
+            if (titleEl) titleEl.textContent = title;
+        }
+        async function showAttentionScreen(message) {
+            if (suppressReconnect || sessionEndedByUser || appInAttentionState) return;
+            appInAttentionState = true;
+            hideAfkPrompt();
+            hidePreloadSpinner();
+
+            const retryButton = document.getElementById("retryButton");
+            if (retryButton) retryButton.style.display = '';
+            setAttentionButtonLabel('RELAUNCH');
+
+            if (isMaximumConcurrencyMessage(message)) {
+                const failedIds = markSelectedShareIdAsBusy();
+                const remaining = getAvailableShareCountAfterBusyMark(failedIds);
+                setAttentionTitle('VISUALIZER BUSY');
+                document.getElementById("attentionMessage").textContent = remaining > 0
+                    ? 'All seats for this visualizer instance are currently in use. Please relaunch to try another available server.'
+                    : 'All visualizer sessions are currently busy. Please retry shortly.';
+            } else {
+                setAttentionTitle('CONNECTION ISSUE');
+                document.getElementById("attentionMessage").textContent = brandMessage(message);
+            }
+
+            await fadeToBlack(500);
+            hideAllUiScreens();
+            hideInGameUi();
+            document.getElementById("attentionScreen").classList.add("visible");
+            playAttentionBackground();
+            await fadeFromBlack(700);
+        }
         function registerArcwareAttentionHandlers() {
             if (typeof Application?.on === "function") {
                 ["error", "disconnect", "close"].forEach(eventName => {
@@ -5946,6 +6169,49 @@
             }
             window.addEventListener("unhandledrejection", (event) => { const reasonText = event?.reason?.message || event?.reason?.reason || String(event?.reason || ""); if (shouldSurfaceAttention(reasonText)) showAttentionScreen(reasonText); });
             window.addEventListener("error", (event) => { const message = event?.message || event?.error?.message || String(event?.error || ""); if (shouldSurfaceAttention(message)) showAttentionScreen(message); });
+            watchForArcwareFatalTextInDom();
+        }
+        function watchForArcwareFatalTextInDom() {
+            const target = document.body;
+            if (!target || window.__luxArcwareFatalTextObserverStarted) return;
+            window.__luxArcwareFatalTextObserverStarted = true;
+
+            const check = () => {
+                if (appInAttentionState || suppressReconnect || sessionEndedByUser) return;
+
+                // Arcware can inject fatal disconnect text directly into the DOM instead of
+                // sending it through the normal Application error/disconnect callbacks.
+                // We DO NOT pass the whole page's visible text to showAttentionScreen,
+                // because that includes our own menu copy, buttons, microphone helper text,
+                // and loading/legal text. We only extract a small known fatal phrase and
+                // then show a short branded message.
+                const visibleText = Array.from(document.body.querySelectorAll('body *'))
+                    .filter((el) => {
+                        const style = window.getComputedStyle(el);
+                        const rect = el.getBoundingClientRect();
+                        return style.display !== 'none'
+                            && style.visibility !== 'hidden'
+                            && parseFloat(style.opacity || '1') > 0.01
+                            && rect.width > 0
+                            && rect.height > 0;
+                    })
+                    .map((el) => el.innerText || el.textContent || '')
+                    .join(' ')
+                    .slice(-6000);
+
+                const fatalDomMessage = extractArcwareFatalTextFromDom(visibleText);
+                if (fatalDomMessage && shouldSurfaceAttention(fatalDomMessage)) {
+                    showAttentionScreen(fatalDomMessage);
+                }
+            };
+
+            const observer = new MutationObserver(() => {
+                clearTimeout(window.__luxArcwareFatalTextCheckTimer);
+                window.__luxArcwareFatalTextCheckTimer = setTimeout(check, 120);
+            });
+            observer.observe(target, { childList: true, subtree: true, characterData: true });
+            setTimeout(check, 600);
+            setTimeout(check, 1600);
         }
         function sendToUnreal(payload) {
             const message = typeof payload === "string" ? payload : JSON.stringify(payload);
@@ -6104,6 +6370,10 @@
         let indoorCameraLimitActive = false;
         let cameraIndoorLocationTrackingActive = false;
         let indoorCameraDetectedFloor = 'ground';
+        let profileWalkawayLocationTrackingActive = false;
+        let profileWalkawayStartPose = null;
+        let profileWalkawayBuild = '';
+        let profileWalkawayWaitingForInitialPose = false;
         const CAMERA_HEIGHT_MAX_OUTDOOR = 300;
         const CAMERA_HEIGHT_MAX_INDOOR_GROUND = 48;
         const CAMERA_HEIGHT_MAX_INDOOR_FIRST = 17;
@@ -6175,6 +6445,7 @@
             nonVented: 'DOUBL7_NON_VENTED'
         };
         const profileButtonVariantAliasMap = {
+            VARIABLE_WALL: 'FOLDED_WALL',
             [V_GROOVE_VARIANTS.four]: V_GROOVE_VARIANTS.six,
             V_GROOVE_6INCH_VENTED: 'V_GROOVE_6INCH_VENTED',
             V_GROOVE_4INCH_VENTED: 'V_GROOVE_6INCH_VENTED',
@@ -6187,7 +6458,8 @@
             RANDOM_PLANK: 'JOINER',
             [V_GROOVE_VARIANTS.six]: '4 INCH',
             [V_GROOVE_VARIANTS.four]: '6 INCH',
-            FOLDED_WALL: 'NO OPTIONS',
+            FOLDED_WALL: 'VARIABLE WALL',
+            VARIABLE_WALL: 'FOLDED WALL',
             [DOUBLE_SEVEN_VARIANTS.vented]: 'NON VENTED',
             [DOUBLE_SEVEN_VARIANTS.nonVented]: 'VENTED',
             V_GROOVE_6INCH_VENTED: 'OPTIONS',
@@ -6638,6 +6910,9 @@
                 setCameraSlidersInteractive(false);
                 stopCameraIndoorLocationTracking();
             }
+            if (profileWalkawayLocationTrackingActive && !isProfileWalkawayPanel(panelName)) {
+                stopProfileWalkawayTracking();
+            }
             if (panelName === 'camera') setCameraSlidersInteractive(true);
             clearTimeout(menuSwitchTimer);
             clearTimeout(menuCleanupTimer);
@@ -6690,10 +6965,12 @@
             menuSwitchTimer = setTimeout(() => {
                 clearModes();
                 applyPanelMode(panelName);
+                if (panelName === 'camera') refreshIndoorCameraLocationTracking();
+                if (panelName === 'profile') startProfileWalkawayTracking();
                 animatePanelEntry(panelName, { includeSlider: includeSliderOnEnter });
             }, currentPanel === 'walk' ? 80 : 180);
         }
-        function hideInGameUi() { clearAfkIdleTimer(); clearTimeout(menuSwitchTimer); clearTimeout(menuCleanupTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.remove('inGameUiVisible'); hideEditModeIntro(true); }
+        function hideInGameUi() { clearAfkIdleTimer(); stopProfileWalkawayTracking(); clearTimeout(menuSwitchTimer); clearTimeout(menuCleanupTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.remove('inGameUiVisible'); hideEditModeIntro(true); }
         function showInGameUiAnimated() { if (inGameUiLoaded) return; inGameUiLoaded = true; clearTimeout(menuSwitchTimer); clearTimeout(menuCleanupTimer); bodyEl.classList.remove('menu-switching'); resetPanelInlineStyles(); clearModes(); bodyEl.classList.add('inGameUiVisible'); resetAfkTimer(); animateEditMenuReturn(true); }
         function getColourMenuButtons(panelName) {
             if (panelName === 'solid-colours') return Array.from(document.querySelectorAll('#solidColoursButtonGrid .solidColourButton'));
@@ -7103,7 +7380,7 @@
             sendToUnreal(treesAreVisible ? { 'Trees': 'Visable' } : { 'Trees': 'Invisable' });
         }
         function openProfileMenu() { finishMenuReturnTarget = 'profile'; colorTypeRouteActive = false; switchPanel('profile'); }
-        function closeProfileMenu() { switchPanel('main'); }
+        function closeProfileMenu() { stopProfileWalkawayTracking(); switchPanel('main'); }
         function openFinishTypeMenu() {
             colourMenuReturnTarget = colorTypeRouteActive ? 'main' : finishMenuReturnTarget;
             switchPanel('finish-type');
@@ -7185,7 +7462,7 @@
             if (variant.includes('DOUBL7_NON_VENTED')) return folderMap.doubl7NonVented;
             if (variant.includes('DOUBL7_VENTED')) return folderMap.doubl7Vented;
             if (variant.includes('BOARD_AND_BATTEN')) return folderMap.boardAndBatten;
-            if (variant.includes('FOLDED_WALL')) return folderMap.foldedWall;
+            if (variant.includes('FOLDED_WALL') || variant.includes('VARIABLE_WALL')) return folderMap.foldedWall;
             if (variant.includes('RANDOM_PLANK')) return folderMap.randomPlank;
             if (variant.includes('V_GROOVE') && variant.includes('VENTED') && !variant.includes('NON')) return folderMap.vGrooveVented;
             if (variant.includes('V_GROOVE')) return folderMap.vGroove;
@@ -7589,6 +7866,13 @@
         function getToggledDoubleSevenVariant(variant) {
             return normalizeVariantToken(variant) === DOUBLE_SEVEN_VARIANTS.nonVented ? DOUBLE_SEVEN_VARIANTS.vented : DOUBLE_SEVEN_VARIANTS.nonVented;
         }
+        function isFoldedVariableWallVariant(variant) {
+            const normalized = normalizeVariantToken(variant);
+            return normalized === 'FOLDED_WALL' || normalized === 'VARIABLE_WALL';
+        }
+        function getToggledFoldedVariableWallVariant(variant) {
+            return normalizeVariantToken(variant) === 'VARIABLE_WALL' ? 'FOLDED_WALL' : 'VARIABLE_WALL';
+        }
         function formatVariantLabel(value) { return normalizeVariantToken(value).replace(/_/g, ' '); }
         function animateProfileTitle(text, options = {}) {
             const { immediate = false } = options;
@@ -7769,7 +8053,9 @@
             }
             if (!currentProfileSet) return;
             let nextVariant = '';
-            if (isVGrooveVariant(currentProfileVariant)) {
+            if (isFoldedVariableWallVariant(currentProfileVariant)) {
+                nextVariant = getToggledFoldedVariableWallVariant(currentProfileVariant);
+            } else if (isVGrooveVariant(currentProfileVariant)) {
                 nextVariant = getToggledVGrooveVariant(currentProfileVariant);
             } else if (isDoubleSevenVariant(currentProfileVariant)) {
                 nextVariant = getToggledDoubleSevenVariant(currentProfileVariant);
@@ -8435,6 +8721,7 @@
             if (indoorCameraLimitActive && cameraIndoorLocationTrackingActive && selectedBuild === 'Mod') {
                 applyIndoorCameraHeightLimitFromFloor(classifyTeleportPoseFloor(parsedPose.z), { forceEmitOnFloorChange: true });
             }
+            handleProfileWalkawayPose(parsedPose);
             updateTeleportYouAreHereFromPose();
             return true;
         }
@@ -8628,7 +8915,13 @@
             updateLevelButtonStates();
             syncEnvironmentMenuForBuild(selectedBuild || 'Mod');
             syncHowToMenuForBuild(selectedBuild || 'Mod');
-            document.getElementById("retryButton").addEventListener("click", () => location.reload());
+            document.getElementById("retryButton").addEventListener("click", () => {
+                const failedIds = getFailedShareIdsForThisBrowserSession();
+                const all = window.__luxShareIds || [];
+                const remaining = all.filter(id => !failedIds.includes(id)).length;
+                if (remaining <= 0) clearFailedShareIdsForThisBrowserSession();
+                location.reload();
+            });
 
 
             const scaleSlider = document.getElementById('scaleSlider');
@@ -9016,7 +9309,7 @@
             <video id="attentionBgVideo" src="LOADING_BG.mp4" muted playsinline loop></video>
             <div class="attentionShade"></div>
             <div class="attentionInner"><img id="attentionLogo" src="LOGO.png" alt="Lux Logo">
-                <div class="attentionTitle">CONNECTION TERMINATED</div>
+                <div id="attentionTitle" class="attentionTitle">CONNECTION TERMINATED</div>
                 <div id="attentionMessage">Lux connection issue. Please retry.</div><button id="retryButton"
                     type="button">Retry</button>
             </div>
