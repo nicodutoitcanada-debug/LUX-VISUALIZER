@@ -2714,7 +2714,7 @@
 
         #profileTopRow {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 0;
             margin-bottom: 0;
             margin-top: 38px;
@@ -5173,6 +5173,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
     <script type="module">
         let Application;
+        let pixelStreamingStream = null;
+        let localPixelStreamingApplication = null;
+        let localPixelStreamingStyles = null;
         let screenshotCounter = 1;
         let gameLoaded = false;
         let selectedBuild = null;
@@ -5216,9 +5219,97 @@
 
         import * as PixelStreamingWebSdk from "https://unpkg.com/@arcware-cloud/pixelstreaming-websdk@1.3.32/index.mjs";
 
-        (() => {
-            const { ArcwareInit } = PixelStreamingWebSdk;
+        // =============================================================
+        // LUX STREAMING MODE SWITCH
+        // =============================================================
+        // false = normal Arcware Cloud mode for real deployment.
+        // true  = local Unreal Editor Pixel Streaming mode for fast testing.
+        //
+        // You can also force local mode from the address bar with:
+        //     ?localPixelStreaming=1
+        // and force Arcware mode with:
+        //     ?arcware=1
+        const LOCAL_PIXEL_STREAMING_DEV_MODE = false;
 
+        // Change this only if your local signalling server is not running on port 80.
+        // With Unreal's editor menu settings from your screenshot, Viewer Port 80 means:
+        //     ws://127.0.0.1
+        const LOCAL_PIXEL_STREAMING_SIGNALLING_URL = "ws://127.0.0.1";
+
+        // This must match your Unreal Engine major/minor version.
+        // Examples: "ue5.3", "ue5.4", "ue5.5", "ue5.6"
+        // If local mode opens but does not communicate, this is the first thing to check.
+        const LOCAL_PIXEL_STREAMING_UE_VERSION = "ue5.4";
+
+        // Using bundled Epic modules avoids dependency-version mismatches from CDN imports.
+        // The earlier splitSections error comes from the frontend package loading a mismatched shared dependency.
+        const LOCAL_PIXEL_STREAMING_CDN_TARGET = "es2022";
+        const LOCAL_PIXEL_STREAMING_FRONTEND_URLS = [
+            `https://esm.sh/@epicgames-ps/lib-pixelstreamingfrontend-${LOCAL_PIXEL_STREAMING_UE_VERSION}?bundle&target=${LOCAL_PIXEL_STREAMING_CDN_TARGET}`,
+            `https://esm.sh/@epicgames-ps/lib-pixelstreamingfrontend-${LOCAL_PIXEL_STREAMING_UE_VERSION}?bundle`,
+            `https://cdn.jsdelivr.net/npm/@epicgames-ps/lib-pixelstreamingfrontend-${LOCAL_PIXEL_STREAMING_UE_VERSION}/+esm`
+        ];
+        const LOCAL_PIXEL_STREAMING_UI_URLS = [
+            `https://esm.sh/@epicgames-ps/lib-pixelstreamingfrontend-ui-${LOCAL_PIXEL_STREAMING_UE_VERSION}?bundle&target=${LOCAL_PIXEL_STREAMING_CDN_TARGET}`,
+            `https://esm.sh/@epicgames-ps/lib-pixelstreamingfrontend-ui-${LOCAL_PIXEL_STREAMING_UE_VERSION}?bundle`,
+            `https://cdn.jsdelivr.net/npm/@epicgames-ps/lib-pixelstreamingfrontend-ui-${LOCAL_PIXEL_STREAMING_UE_VERSION}/+esm`
+        ];
+
+        let localPixelStreamingDataChannelReady = false;
+        let localPixelStreamingMessageQueue = [];
+        let localPixelStreamingFlushTimer = null;
+
+        function shouldUseLocalPixelStreaming() {
+            const params = new URLSearchParams(window.location.search || "");
+            if (params.has("arcware")) return false;
+            if (params.has("localPixelStreaming") || params.has("local") || params.has("localps")) return true;
+            return LOCAL_PIXEL_STREAMING_DEV_MODE;
+        }
+
+        async function importFirstAvailableModule(urls, label) {
+            let lastError = null;
+            for (const url of urls) {
+                try {
+                    console.log(`Loading ${label}:`, url);
+                    const mod = await import(url);
+                    console.log(`Loaded ${label}:`, url);
+                    return mod;
+                } catch (error) {
+                    lastError = error;
+                    console.warn(`Failed to load ${label}:`, url, error);
+                }
+            }
+            throw lastError || new Error(`Could not load ${label}`);
+        }
+
+        function markLocalPixelStreamingReady(reason = "unknown") {
+            if (!shouldUseLocalPixelStreaming()) return;
+            if (!localPixelStreamingDataChannelReady) {
+                console.log("LOCAL Pixel Streaming data channel marked ready:", reason);
+            }
+            localPixelStreamingDataChannelReady = true;
+            flushLocalPixelStreamingMessageQueue(reason);
+        }
+
+        function queueLocalPixelStreamingMessage(payload) {
+            localPixelStreamingMessageQueue.push(payload);
+            console.log("Queued message for local Unreal until data channel is ready:", typeof payload === "string" ? payload : JSON.stringify(payload));
+        }
+
+        function flushLocalPixelStreamingMessageQueue(reason = "manual") {
+            if (!shouldUseLocalPixelStreaming() || !localPixelStreamingMessageQueue.length) return;
+            if (localPixelStreamingFlushTimer) clearTimeout(localPixelStreamingFlushTimer);
+            localPixelStreamingFlushTimer = setTimeout(() => {
+                const queued = localPixelStreamingMessageQueue.splice(0);
+                console.log(`Flushing ${queued.length} queued local Unreal message(s):`, reason);
+                queued.forEach((payload) => {
+                    try { sendToUnreal(payload, { forceLocalSend: true }); }
+                    catch (e) { console.warn("Failed to flush queued local Unreal message:", payload, e); }
+                });
+            }, 50);
+        }
+
+        (() => {
             updateAppHeight();
             window.addEventListener("resize", updateAppHeight);
             window.addEventListener("orientationchange", () => {
@@ -5232,10 +5323,43 @@
                 window.visualViewport.addEventListener("scroll", updateAppHeight);
             }
 
+            initLottie();
+            registerAfkActivityListeners();
+            const afkContinueButton = document.getElementById('afkContinueButton');
+            const afkDisconnectButton = document.getElementById('afkDisconnectButton');
+            if (afkContinueButton) afkContinueButton.addEventListener('click', continueAfterAfkPrompt);
+            if (afkDisconnectButton) afkDisconnectButton.addEventListener('click', handleAfkSessionEnd);
+            window.addEventListener('beforeunload', handleIntentionalPageExit);
+            window.addEventListener('pagehide', handleIntentionalPageExit);
+
+            initialiseStreamingSession()
+                .then(() => {
+                    startApp();
+                })
+                .catch((error) => {
+                    console.error("Lux streaming initialization failed:", error);
+                    startApp();
+                    showAttentionScreen("Connection failed. Please retry.");
+                });
+        })();
+
+        async function initialiseStreamingSession() {
+            if (shouldUseLocalPixelStreaming()) {
+                await initialiseLocalPixelStreamingSession();
+            } else {
+                initialiseArcwareStreamingSession();
+            }
+            mountStreamingRootElement();
+            setupResolutionSync();
+        }
+
+        function initialiseArcwareStreamingSession() {
+            const { ArcwareInit } = PixelStreamingWebSdk;
+
             const shareIds = [
-                "share-ba04e7bb-3b1c-4c4f-89f4-dddfae1001e5",
-                "share-53e1b508-2ea9-43cc-900f-b160b7654fdb",
-                "share-26d724db-7a70-40f2-893c-25c18deb0e29"
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35",
+                "share-8e9fc715-977f-46cb-9ad5-0160a9e56a35"
             ];
             window.__luxShareIds = shareIds;
             const failedShareIds = getFailedShareIdsForThisBrowserSession();
@@ -5247,7 +5371,7 @@
             const selectedShareId = availableShareIds[Math.floor(Math.random() * availableShareIds.length)];
             selectedShareIdForThisSession = selectedShareId;
             window.__luxSelectedShareId = selectedShareId;
-            console.log("Lux visualizer share selected:", selectedShareId);
+            console.log("Lux visualizer Arcware share selected:", selectedShareId);
 
             const initResult = new ArcwareInit(
                 { shareId: selectedShareId },
@@ -5257,104 +5381,280 @@
                 }
             );
             Application = initResult.Application;
+            pixelStreamingStream = Application?.stream || Application?.pixelStreaming || null;
             registerArcwareAttentionHandlers();
 
-            Application.getApplicationResponse((response) => {
-                console.log("Response from Unreal:", response);
-                try {
-                    const parsed = JSON.parse(response);
-                    if (parsed.screenshot === "generating") showOverlay("Generating high resolution image");
-                    if (parsed.game === "loaded") {
-                        gameLoaded = true;
-                        updateLevelButtonStates();
-                        if (!selectedBuild && !document.getElementById("buildMenu").classList.contains("visible") && !appInAttentionState) {
-                            advanceToBuildMenuWithFade();
-                        }
+            if (Application?.getApplicationResponse) {
+                Application.getApplicationResponse(handleUnrealResponse);
+            }
+
+            try { window.file = Application?.webRtcController?.file; } catch (e) { }
+        }
+
+        async function initialiseLocalPixelStreamingSession() {
+            console.log("Lux visualizer LOCAL Pixel Streaming mode enabled:", LOCAL_PIXEL_STREAMING_SIGNALLING_URL, LOCAL_PIXEL_STREAMING_UE_VERSION);
+            document.body.classList.add('localPixelStreamingDevMode');
+
+            const pixelStreamingFrontend = await importFirstAvailableModule(LOCAL_PIXEL_STREAMING_FRONTEND_URLS, "Epic Pixel Streaming frontend");
+            const pixelStreamingUi = await importFirstAvailableModule(LOCAL_PIXEL_STREAMING_UI_URLS, "Epic Pixel Streaming UI");
+
+            const { Config, PixelStreaming } = pixelStreamingFrontend;
+            const { Application: PixelStreamingApplication, PixelStreamingApplicationStyle } = pixelStreamingUi;
+
+            if (PixelStreamingApplicationStyle) {
+                localPixelStreamingStyles = new PixelStreamingApplicationStyle({
+                    customStyles: {
+                        '#uiFeatures': { display: 'none !important' },
+                        '#controls': { display: 'none !important' },
+                        '#settings-panel': { display: 'none !important' },
+                        '#connection': { display: 'none !important' }
                     }
-                    if (parsed.modern === "loaded") {
-                        revealGameFromLevelLoading();
-                    }
-                    if (['modern', 'multi', 'trad'].includes(parsed.load_ui)) {
-                        revealGameFromLevelLoading().finally(() => {
-                            showReadyMessage();
-                            showInGameUiAnimated();
-                        });
-                    }
-                    if (parsed.movie === 'ended') {
-                        handleMovieEndedMessage();
-                    }
-                    if (parsed.camera === 'limit') {
-                        indoorCameraLimitActive = true;
-                        indoorCameraDetectedFloor = 'ground';
-                        if (selectedBuild === 'Mod') {
-                            applyIndoorCameraHeightLimitFromFloor(latestTeleportPose ? classifyTeleportPoseFloor(latestTeleportPose.z) : 'ground');
-                            refreshIndoorCameraLocationTracking();
-                        } else {
-                            setCameraHeightSliderMax(CAMERA_HEIGHT_MAX_INDOOR_GROUND);
-                        }
-                    }
-                    if (parsed.camera === 'UNlimit') {
-                        indoorCameraLimitActive = false;
-                        indoorCameraDetectedFloor = 'ground';
-                        stopCameraIndoorLocationTracking();
-                        setCameraHeightSliderMax(CAMERA_HEIGHT_MAX_OUTDOOR);
-                    }
-                    handleTeleportLocationBackendPayload(parsed);
-                    handleProfileBackendPayload(parsed);
-                } catch (e) { }
-                if (response.startsWith("CreateScreenshot")) {
-                    const latestScreenshotFile = Application?.webRtcController?.file || window.file;
-                    handleCompletedScreenshot(latestScreenshotFile);
+                });
+                try { localPixelStreamingStyles.applyStyleSheet(); } catch (e) { }
+            }
+
+            const config = new Config({
+                useUrlParams: true,
+                initialSettings: {
+                    ss: LOCAL_PIXEL_STREAMING_SIGNALLING_URL,
+                    AutoConnect: true,
+                    AutoPlayVideo: true,
+                    StartVideoMuted: true,
+                    MatchViewportRes: true,
+                    HoveringMouse: true,
+                    FakeMouseWithTouches: true,
+                    WaitForStreamer: true,
+                    PreferredCodec: "H264",
+                    ForceMonoAudio: false
                 }
             });
 
+            pixelStreamingStream = new PixelStreaming(config);
+            localPixelStreamingApplication = new PixelStreamingApplication({
+                stream: pixelStreamingStream,
+                onColorModeChanged: (isLightMode) => {
+                    try { localPixelStreamingStyles?.setColorMode?.(isLightMode); } catch (e) { }
+                }
+            });
+            Application = localPixelStreamingApplication;
+
+            installLocalPixelStreamingConnectionWatchers(pixelStreamingStream);
+
+            // Safety fallback: if video/audio is already flowing but the library never fires a
+            // data-channel-ready event, try flushing queued messages a few seconds later.
+            // This does not affect Arcware mode.
+            setTimeout(() => markLocalPixelStreamingReady("local fallback timer 1"), 3000);
+            setTimeout(() => markLocalPixelStreamingReady("local fallback timer 2"), 6500);
+
+            if (pixelStreamingStream?.addResponseEventListener) {
+                pixelStreamingStream.addResponseEventListener('lux_handle_responses', handleUnrealResponse);
+            }
+            if (Application?.stream?.addResponseEventListener && Application.stream !== pixelStreamingStream) {
+                Application.stream.addResponseEventListener('lux_handle_responses_app_stream', handleUnrealResponse);
+            }
+            installLocalUnrealDebugListeners(pixelStreamingStream);
+        }
+
+
+        function installLocalPixelStreamingConnectionWatchers(stream) {
+            if (!stream) return;
+
+            const readyEvents = [
+                "dataChannelOpen",
+                "dataChannelOpened",
+                "dataChannelConnected",
+                "dataChannelReady",
+                "webRtcConnected",
+                "webRtcSdp",
+                "videoInitialized",
+                "videoLoaded",
+                "playStream",
+                "statsReceived"
+            ];
+
+            readyEvents.forEach((eventName) => {
+                try {
+                    if (typeof stream.addEventListener === "function") {
+                        stream.addEventListener(eventName, () => markLocalPixelStreamingReady(eventName));
+                    }
+                } catch (e) { }
+                try {
+                    if (typeof stream.addListener === "function") {
+                        stream.addListener(eventName, () => markLocalPixelStreamingReady(eventName));
+                    }
+                } catch (e) { }
+            });
+
+            // Log the object shape once. This helps us target the exact local API if the
+            // current Epic package still differs from Arcware's wrapper.
+            try {
+                console.log("LOCAL PixelStreaming stream keys:", Object.keys(stream));
+                console.log("LOCAL PixelStreaming stream prototype keys:", Object.getOwnPropertyNames(Object.getPrototypeOf(stream)));
+            } catch (e) { }
+
+            window.addEventListener("unhandledrejection", (event) => {
+                const message = event?.reason?.message || String(event?.reason || "");
+                if (message.includes("splitSections")) {
+                    console.warn("Ignored Epic Pixel Streaming CDN codec parser warning. Stream may still continue; if messages still fail, use the newly bundled CDN version in this file.", event.reason);
+                    event.preventDefault?.();
+                }
+            });
+        }
+
+
+        function debugLocalUnrealMessage(label, value) {
+            console.log(`LOCAL UE MESSAGE [${label}]:`, value);
+
+            let parsed = null;
+
+            if (typeof value === "string") {
+                try {
+                    parsed = JSON.parse(value);
+                } catch (e) {
+                    console.log("LOCAL UE RAW STRING:", value);
+                }
+            } else if (value && typeof value === "object") {
+                parsed = value;
+            }
+
+            if (parsed) {
+                console.log("LOCAL UE PARSED JSON:", parsed);
+            }
+        }
+
+        function installLocalUnrealDebugListeners(stream) {
+            if (!stream || !stream.addResponseEventListener) {
+                console.warn("LOCAL Pixel Streaming debug listeners could not be installed: addResponseEventListener is not available.");
+                return;
+            }
+
+            window.__luxLocalPixelStreaming = stream;
+            console.log("Installing LOCAL Unreal message debug listeners...");
+
+            [
+                "game",
+                "Game",
+                "load_ui",
+                "Load_UI",
+                "LoadUI",
+                "modern",
+                "multi",
+                "trad",
+                "movie",
+                "camera",
+                "screenshot",
+                "profileSet",
+                "profileTitle",
+                "colorSet",
+                "colorTitle",
+                "joinerSet",
+                "open",
+                "location",
+                "profile_info",
+                "fence",
+                "pergola",
+                "create"
+            ].forEach((eventName) => {
+                try {
+                    stream.addResponseEventListener(eventName, (value) => {
+                        debugLocalUnrealMessage(eventName, value);
+                    });
+                } catch (e) {
+                    console.warn("Could not add local listener for:", eventName, e);
+                }
+            });
+        }
+
+        function handleUnrealResponse(response) {
+            console.log("Response from Unreal:", response);
+            try {
+                const parsed = typeof response === 'string' ? JSON.parse(response) : response;
+                if (parsed.screenshot === "generating") showOverlay("Generating high resolution image");
+                if (parsed.game === "loaded" || parsed.Game === "loaded" || parsed.game === "Loaded" || parsed.Game === "Loaded") {
+                    gameLoaded = true;
+                    updateLevelButtonStates();
+                    if (!selectedBuild && !document.getElementById("buildMenu").classList.contains("visible") && !appInAttentionState) {
+                        advanceToBuildMenuWithFade();
+                    }
+                }
+                if (parsed.modern === "loaded") {
+                    revealGameFromLevelLoading();
+                }
+                if (['modern', 'multi', 'trad'].includes(parsed.load_ui)) {
+                    revealGameFromLevelLoading().finally(() => {
+                        showReadyMessage();
+                        showInGameUiAnimated();
+                    });
+                }
+                if (parsed.movie === 'ended') {
+                    handleMovieEndedMessage();
+                }
+                if (parsed.camera === 'limit') {
+                    indoorCameraLimitActive = true;
+                    indoorCameraDetectedFloor = 'ground';
+                    if (selectedBuild === 'Mod') {
+                        applyIndoorCameraHeightLimitFromFloor(latestTeleportPose ? classifyTeleportPoseFloor(latestTeleportPose.z) : 'ground');
+                        refreshIndoorCameraLocationTracking();
+                    } else {
+                        setCameraHeightSliderMax(CAMERA_HEIGHT_MAX_INDOOR_GROUND);
+                    }
+                }
+                if (parsed.camera === 'UNlimit') {
+                    indoorCameraLimitActive = false;
+                    indoorCameraDetectedFloor = 'ground';
+                    stopCameraIndoorLocationTracking();
+                    setCameraHeightSliderMax(CAMERA_HEIGHT_MAX_OUTDOOR);
+                }
+                handleTeleportLocationBackendPayload(parsed);
+                handleProfileBackendPayload(parsed);
+            } catch (e) { }
+            if (typeof response === 'string' && response.startsWith("CreateScreenshot")) {
+                const latestScreenshotFile = Application?.webRtcController?.file || pixelStreamingStream?.webRtcController?.file || window.file;
+                handleCompletedScreenshot(latestScreenshotFile);
+            }
+        }
+
+        function mountStreamingRootElement() {
             setTimeout(() => {
                 const container = document.getElementById("video-container");
+                if (!container || !Application?.rootElement) return;
                 container.appendChild(Application.rootElement);
-                if (Application.rootElement) {
-                    Application.rootElement.style.width = "100%";
-                    Application.rootElement.style.height = "100%";
-                    Application.rootElement.style.position = "absolute";
-                    Application.rootElement.style.inset = "0";
-                }
-                function getViewportSize() {
-                    const pixelRatio = window.devicePixelRatio || 1;
-                    const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-                    const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-                    return { width: Math.round(viewportWidth * pixelRatio), height: Math.round(viewportHeight * pixelRatio) };
-                }
-                sendResolutionToUnreal = function () {
-                    if (!Application) return;
-                    const { width, height } = getViewportSize();
-                    const consoleCommand = `r.SetRes ${width}x${height}w`;
-                    sendToUnreal({ console: true, Command: consoleCommand });
-                    console.log(`Sent resolution to Unreal: ${consoleCommand}`);
-                };
-                window.addEventListener('resize', sendResolutionToUnreal);
-                window.addEventListener('orientationchange', () => {
-                    setTimeout(sendResolutionToUnreal, 150);
-                    setTimeout(sendResolutionToUnreal, 500);
-                    setTimeout(sendResolutionToUnreal, 1200);
-                });
-                if (window.visualViewport) {
-                    window.visualViewport.addEventListener('resize', () => setTimeout(sendResolutionToUnreal, 50));
-                }
-                setTimeout(sendResolutionToUnreal, 300);
-                setTimeout(sendResolutionToUnreal, 800);
-                setTimeout(sendResolutionToUnreal, 1400);
+                Application.rootElement.style.width = "100%";
+                Application.rootElement.style.height = "100%";
+                Application.rootElement.style.position = "absolute";
+                Application.rootElement.style.inset = "0";
+                Application.rootElement.style.margin = "0";
+                Application.rootElement.style.padding = "0";
             }, 100);
+        }
 
-            initLottie();
-            registerAfkActivityListeners();
-            const afkContinueButton = document.getElementById('afkContinueButton');
-            const afkDisconnectButton = document.getElementById('afkDisconnectButton');
-            if (afkContinueButton) afkContinueButton.addEventListener('click', continueAfterAfkPrompt);
-            if (afkDisconnectButton) afkDisconnectButton.addEventListener('click', handleAfkSessionEnd);
-            startApp();
-            window.addEventListener('beforeunload', handleIntentionalPageExit);
-            window.addEventListener('pagehide', handleIntentionalPageExit);
-            window.file = Application.webRtcController.file;
-        })();
+        function setupResolutionSync() {
+            function getViewportSize() {
+                const pixelRatio = window.devicePixelRatio || 1;
+                const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+                const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                return { width: Math.round(viewportWidth * pixelRatio), height: Math.round(viewportHeight * pixelRatio) };
+            }
+            sendResolutionToUnreal = function () {
+                if (!Application && !pixelStreamingStream) return;
+                const { width, height } = getViewportSize();
+                const consoleCommand = `r.SetRes ${width}x${height}w`;
+                sendToUnreal({ console: true, Command: consoleCommand });
+                console.log(`Sent resolution to Unreal: ${consoleCommand}`);
+            };
+            window.addEventListener('resize', sendResolutionToUnreal);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(sendResolutionToUnreal, 150);
+                setTimeout(sendResolutionToUnreal, 500);
+                setTimeout(sendResolutionToUnreal, 1200);
+            });
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => setTimeout(sendResolutionToUnreal, 50));
+            }
+            setTimeout(sendResolutionToUnreal, 300);
+            setTimeout(sendResolutionToUnreal, 800);
+            setTimeout(sendResolutionToUnreal, 1400);
+        }
 
         function initLottie() {
             const container = document.getElementById("lottieLoader");
@@ -5956,7 +6256,7 @@
                 const appSettings = Application?.settings?.initialSettings;
                 if (appSettings && typeof appSettings === 'object') appSettings.AutoConnect = false;
             } catch (e) { }
-            const targets = [Application, Application?.webRtcController, Application?.stream];
+            const targets = [pixelStreamingStream, Application, Application?.webRtcController, Application?.stream];
             targets.forEach((target) => {
                 if (!target || typeof target !== 'object') return;
                 ['connect', 'reconnect', 'tryReconnect', 'start'].forEach((methodName) => {
@@ -5976,7 +6276,7 @@
             });
         }
         function detachStreamingSession() {
-            const tearDownTargets = [Application?.stream, Application?.webRtcController, Application];
+            const tearDownTargets = [pixelStreamingStream, Application?.stream, Application?.webRtcController, Application];
             tearDownTargets.forEach((target) => {
                 if (!target) return;
                 ['disconnect', 'close', 'stop', 'destroy', 'teardown'].forEach((methodName) => {
@@ -6213,12 +6513,39 @@
             setTimeout(check, 600);
             setTimeout(check, 1600);
         }
-        function sendToUnreal(payload) {
+        function sendToUnreal(payload, options = {}) {
             const message = typeof payload === "string" ? payload : JSON.stringify(payload);
+            if (shouldUseLocalPixelStreaming() && !options.forceLocalSend && !localPixelStreamingDataChannelReady) {
+                queueLocalPixelStreamingMessage(payload);
+                return true;
+            }
+            const objectPayload = typeof payload === "string" ? (() => { try { return JSON.parse(payload); } catch (e) { return payload; } })() : payload;
             let sent = false;
-            try { if (Application?.emitUIInteraction) { Application.emitUIInteraction(message); sent = true; } } catch (e) { if (shouldSurfaceAttention(e?.message)) showAttentionScreen(e.message); }
+
+            // Local Unreal Editor Pixel Streaming mode uses the official Epic PixelStreaming object.
+            // Arcware mode uses Application / webRtcController. We try local first because in local
+            // mode Application is the UI wrapper, while pixelStreamingStream is the actual stream.
+            try {
+                if (pixelStreamingStream?.emitUIInteraction) {
+                    pixelStreamingStream.emitUIInteraction(objectPayload);
+                    sent = true;
+                }
+            } catch (e) {
+                try {
+                    if (pixelStreamingStream?.emitUIInteraction && typeof objectPayload !== 'string') {
+                        pixelStreamingStream.emitUIInteraction(message);
+                        sent = true;
+                    }
+                } catch (e2) {
+                    if (shouldSurfaceAttention(e2?.message || e?.message)) showAttentionScreen(e2?.message || e.message);
+                }
+            }
+
+            try { if (!sent && Application?.emitUIInteraction) { Application.emitUIInteraction(message); sent = true; } } catch (e) { if (shouldSurfaceAttention(e?.message)) showAttentionScreen(e.message); }
             try { if (!sent && Application?.webRtcController?.emitUIInteraction) { Application.webRtcController.emitUIInteraction(message); sent = true; } } catch (e) { if (shouldSurfaceAttention(e?.message)) showAttentionScreen(e.message); }
-            try { if (!sent && Application?.stream?.emitUIInteraction) { Application.stream.emitUIInteraction(message); sent = true; } } catch (e) { if (shouldSurfaceAttention(e?.message)) showAttentionScreen(e.message); }
+            try { if (!sent && Application?.stream?.emitUIInteraction) { Application.stream.emitUIInteraction(objectPayload); sent = true; } } catch (e) {
+                try { if (!sent && Application?.stream?.emitUIInteraction) { Application.stream.emitUIInteraction(message); sent = true; } } catch (e2) { if (shouldSurfaceAttention(e2?.message || e?.message)) showAttentionScreen(e2?.message || e.message); }
+            }
             console.log(sent ? "Sent to Unreal:" : "Could not send to Unreal:", message);
             if (!sent && !suppressReconnect && !sessionEndedByUser) showAttentionScreen("Connection failed. Please retry.");
             return sent;
@@ -6436,6 +6763,7 @@
             'PROFILE_BTN_RANDOM-PLANK.png': 'RANDOM_PLANK',
             'PROFILE_BTN_V-GROOVE.png': V_GROOVE_VARIANTS.six,
             'PROFILE_BTN_FOLDED-WALL.png': 'FOLDED_WALL',
+            'PROFILE_BTN_CHANNEL-SIDING.png': 'CHANNEL_SIDING',
             'PROFILE_BTN_DOUBLE-SEVEN.png': 'DOUBL7_VENTED',
             'PROFILE_BTN_V-GROOVE-VENTED.png': 'V_GROOVE_6INCH_VENTED'
         };
@@ -6460,6 +6788,7 @@
             [V_GROOVE_VARIANTS.four]: '6 INCH',
             FOLDED_WALL: 'VARIABLE WALL',
             VARIABLE_WALL: 'FOLDED WALL',
+            CHANNEL_SIDING: 'NO OPTIONS',
             [DOUBLE_SEVEN_VARIANTS.vented]: 'NON VENTED',
             [DOUBLE_SEVEN_VARIANTS.nonVented]: 'VENTED',
             V_GROOVE_6INCH_VENTED: 'OPTIONS',
@@ -6495,6 +6824,7 @@
             vGrooveVented: 'SC_V_GROOVE_VENTED',
             randomPlank: 'SC_RANDOM_PLANK',
             foldedWall: 'SC_FOLDED_WALL',
+            channelSiding: 'SC_CHANNEL_SIDING',
             boardAndBatten: 'SC_BOARD_AND_BATTEN',
             doubl7Vented: 'SC_DOUBL7_VENTED',
             doubl7NonVented: 'SC_DOUBL7_NON_VENTED',
@@ -6507,6 +6837,7 @@
             vGrooveVented: 'WG_V_GROOVE_VENTED',
             randomPlank: 'WG_RANDOM_PLANK',
             foldedWall: 'WG_FOLDED_WALL',
+            channelSiding: 'WG_CHANNEL_SIDING',
             boardAndBatten: 'WG_BOARD_AND_BATTEN',
             doubl7Vented: 'WG_DOUBL7_VENTED',
             doubl7NonVented: 'WG_DOUBL7_NON_VENTED',
@@ -6519,6 +6850,7 @@
             vGrooveVented: 'WCN_V_GROOVE_VENTED',
             randomPlank: 'WCN_RANDOM_PLANK',
             foldedWall: 'WCN_FOLDED_WALL',
+            channelSiding: 'WCN_CHANNEL_SIDING',
             boardAndBatten: 'WCN_BOARD_AND_BATTEN',
             doubl7Vented: 'WCN_DOUBL7_VENTED',
             doubl7NonVented: 'WCN_DOUBL7_NON_VENTED',
@@ -6531,6 +6863,7 @@
             vGrooveVented: 'TX_V_GROOVE_VENTED',
             randomPlank: 'TX_RANDOM_PLANK',
             foldedWall: 'TX_FOLDED_WALL',
+            channelSiding: 'TX_CHANNEL_SIDING',
             boardAndBatten: 'TX_BOARD_AND_BATTEN',
             doubl7Vented: 'TX_DOUBL7_VENTED',
             doubl7NonVented: 'TX_DOUBL7_NON_VENTED',
@@ -6577,7 +6910,7 @@
         ];
 
         const profileModeEnabledVariants = {
-            profile: new Set(['BOARD_AND_BATTEN', 'RANDOM_PLANK', 'V_GROOVE_6_INCH', 'FOLDED_WALL']),
+            profile: new Set(['BOARD_AND_BATTEN', 'RANDOM_PLANK', 'V_GROOVE_6_INCH', 'FOLDED_WALL', 'CHANNEL_SIDING']),
             soffit: new Set(['DOUBL7_VENTED', 'V_GROOVE_6INCH_VENTED'])
         };
         function getResponsiveUiScaleMultiplier() {
@@ -7463,6 +7796,7 @@
             if (variant.includes('DOUBL7_VENTED')) return folderMap.doubl7Vented;
             if (variant.includes('BOARD_AND_BATTEN')) return folderMap.boardAndBatten;
             if (variant.includes('FOLDED_WALL') || variant.includes('VARIABLE_WALL')) return folderMap.foldedWall;
+            if (variant.includes('CHANNEL_SIDING')) return folderMap.channelSiding;
             if (variant.includes('RANDOM_PLANK')) return folderMap.randomPlank;
             if (variant.includes('V_GROOVE') && variant.includes('VENTED') && !variant.includes('NON')) return folderMap.vGrooveVented;
             if (variant.includes('V_GROOVE')) return folderMap.vGroove;
@@ -9491,6 +9825,8 @@
                                     src="PROFILE_BTN_V-GROOVE.png" alt="V Groove"></button><button
                                 class="profileTypeButton" type="button" aria-label="Profile type Folded Wall"><img
                                     src="PROFILE_BTN_FOLDED-WALL.png" alt="Folded Wall"></button><button
+                                class="profileTypeButton" type="button" aria-label="Profile type Channel Siding"><img
+                                    src="PROFILE_BTN_CHANNEL-SIDING.png" alt="Channel Siding"></button><button
                                 class="profileTypeButton" type="button" aria-label="Profile type Double Seven"><img
                                     src="PROFILE_BTN_DOUBLE-SEVEN.png" alt="Double Seven"></button><button
                                 class="profileTypeButton" type="button" aria-label="Profile type V Groove Vented"><img
