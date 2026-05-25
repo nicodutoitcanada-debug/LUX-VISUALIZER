@@ -110,6 +110,61 @@
             pointer-events: none;
         }
 
+
+        /* report issue button */
+        #reportIssueButton {
+            position: fixed;
+            top: max(16px, env(safe-area-inset-top));
+            left: max(16px, env(safe-area-inset-left));
+            z-index: 10060;
+            min-width: 164px;
+            height: 40px;
+            padding: 0 20px;
+            border: 1px solid rgba(255, 255, 255, 0.32);
+            background: rgba(255, 255, 255, 0.10);
+            color: white;
+            border-radius: 999px;
+            font: inherit;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: auto;
+            opacity: 0.82;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.18s ease, opacity 0.18s ease;
+        }
+
+        #reportIssueButton:hover,
+        #reportIssueButton:focus-visible {
+            background: rgba(255, 255, 255, 0.28);
+            border-color: rgba(255, 255, 255, 0.48);
+            transform: scale(1.02);
+            opacity: 1;
+        }
+
+        #reportIssueButton:active {
+            transform: scale(0.98);
+            opacity: 1;
+        }
+
+        @media (max-width: 680px) {
+            #reportIssueButton {
+                min-width: 138px;
+                height: 34px;
+                padding: 0 14px;
+                font-size: 8px;
+                letter-spacing: 0.11em;
+            }
+        }
+
         .uiScreen {
             position: absolute;
             inset: 0;
@@ -9571,6 +9626,7 @@
 </head>
 
 <body>
+    <a id="reportIssueButton" href="https://luxarpro.com/contact/" target="_blank" rel="noopener noreferrer" aria-label="Report an issue">REPORT AN ISSUE</a>
     <div id="video-container"></div>
     <div id="preloadSpinner">
         <div class="spinner"></div>
