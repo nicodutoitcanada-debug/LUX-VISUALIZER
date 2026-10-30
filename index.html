@@ -101,6 +101,14 @@
             height: 100% !important;
         }
 
+        /* Never crop stream controls when the decoded aspect is catching up to rotation. */
+        #video-container video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            object-position: center center !important;
+        }
+
         #uiLayer {
             position: fixed;
             inset: 0;
@@ -110,60 +118,6 @@
             pointer-events: none;
         }
 
-
-        /* report issue button */
-        #reportIssueButton {
-            position: fixed;
-            top: max(16px, env(safe-area-inset-top));
-            left: max(16px, env(safe-area-inset-left));
-            z-index: 10060;
-            min-width: 164px;
-            height: 40px;
-            padding: 0 20px;
-            border: 1px solid rgba(255, 255, 255, 0.32);
-            background: rgba(255, 255, 255, 0.10);
-            color: white;
-            border-radius: 999px;
-            font: inherit;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            pointer-events: auto;
-            opacity: 0.82;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            transition: background 0.2s ease, border-color 0.2s ease, transform 0.18s ease, opacity 0.18s ease;
-        }
-
-        #reportIssueButton:hover,
-        #reportIssueButton:focus-visible {
-            background: rgba(255, 255, 255, 0.28);
-            border-color: rgba(255, 255, 255, 0.48);
-            transform: scale(1.02);
-            opacity: 1;
-        }
-
-        #reportIssueButton:active {
-            transform: scale(0.98);
-            opacity: 1;
-        }
-
-        @media (max-width: 680px) {
-            #reportIssueButton {
-                min-width: 138px;
-                height: 34px;
-                padding: 0 14px;
-                font-size: 8px;
-                letter-spacing: 0.11em;
-            }
-        }
 
         .uiScreen {
             position: absolute;
@@ -582,6 +536,43 @@
             }
         }
 
+
+        /* Three-build level transition: keep the movie up while video buffers. */
+        #luxLevelVideoWaitNotice[hidden] { display: none !important; }
+        #luxLevelVideoWaitNotice {
+            position: absolute;
+            z-index: 5;
+            left: 50%;
+            bottom: max(18px, env(safe-area-inset-bottom));
+            transform: translateX(-50%);
+            width: min(430px, calc(100vw - 36px));
+            padding: 14px 18px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 17px;
+            background: rgba(12,16,24,.78);
+            color: white;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        #luxLevelVideoWaitHeading { font-size: 12px; font-weight: 700; letter-spacing: .13em; }
+        #luxLevelVideoWaitBody { font-size: 12px; line-height: 1.5; margin-top: 6px; opacity: .9; }
+        #luxLevelVideoWaitActions { display: flex; gap: 8px; margin-top: 12px; justify-content: center; flex-wrap: wrap; }
+        #luxLevelVideoWaitActions[hidden] { display: none !important; }
+        #luxLevelVideoWaitActions button {
+            pointer-events: auto;
+            touch-action: manipulation;
+            min-height: 35px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255,255,255,.32);
+            border-radius: 999px;
+            background: rgba(255,255,255,.10);
+            color: white;
+            font: inherit;
+            font-size: 10px;
+            cursor: pointer;
+        }
         /* ready */
         #readyMessage {
             background: transparent;
@@ -5252,6 +5243,59 @@
         let isRevealingGame = false;
         let inGameUiLoaded = false;
         let sendResolutionToUnreal = () => { };
+
+        // LUX NETWORK-ADAPTIVE RESOLUTION (colour-safe baseline).
+        // Preserve Arcware's original bitrate, encoder and codec settings.
+        // Optimize by changing only render size via native Pixel Streaming Commands.
+        // Always request 30 FPS on desktop and mobile, never 60.
+        // All three Lux levels keep their existing video-ready loading protection.
+        // LUX: bitrate limits are separate from the stream aspect ratio.
+        // Resize through Pixel Streaming's NATIVE Command (Resolution.Width/Height),
+        // rather than requiring an optional UIInteraction/Blueprint to run r.SetRes.
+        // One owner only: manual native requests with MatchViewportRes:false.
+        // The Arcware dashboard Dynamic Resolution option may remain OFF in this mode.
+        const LUX_STREAM_MOBILE = /Android|iPhone|iPod|iPad/i.test(navigator.userAgent) ||
+            (window.matchMedia('(pointer:coarse)').matches && Math.min(window.innerWidth, window.innerHeight) < 900);
+        const LUX_MOBILE_MAX_LONG_EDGE = 1440; // Same mobile render cap as Home View.
+        const LUX_DESKTOP_MAX_LONG_EDGE = 1920; // Keeps true 1080p desktop; caps high-DPI/4K.
+        const LUX_WEBRTC_FPS = 30; // Maximum requested WebRTC FPS on ALL devices.
+        // An older custom Blueprint can serve as an emergency fallback if the SDK
+        // exposes no native Command transport. Native Command is the primary path.
+        const LUX_RESOLUTION_DESCRIPTOR = 'consoleCommand';
+        let luxNativeResolutionStream = null;
+        let luxLastResizeTransport = 'not sent';
+        let luxLastResizeRequestedAt = 0;
+        let luxLastResizeError = '';
+        let luxResCheckToken = 0;
+        // Quality tiers specify MAXIMUM LONG EDGE only. The other dimension
+        // always follows the real viewport aspect (no cropping or stretching).
+        // Starting at 1600 PC / 1080 mobile reduces pixels from the old maximum
+        // by ~31% / ~44% on typical matched-aspect displays.
+        const LUX_RESOLUTION_TIERS = LUX_STREAM_MOBILE
+            ? [720, 900, 1080, 1440]
+            : [1280, 1600, 1920];
+        let luxResolutionTierIndex = LUX_STREAM_MOBILE ? 2 : 1;
+        let luxQualityTimer = null;
+        let luxQualityPrevious = null;
+        let luxQualityBad = 0;
+        let luxQualityGood = 0;
+        let luxQualityMeasured = null;
+        let luxQualityLastChangeAt = 0;
+        let luxQualityLastReason = 'balanced startup';
+        let luxQualityStatsUnavailable = false;
+        let luxResolutionReady = false;
+        let luxLastSentResolution = '';
+        let luxViewportDebounce = null;
+        let luxOrientationTimeouts = [];
+
+        // A level-loaded data-channel message is NOT proof that the browser has
+        // received the new level's picture. All three Lux builds share this gate.
+        let luxLevelGeneration = 0;
+        let luxLevelReadyAt = 0;
+        let luxLevelResSentAt = 0;
+        let luxLevelVideoState = null;
+        let luxRevealGeneration = -1;
+
         let revealGamePromise = null;
         let editModeIntroShown = false;
         let archesMenuAvailable = false;
@@ -5406,6 +5450,7 @@
             }
             mountStreamingRootElement();
             setupResolutionSync();
+            luxStartAdaptiveQuality(); // Observe network only; never override bitrate.
         }
 
         function initialiseArcwareStreamingSession() {
@@ -5431,12 +5476,23 @@
             const initResult = new ArcwareInit(
                 { shareId: selectedShareId },
                 {
-                    initialSettings: { AutoConnect: true, AutoPlayVideo: true, StartVideoMuted: true },
+                    // Preserve colour-correct original Lux bitrate/codec defaults.
+                    // Adaptive native-resolution sizing, hard 30 FPS request.
+                    initialSettings: {
+                        AutoConnect: true, AutoPlayVideo: true, StartVideoMuted: true,
+                        MatchViewportRes: false,
+                        WebRTCFPS: LUX_WEBRTC_FPS // Request 30 FPS; preserve original bitrate defaults.
+                    },
                     settings: { infoButton: false, micButton: false, audioButton: false, fullscreenButton: false, settingsButton: false, connectionStrengthIcon: false }
                 }
             );
             Application = initResult.Application;
+            // ArcwareInit exposes the underlying Epic PixelStreaming object. Its
+            // emitCommand() is preferable to custom Blueprint UI interactions.
+            luxNativeResolutionStream = initResult.PixelStreaming || null;
             pixelStreamingStream = Application?.stream || Application?.pixelStreaming || null;
+            // Arcware bitrate untouched. The separate resolution monitor only
+            // requests different viewport-matched render sizes when needed.
             registerArcwareAttentionHandlers();
 
             if (Application?.getApplicationResponse) {
@@ -5475,7 +5531,8 @@
                     AutoConnect: true,
                     AutoPlayVideo: true,
                     StartVideoMuted: true,
-                    MatchViewportRes: true,
+                    MatchViewportRes: false, // Same native responsive sizing, default video quality.
+                    WebRTCFPS: LUX_WEBRTC_FPS, // Max 30 FPS, including local test mode.
                     HoveringMouse: true,
                     FakeMouseWithTouches: true,
                     WaitForStreamer: true,
@@ -5485,6 +5542,7 @@
             });
 
             pixelStreamingStream = new PixelStreaming(config);
+            luxNativeResolutionStream = pixelStreamingStream;
             localPixelStreamingApplication = new PixelStreamingApplication({
                 stream: pixelStreamingStream,
                 onColorModeChanged: (isLightMode) => {
@@ -5627,16 +5685,34 @@
                 if (parsed.screenshot === "generating") showOverlay("Generating high resolution image");
                 if (parsed.game === "loaded" || parsed.Game === "loaded" || parsed.game === "Loaded" || parsed.Game === "Loaded") {
                     gameLoaded = true;
+                    luxResolutionReady = true;
+                    luxQueueResolutionSync('Unreal game loaded', 440, true);
                     updateLevelButtonStates();
                     if (!selectedBuild && !document.getElementById("buildMenu").classList.contains("visible") && !appInAttentionState) {
                         advanceToBuildMenuWithFade();
                     }
                 }
-                if (parsed.modern === "loaded") {
+                // Modern has an additional early loaded message. It may arrive
+                // before the first actual WebRTC picture, so it must pass the
+                // same video-ready guard as Multi and Traditional.
+                if (parsed.modern === "loaded" && selectedBuild === 'Mod') {
+                    luxResolutionReady = true;
+                    if (!luxLevelReadyAt) luxLevelReadyAt = performance.now();
+                    luxQueueResolutionSync('Modern level loaded', 500, true);
                     revealGameFromLevelLoading();
                 }
-                if (['modern', 'multi', 'trad'].includes(parsed.load_ui)) {
-                    revealGameFromLevelLoading().finally(() => {
+                const messageBuild = { modern: 'Mod', multi: 'Multi', trad: 'Trad' }[parsed.load_ui];
+                if (messageBuild && messageBuild === selectedBuild) {
+                    luxResolutionReady = true;
+                    if (!luxLevelReadyAt) luxLevelReadyAt = performance.now();
+                    luxQueueResolutionSync(`${messageBuild} UI loaded`, 500, true);
+                    const requestedGeneration = luxLevelGeneration;
+                    // GAME READY and the controls appear ONLY after decoded,
+                    // visible video arrives, not merely after Unreal's message.
+                    revealGameFromLevelLoading().then(revealed => {
+                        if (!revealed || requestedGeneration !== luxLevelGeneration ||
+                            selectedBuild !== messageBuild || appInAttentionState ||
+                            sessionEndedByUser || sessionTeardownStarted) return;
                         showReadyMessage();
                         showInGameUiAnimated();
                     });
@@ -5683,32 +5759,371 @@
             }, 100);
         }
 
+        // ================================================================
+        // LUX STREAM PERFORMANCE: adaptive resolution, NOT adaptive bitrate.
+        // WebRTC/Arcware retains original encoder/bitrate behavior and its own
+        // congestion control. Browser only asks for fewer/more rendered pixels.
+        // No extra WebRTC session, no automatic reconnection, no UI overlays.
+        // ================================================================
+        function luxRtcPeer() {
+            const ctrl = Application?.webRtcController || Application?.stream?.webRtcController ||
+                pixelStreamingStream?.webRtcController;
+            const player = ctrl?.webRtcPlayerObj || Application?.stream?.webRtcPlayerObj ||
+                pixelStreamingStream?.webRtcPlayerObj;
+            return player?.pc || player?.peerConnection || ctrl?.pc || ctrl?.peerConnection ||
+                pixelStreamingStream?.pc || Application?.stream?.pc || null;
+        }
+        function luxQualityAllowed() {
+            return !sessionTeardownStarted && !sessionEndedByUser &&
+                !suppressReconnect && !appInAttentionState && !document.hidden &&
+                !!Application && gameLoaded && gameRevealed && luxResolutionReady &&
+                !document.getElementById('levelLoadingScreen')?.classList.contains('visible');
+        }
+        function luxCurrentResolutionCap() {
+            return LUX_RESOLUTION_TIERS[luxResolutionTierIndex];
+        }
+        function luxChangeResolutionTier(nextIndex, reason) {
+            if (!luxQualityAllowed()) return false;
+            if (!Number.isInteger(nextIndex) || nextIndex < 0 || nextIndex >= LUX_RESOLUTION_TIERS.length ||
+                nextIndex === luxResolutionTierIndex) return false;
+            const previousIndex = luxResolutionTierIndex;
+            luxResolutionTierIndex = nextIndex;
+            // Native stream Command is the same resolution transport already
+            // tested on desktop; preserve viewport aspect and video fit:contain.
+            const applied = sendResolutionToUnreal('adaptive stream resolution: ' + reason, true);
+            if (!applied) {
+                luxResolutionTierIndex = previousIndex;
+                console.warn('[LUX ADAPTIVE] Resolution request not ready, keeping tier', luxCurrentResolutionCap());
+                return false;
+            }
+            luxQualityLastChangeAt = performance.now();
+            luxQualityLastReason = reason;
+            luxQualityBad = 0;
+            luxQualityGood = 0;
+            console.info('[LUX ADAPTIVE] Requested', luxCurrentResolutionCap(),
+                'max-long-edge pixels; reason:', reason, '(bitrate/codec unchanged)');
+            return true;
+        }
+        async function luxMonitorQuality() {
+            if (!luxQualityAllowed()) {
+                luxQualityPrevious = null;
+                luxQualityBad = 0;
+                luxQualityGood = 0;
+                return;
+            }
+            const pc = luxRtcPeer();
+            if (typeof pc?.getStats !== 'function') {
+                luxQualityStatsUnavailable = true;
+                return; // Keep balanced profile; never guess network quality.
+            }
+            try {
+                const report = await pc.getStats();
+                if (!luxQualityAllowed()) return;
+                let video = null, pair = null;
+                report.forEach(row => {
+                    if (row.type === 'inbound-rtp' && !row.isRemote &&
+                        (row.kind === 'video' || row.mediaType === 'video')) video = row;
+                    if (row.type === 'candidate-pair' && row.state === 'succeeded' &&
+                        (row.nominated || row.selected)) pair = row;
+                });
+                if (!video) { luxQualityStatsUnavailable = true; return; }
+                luxQualityStatsUnavailable = false;
+                const sample = {
+                    timestamp: Number(video.timestamp) || Date.now(),
+                    bytes: Number(video.bytesReceived) || 0,
+                    received: Number(video.packetsReceived) || 0,
+                    lost: Number(video.packetsLost) || 0,
+                    decoded: Number(video.framesDecoded) || 0,
+                    freezes: Number(video.freezeCount) || 0,
+                    jitterDelay: Number(video.jitterBufferDelay) || 0,
+                    jitterCount: Number(video.jitterBufferEmittedCount) || 0,
+                    rtt: typeof pair?.currentRoundTripTime === 'number' ? pair.currentRoundTripTime : null
+                };
+                if (!luxQualityPrevious) { luxQualityPrevious = sample; return; }
+                const prev = luxQualityPrevious;
+                luxQualityPrevious = sample;
+                const seconds = (sample.timestamp - prev.timestamp) / 1000;
+                if (seconds < 2 || seconds > 20) return;
+                const received = Math.max(0, sample.received - prev.received);
+                const lost = Math.max(0, sample.lost - prev.lost);
+                const total = received + lost;
+                const loss = total >= 30 ? lost / total : null;
+                const decodedFps = Math.max(0, sample.decoded - prev.decoded) / seconds;
+                const newFreezes = Math.max(0, sample.freezes - prev.freezes);
+                const emitted = sample.jitterCount - prev.jitterCount;
+                const avgBufferSeconds = emitted > 0
+                    ? Math.max(0, sample.jitterDelay - prev.jitterDelay) / emitted : null;
+                const throughputKbps = Math.max(0, sample.bytes - prev.bytes) * 8 / seconds / 1000;
+                luxQualityMeasured = {
+                    profile: LUX_STREAM_MOBILE ? 'mobile' : 'desktop',
+                    receivedKbps: Math.round(throughputKbps),
+                    decodedFps: Math.round(decodedFps * 10) / 10,
+                    packetLossPercent: loss === null ? null : Math.round(loss * 10000) / 100,
+                    roundTripMs: sample.rtt === null ? null : Math.round(sample.rtt * 1000),
+                    averageJitterBufferMs: avgBufferSeconds === null ? null : Math.round(avgBufferSeconds * 1000),
+                    newFreezes,
+                    sampledSeconds: Math.round(seconds * 10) / 10
+                };
+                // Distinguish poor NETWORK from low FPS caused by Unreal GPU load.
+                // Low FPS *alone* is not evidence of bandwidth congestion.
+                // WebRTC already adjusts bitrate, so never set a hard bitrate cap.
+                const bad = (loss !== null && loss >= .025) ||
+                    (sample.rtt !== null && sample.rtt >= .38) ||
+                    (avgBufferSeconds !== null && avgBufferSeconds >= .18) ||
+                    newFreezes > 0;
+                const severe = (loss !== null && loss >= .10) || newFreezes >= 2 ||
+                    (sample.rtt !== null && sample.rtt >= .75);
+                // Only step back up when a full-rate stream has actually been
+                // stable. This avoids constant down/up oscillation on weak Wi-Fi.
+                const good = (loss !== null && loss < .006) &&
+                    (sample.rtt === null || sample.rtt < .20) &&
+                    (avgBufferSeconds === null || avgBufferSeconds < .09) &&
+                    newFreezes === 0 && decodedFps >= 26;
+                if (bad) { luxQualityBad++; luxQualityGood = 0; }
+                else if (good) { luxQualityGood++; luxQualityBad = 0; }
+                else { luxQualityBad = 0; luxQualityGood = 0; }
+                const sinceChange = performance.now() - luxQualityLastChangeAt;
+                if (sinceChange < 20000) return; // Cooldown after each resize.
+                if ((severe || luxQualityBad >= 2) && luxResolutionTierIndex > 0) {
+                    luxChangeResolutionTier(luxResolutionTierIndex - 1, 'poor network');
+                } else if (luxQualityGood >= 12 && luxResolutionTierIndex < LUX_RESOLUTION_TIERS.length - 1) {
+                    luxChangeResolutionTier(luxResolutionTierIndex + 1, 'stable network');
+                }
+            } catch (error) {
+                luxQualityStatsUnavailable = true;
+                console.debug('[LUX ADAPTIVE] WebRTC stats unavailable; preserving resolution tier:', error?.message || error);
+            }
+        }
+        function luxStartAdaptiveQuality() {
+            if (luxQualityTimer) return;
+            luxQualityPrevious = null;
+            // First request goes out at balanced resolution. Only adapt after
+            // the actual Lux level is revealed, not during its loading movie.
+            luxQualityTimer = setInterval(luxMonitorQuality, 5000);
+        }
+        function luxStopAdaptiveQuality() {
+            if (luxQualityTimer) clearInterval(luxQualityTimer);
+            luxQualityTimer = null;
+            luxQualityPrevious = null;
+            luxQualityBad = luxQualityGood = 0;
+        }
+        window.luxStreamingQualityStatus = () => ({
+            profile: LUX_STREAM_MOBILE ? 'mobile' : 'desktop',
+            adaptiveResolution: true,
+            bitrateOverrides: false,
+            codecOverrides: false,
+            requestedMaxFps: LUX_WEBRTC_FPS,
+            tierMaxLongEdges: [...LUX_RESOLUTION_TIERS],
+            requestedMaxLongEdge: luxCurrentResolutionCap(),
+            tier: luxResolutionTierIndex,
+            monitoring: Boolean(luxQualityTimer),
+            streamStatisticsAvailable: !luxQualityStatsUnavailable,
+            latestNetworkSample: luxQualityMeasured,
+            lastChange: luxQualityLastReason,
+            note: 'Native-resolution adaptation only. Arcware original bitrate and video colours unchanged. FPS target always 30.'
+        });
+
+        function luxStreamingViewportSize() {
+            const stage = document.getElementById('video-container');
+            const cssWidth = Math.max(1, stage?.clientWidth || window.innerWidth);
+            const cssHeight = Math.max(1, stage?.clientHeight || window.innerHeight);
+            const dpr = Math.max(1, window.devicePixelRatio || 1);
+            let width = cssWidth * dpr, height = cssHeight * dpr;
+            const maxLongEdge = luxCurrentResolutionCap();
+            const scale = Math.min(1, maxLongEdge / Math.max(width, height));
+            // Preserve actual viewport aspect, and do not upscale smaller windows.
+            width = Math.max(2, 2 * Math.round(width * scale / 2));
+            height = Math.max(2, 2 * Math.round(height * scale / 2));
+            return { width, height };
+        }
+        function luxStreamAspectMismatched() {
+            const stage = document.getElementById('video-container');
+            const video = stage?.querySelector('video');
+            if (!video?.videoWidth || !video?.videoHeight || !stage?.clientWidth || !stage?.clientHeight) return false;
+            return Math.abs(video.videoWidth / video.videoHeight - stage.clientWidth / stage.clientHeight) > 0.025;
+        }
+        function luxQueueResolutionSync(reason = 'viewport change', ms = 250, force = false) {
+            clearTimeout(luxViewportDebounce);
+            luxViewportDebounce = setTimeout(() => sendResolutionToUnreal(reason, force), ms);
+        }
+        function luxSendNativeResolution(width, height) {
+            const resolutionCommand = { 'Resolution.Width': width, 'Resolution.Height': height };
+            // Epic/Arcware native Pixel Streaming Command packets are handled by
+            // UE itself, so no LUX-specific Blueprint or UIInteraction handler is needed.
+            // Keep the original stream object intact for existing menus/messages.
+            const candidates = [
+                ['Arcware/Epic stream', luxNativeResolutionStream],
+                ['app stream', Application?.stream],
+                ['active stream', pixelStreamingStream],
+                ['app pixelStreaming', Application?.pixelStreaming],
+                ['application', Application]
+            ];
+            let supported = false;
+            const visited = new Set();
+            for (const [name, target] of candidates) {
+                if (!target || visited.has(target)) continue;
+                visited.add(target);
+                if (typeof target.emitCommand !== 'function') continue;
+                supported = true;
+                try {
+                    const result = target.emitCommand(resolutionCommand);
+                    // Some Epic SDK versions return false while media/data channel
+                    // is not ready. Never count that as a successful resize.
+                    if (result !== false) return { sent: true, transport: name + '.emitCommand', native: true };
+                } catch (error) {
+                    luxLastResizeError = error?.message || String(error);
+                }
+            }
+            // Some SDK versions expose emitCommand on the underlying controller.
+            const controller = Application?.webRtcController || luxNativeResolutionStream?.webRtcController ||
+                pixelStreamingStream?.webRtcController;
+            if (controller && typeof controller.emitCommand === 'function') {
+                supported = true;
+                const video = document.querySelector('#video-container video');
+                if (video?.readyState >= 2) {
+                    try {
+                        controller.emitCommand(resolutionCommand);
+                        return { sent: true, transport: 'webRtcController.emitCommand', native: true };
+                    } catch (error) {
+                        luxLastResizeError = error?.message || String(error);
+                    }
+                }
+            }
+            return { sent: false, supported, transport: supported ? 'native Command not ready' : 'native Command unavailable' };
+        }
+        function luxScheduleAspectVerification(key) {
+            const token = ++luxResCheckToken;
+            // One bounded correction per viewport size. A new resize cancels old
+            // checks; we DO NOT reconnect or start another paid Arcware session.
+            setTimeout(() => {
+                if (token !== luxResCheckToken || document.hidden || !luxResolutionReady ||
+                    key !== luxLastSentResolution || sessionEndedByUser || appInAttentionState) return;
+                if (luxStreamAspectMismatched()) {
+                    console.warn('[LUX RESIZE] Stream still has the wrong aspect after resize; retrying once.',
+                        window.luxStreamingResolutionStatus?.());
+                    sendResolutionToUnreal('stream aspect mismatch (one retry)', true, true);
+                }
+            }, 1600);
+            setTimeout(() => {
+                if (token !== luxResCheckToken || document.hidden || !luxResolutionReady ||
+                    key !== luxLastSentResolution || sessionEndedByUser || appInAttentionState) return;
+                if (luxStreamAspectMismatched()) {
+                    console.warn('[LUX RESIZE] Unreal has not matched the browser aspect. Inspect '
+                        + 'window.luxStreamingResolutionStatus() and confirm UE accepts native Resolution Command.',
+                        window.luxStreamingResolutionStatus?.());
+                }
+            }, 3900);
+        }
         function setupResolutionSync() {
-            function getViewportSize() {
-                const pixelRatio = window.devicePixelRatio || 1;
-                const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-                const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-                return { width: Math.round(viewportWidth * pixelRatio), height: Math.round(viewportHeight * pixelRatio) };
-            }
-            sendResolutionToUnreal = function () {
-                if (!Application && !pixelStreamingStream) return;
-                const { width, height } = getViewportSize();
-                const consoleCommand = `r.SetRes ${width}x${height}w`;
-                sendToUnreal({ console: true, Command: consoleCommand });
-                console.log(`Sent resolution to Unreal: ${consoleCommand}`);
+            const stage = document.getElementById('video-container');
+            if (!stage) return;
+            sendResolutionToUnreal = function(reason = 'viewport', force = false, aspectRetry = false) {
+                if (!luxResolutionReady || !Application || document.hidden ||
+                    sessionEndedByUser || sessionTeardownStarted || suppressReconnect || appInAttentionState) return false;
+                // A focused mobile input can make Safari shrink only visualViewport.
+                if (document.activeElement?.matches?.('input:not([type=range]), textarea, select')) return false;
+                const { width, height } = luxStreamingViewportSize();
+                const key = `${width}x${height}`;
+                if (!force && key === luxLastSentResolution) return true;
+                let result = luxSendNativeResolution(width, height);
+                // Legacy support ONLY if no native Command API is exposed at all.
+                // The Blueprint may not exist in LUX, so diagnostics flag this.
+                if (!result.sent && !result.supported) {
+                    const cmd = `r.SetRes ${key}w`;
+                    const payload = LUX_RESOLUTION_DESCRIPTOR === 'legacy'
+                        ? { console: true, Command: cmd }
+                        : { consoleCommand: cmd };
+                    result = { sent: sendToUnreal(payload), transport: 'Blueprint UIInteraction fallback (not verified)', native: false };
+                }
+                luxLastResizeTransport = result.transport;
+                if (!result.sent) {
+                    console.warn('[LUX RESIZE] Resolution command not ready:', reason, result.transport, key);
+                    // Existing video playing/metadata handlers and subsequent level-load
+                    // messages will retry once the data channel is available.
+                    return false;
+                }
+                luxLastResizeRequestedAt = performance.now();
+                luxLastSentResolution = key;
+                if (luxLevelReadyAt && document.getElementById('levelLoadingScreen')?.classList.contains('visible')) {
+                    luxLevelResSentAt = performance.now();
+                }
+                console.info(`[LUX RESIZE] ${reason}: ${key} via ${result.transport}`);
+                if (!aspectRetry) luxScheduleAspectVerification(key);
+                return true;
             };
-            window.addEventListener('resize', sendResolutionToUnreal);
+            let lastLayout = '';
+            const update = (reason = 'resize', force = false) => {
+                const next = `${stage.clientWidth}x${stage.clientHeight}`;
+                if (!force && next === lastLayout) return;
+                lastLayout = next;
+                luxQueueResolutionSync(reason, 260, force);
+            };
+            const clearOrientationTimeouts = () => {
+                luxOrientationTimeouts.forEach(clearTimeout);
+                luxOrientationTimeouts = [];
+            };
+            const orientationSettled = () => {
+                clearOrientationTimeouts();
+                [450, 1100, 2400].forEach((delay, i) => {
+                    luxOrientationTimeouts.push(setTimeout(() => {
+                        const next = `${stage.clientWidth}x${stage.clientHeight}`;
+                        if (next !== lastLayout) update('rotation settled', true);
+                        if (i === 2 && luxStreamAspectMismatched()) {
+                            sendResolutionToUnreal('rotation aspect correction', true);
+                        }
+                    }, delay));
+                });
+            };
+            window.addEventListener('resize', () => update('window resized'), { passive: true });
             window.addEventListener('orientationchange', () => {
-                setTimeout(sendResolutionToUnreal, 150);
-                setTimeout(sendResolutionToUnreal, 500);
-                setTimeout(sendResolutionToUnreal, 1200);
-            });
-            if (window.visualViewport) {
-                window.visualViewport.addEventListener('resize', () => setTimeout(sendResolutionToUnreal, 50));
+                update('orientation changed', true);
+                orientationSettled();
+            }, { passive: true });
+            if (typeof ResizeObserver !== 'undefined') {
+                new ResizeObserver(() => update('stream stage resized')).observe(stage);
             }
-            setTimeout(sendResolutionToUnreal, 300);
-            setTimeout(sendResolutionToUnreal, 800);
-            setTimeout(sendResolutionToUnreal, 1400);
+            const handledVideos = new WeakSet();
+            const watchVideos = () => {
+                stage.querySelectorAll('video').forEach(video => {
+                    if (handledVideos.has(video)) return;
+                    handledVideos.add(video);
+                    video.addEventListener('loadedmetadata', () => {
+                        luxQueueResolutionSync('video metadata', 350, true);
+                    });
+                    video.addEventListener('playing', () => {
+                        setTimeout(() => {
+                            if (!luxLastSentResolution || luxStreamAspectMismatched())
+                                sendResolutionToUnreal('video playing / aspect correction', true);
+                        }, 600);
+                    }, { once: true });
+                });
+            };
+            new MutationObserver(watchVideos).observe(stage, { childList: true, subtree: true });
+            watchVideos();
+            window.addEventListener('pageshow', () => update('page shown', true), { passive: true });
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) update('returned to tab', true);
+            });
+            window.luxStreamingResolutionStatus = () => {
+                const video = stage.querySelector('video');
+                return {
+                    profile: LUX_STREAM_MOBILE ? 'mobile' : 'desktop',
+                    maximumAllowedLongEdge: LUX_STREAM_MOBILE ? LUX_MOBILE_MAX_LONG_EDGE : LUX_DESKTOP_MAX_LONG_EDGE,
+                    activeAdaptiveLongEdge: luxCurrentResolutionCap(),
+                    target: luxStreamingViewportSize(), lastRequested: luxLastSentResolution,
+                    video: video ? { width: video.videoWidth, height: video.videoHeight } : null,
+                    resizeTransport: luxLastResizeTransport,
+                    lastRequestAgeSeconds: luxLastResizeRequestedAt ?
+                        Math.round((performance.now() - luxLastResizeRequestedAt) / 100) / 10 : null,
+                    streamAspectMatchesViewport: video?.videoWidth && video?.videoHeight
+                        ? !luxStreamAspectMismatched() : null,
+                    viewportCss: { width: stage.clientWidth, height: stage.clientHeight },
+                    lastTransportError: luxLastResizeError || null,
+                    unrealReady: luxResolutionReady,
+                    note: 'Requested does not mean applied. Compare video pixel aspect to viewport. No session restart.'
+                };
+            };
+            update('initial stream stage');
         }
 
         function initLottie() {
@@ -6242,6 +6657,188 @@
             }
             sendToUnreal({ profile_info: profileInfo });
         }
+        // LUX VIDEO-VERIFIED LEVEL HANDOFF (Traditional, Modern, Multi)
+        // We never use 'loadeddata' or 'playing' alone as proof of real frames.
+        // A 32x18 sampling check rejects an actual black video picture when
+        // canvas access is available. If readback is prohibited, a progression
+        // of freshly decoded frames is the fallback, just as in Home View.
+        const luxLevelSampleCanvas = document.createElement('canvas');
+        luxLevelSampleCanvas.width = 32;
+        luxLevelSampleCanvas.height = 18;
+        const luxLevelSampleContext = luxLevelSampleCanvas.getContext('2d', { willReadFrequently: true });
+
+        function luxSetLevelVideoNotice(kind, details = '') {
+            const el = document.getElementById('luxLevelVideoWaitNotice');
+            if (!el) return;
+            if (kind === 'hide') { el.hidden = true; return; }
+            const title = document.getElementById('luxLevelVideoWaitHeading');
+            const body = document.getElementById('luxLevelVideoWaitBody');
+            const actions = document.getElementById('luxLevelVideoWaitActions');
+            el.hidden = false;
+            title.textContent = kind === 'slow' ? 'WAITING FOR STREAM' : 'VIDEO IS TAKING LONGER';
+            body.textContent = details || (kind === 'slow'
+                ? 'The building has loaded. Waiting for the first visible streaming picture.'
+                : 'The building has loaded, but its picture has not arrived. Retry playback, or end this paid session.');
+            actions.hidden = kind !== 'stuck';
+        }
+        document.getElementById('luxLevelTryPlayback')?.addEventListener('click', () => {
+            if (sessionEndedByUser || sessionTeardownStarted || appInAttentionState) return;
+            const video = document.querySelector('#video-container video');
+            if (!video) {
+                luxSetLevelVideoNotice('stuck', 'The stream player is not attached yet. You can continue waiting or end the session.');
+                return;
+            }
+            try {
+                const attempt = video.play(); // Reuse the current stream. Never start a new paid session here.
+                attempt?.catch?.(err => luxSetLevelVideoNotice('stuck',
+                    `Video playback was blocked (${err?.name || 'unknown error'}). You can retry or end the session.`));
+                luxSetLevelVideoNotice('slow', 'Trying to resume the existing video stream.');
+            } catch (err) {
+                luxSetLevelVideoNotice('stuck', 'Unable to resume playback. You can end this session.');
+            }
+        });
+        document.getElementById('luxLevelEndSession')?.addEventListener('click', () => {
+            luxLevelGeneration++; // Cancel the video-ready waiter before teardown.
+            endSessionByUser('Your session has ended.');
+        });
+
+        function luxSampleVisibleLevelPicture(video) {
+            if (!luxLevelSampleContext || video.readyState < 2 || !video.videoWidth || !video.videoHeight) return null;
+            try {
+                luxLevelSampleContext.drawImage(video, 0, 0, 32, 18);
+                const pixels = luxLevelSampleContext.getImageData(0, 0, 32, 18).data;
+                let lit = 0, brightness = 0;
+                for (let i = 0; i < pixels.length; i += 4) {
+                    const luminance = .2126 * pixels[i] + .7152 * pixels[i + 1] + .0722 * pixels[i + 2];
+                    brightness += luminance;
+                    if (luminance > 25) lit++;
+                }
+                return lit >= 5 || brightness / (pixels.length / 4) > 9;
+            } catch (_) {
+                return null; // Readback unsupported: require real frame progression instead.
+            }
+        }
+
+        function luxLevelActive(generation) {
+            return generation === luxLevelGeneration && !sessionEndedByUser &&
+                !sessionTeardownStarted && !suppressReconnect && !appInAttentionState &&
+                document.getElementById('levelLoadingScreen')?.classList.contains('visible');
+        }
+
+        async function luxWaitForLevelVideo(generation) {
+            const startedAt = performance.now();
+            let video = null;
+            let videoCallbackHandle = null;
+            let newVideoFrames = 0;
+            let lastSeenFrames = 0;
+            let lastSeenTime = 0;
+            let observedFrameSamples = 0;
+            let consecutiveGood = 0;
+            let lastGoodAt = 0;
+            let lastResCommand = luxLevelResSentAt;
+            let rvfcSupported = false;
+
+            const stopFrameCallback = () => {
+                if (video && videoCallbackHandle !== null && typeof video.cancelVideoFrameCallback === 'function') {
+                    try { video.cancelVideoFrameCallback(videoCallbackHandle); } catch (_) { }
+                }
+                videoCallbackHandle = null;
+            };
+            const startFrameCallback = () => {
+                if (!rvfcSupported || !video) return;
+                const attachedVideo = video;
+                const onFrame = () => {
+                    if (video !== attachedVideo || !luxLevelActive(generation)) return;
+                    newVideoFrames++;
+                    try { videoCallbackHandle = attachedVideo.requestVideoFrameCallback(onFrame); } catch (_) { }
+                };
+                try { videoCallbackHandle = attachedVideo.requestVideoFrameCallback(onFrame); } catch (_) { }
+            };
+            try {
+                while (luxLevelActive(generation)) {
+                    if (document.hidden) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        continue;
+                    }
+                    const now = performance.now();
+                    const currentVideo = document.querySelector('#video-container video');
+                    if (currentVideo !== video) {
+                        stopFrameCallback();
+                        video = currentVideo;
+                        newVideoFrames = 0;
+                        lastSeenFrames = 0;
+                        lastSeenTime = video?.currentTime || 0;
+                        consecutiveGood = 0;
+                        observedFrameSamples = 0;
+                        rvfcSupported = typeof video?.requestVideoFrameCallback === 'function';
+                        startFrameCallback();
+                    }
+                    if (luxLevelResSentAt !== lastResCommand) {
+                        lastResCommand = luxLevelResSentAt;
+                        consecutiveGood = 0;
+                        observedFrameSamples = 0;
+                    }
+                    const track = video?.srcObject?.getVideoTracks?.()[0];
+                    const trackLive = !track || (track.readyState === 'live' && !track.muted);
+                    let frameCounter = 0;
+                    try { frameCounter = video?.getVideoPlaybackQuality?.().totalVideoFrames || video?.webkitDecodedFrameCount || 0; } catch (_) { }
+                    const playbackTime = video?.currentTime || 0;
+                    const videoFramesAdvanced = newVideoFrames > 0 ||
+                        (frameCounter > lastSeenFrames) ||
+                        (video && playbackTime > lastSeenTime + .12 && !video.paused);
+                    newVideoFrames = 0;
+                    lastSeenFrames = frameCounter;
+                    lastSeenTime = playbackTime;
+                    const hasDecodedVideo = !!(video && trackLive && !video.paused &&
+                        video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0);
+                    // Delayed resolution sync may temporarily restart the video. Wait for
+                    // post-sync frames before removing the movie, including on desktop.
+                    const resolutionSettled = !luxLevelResSentAt || now - luxLevelResSentAt >= 700;
+                    const readySettled = luxLevelReadyAt && now - luxLevelReadyAt >= 350;
+                    if (hasDecodedVideo && videoFramesAdvanced && readySettled && resolutionSettled) {
+                        observedFrameSamples++;
+                        const picture = luxSampleVisibleLevelPicture(video);
+                        if (picture === false) {
+                            consecutiveGood = 0;
+                        } else if (now - lastGoodAt >= 170) {
+                            consecutiveGood++;
+                            lastGoodAt = now;
+                        }
+                        luxLevelVideoState = {
+                            build: selectedBuild, hasDecodedVideo, newlyDecodedFrames: observedFrameSamples,
+                            sample: picture === null ? 'unavailable' : (picture ? 'visible' : 'black'),
+                            goodChecks: consecutiveGood, videoSize: `${video.videoWidth}x${video.videoHeight}`,
+                            waitedSeconds: Math.round((now - startedAt) / 100) / 10
+                        };
+                        if (consecutiveGood >= 2 && (picture !== null || observedFrameSamples >= 3)) {
+                            luxSetLevelVideoNotice('hide');
+                            console.info('[LUX VIDEO] Visible scene ready:', luxLevelVideoState);
+                            return true;
+                        }
+                    }
+                    const elapsed = now - startedAt;
+                    if (elapsed >= 20000) {
+                        luxSetLevelVideoNotice('stuck', video && video.paused
+                            ? 'Video is paused by the browser. Try video playback, or end the session.'
+                            : luxLevelVideoState?.sample === 'black'
+                                ? 'The stream is still delivering black frames. You can retry playback or end the session.'
+                                : 'Unreal reported ready, but no visible picture has arrived. You can wait, retry, or end the session.');
+                    } else if (elapsed >= 8000) {
+                        luxSetLevelVideoNotice('slow');
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 220));
+                }
+            } finally {
+                stopFrameCallback();
+            }
+            return false; // Cancelled by a different level, disconnect or end-session.
+        }
+        window.luxLevelVideoStatus = () => ({
+            level: selectedBuild, unrealReady: !!luxLevelReadyAt,
+            shown: gameRevealed, video: luxLevelVideoState,
+            streamResolution: window.luxStreamingResolutionStatus?.(),
+            note: 'No automatic reconnect and no automatic reveal on a timeout.'
+        });
         async function showLevelLoadingScreen(buildName) {
             hideAllUiScreens();
             hideInGameUi();
@@ -6274,34 +6871,40 @@
             await fadeFromBlack(900);
         }
         function revealGameFromLevelLoading() {
-            hidePreloadSpinner();
-            if (gameRevealed) return Promise.resolve();
-            if (revealGamePromise) return revealGamePromise;
-
+            if (gameRevealed) return Promise.resolve(true);
+            if (revealGamePromise && luxRevealGeneration === luxLevelGeneration) return revealGamePromise;
+            if (!luxLevelReadyAt || !document.getElementById('levelLoadingScreen')?.classList.contains('visible')) {
+                return Promise.resolve(false);
+            }
+            const generation = luxLevelGeneration;
+            luxRevealGeneration = generation;
             isRevealingGame = true;
-            revealGamePromise = (async () => {
+            const promise = (async () => {
+                // Refresh the stream sizing WHILE the level movie is still visible.
+                // The old timed reveal could expose a blank Pixel Streaming frame.
+                triggerViewportRefreshSequence();
+                const pictureReady = await luxWaitForLevelVideo(generation);
+                if (!pictureReady || !luxLevelActive(generation)) return false;
+                // Only after REAL frames arrive may Lux begin its normal fade.
                 await fadeToBlack(800);
-                triggerViewportRefreshSequence();
-                await new Promise(resolve => setTimeout(resolve, 350));
+                if (!luxLevelActive(generation)) return false;
+                hidePreloadSpinner();
                 hideLevelLoadingScreen();
-                triggerViewportRefreshSequence();
-                await new Promise(resolve => setTimeout(resolve, 450));
-                await fadeFromBlack(2600);
+                await fadeFromBlack(1100);
+                if (generation !== luxLevelGeneration || appInAttentionState || sessionEndedByUser) return false;
                 gameRevealed = true;
-            })().catch((error) => {
-                console.error('Failed to reveal game from loading screen:', error);
-                try { hideLevelLoadingScreen(); } catch (e) { }
-                try {
-                    const fade = document.getElementById('transitionFade');
-                    if (fade) fade.classList.remove('visible');
-                } catch (e) { }
-                throw error;
+                return true;
+            })().catch(error => {
+                console.error('[LUX VIDEO] Unable to reveal level; retaining loader:', error);
+                return false; // Never expose black video on a failed guard.
             }).finally(() => {
-                isRevealingGame = false;
-                revealGamePromise = null;
+                if (luxRevealGeneration === generation) {
+                    isRevealingGame = false;
+                    revealGamePromise = null;
+                }
             });
-
-            return revealGamePromise;
+            revealGamePromise = promise;
+            return promise;
         }
         function showReadyMessage() { clearTimeout(readyMessageTimer); const screen = document.getElementById("readyMessage"); const text = document.getElementById("readyText"); screen.classList.add("visible"); text.classList.remove("animate"); void text.offsetWidth; text.classList.add("animate"); readyMessageTimer = setTimeout(() => { screen.classList.remove("visible"); text.classList.remove("animate"); }, 3000); }
         function disableReconnectAttempts() {
@@ -6331,6 +6934,8 @@
             });
         }
         function detachStreamingSession() {
+            luxStopAdaptiveQuality();
+            luxResolutionReady = false;
             const tearDownTargets = [pixelStreamingStream, Application?.stream, Application?.webRtcController, Application];
             tearDownTargets.forEach((target) => {
                 if (!target) return;
@@ -6490,6 +7095,7 @@
         async function showAttentionScreen(message) {
             if (suppressReconnect || sessionEndedByUser || appInAttentionState) return;
             appInAttentionState = true;
+            luxStopAdaptiveQuality();
             hideAfkPrompt();
             hidePreloadSpinner();
 
@@ -6614,6 +7220,11 @@
             syncEnvironmentMenuForBuild(buildName);
             syncHowToMenuForBuild(buildName);
             syncMainMenuIconsForBuild(buildName);
+            luxLevelGeneration++;
+            luxLevelReadyAt = 0;
+            luxLevelResSentAt = 0;
+            luxLevelVideoState = null;
+            luxSetLevelVideoNotice('hide');
             gameRevealed = false;
             isRevealingGame = false;
             inGameUiLoaded = false;
@@ -9626,7 +10237,6 @@
 </head>
 
 <body>
-    <a id="reportIssueButton" href="https://luxarpro.com/contact/" target="_blank" rel="noopener noreferrer" aria-label="Report an issue">REPORT AN ISSUE</a>
     <div id="video-container"></div>
     <div id="preloadSpinner">
         <div class="spinner"></div>
@@ -9689,6 +10299,15 @@
                     <div id="levelLoadingBody2" class="levelLine levelBody delay3">Note: The products and colours shown
                         on the Visualizer have been reproduced to represent the actual products and colours as
                         accurately as possible.</div>
+                </div>
+            </div>
+
+            <div id="luxLevelVideoWaitNotice" hidden aria-live="polite">
+                <div id="luxLevelVideoWaitHeading">WAITING FOR VIDEO</div>
+                <div id="luxLevelVideoWaitBody">The level has loaded. Waiting for its streaming picture.</div>
+                <div id="luxLevelVideoWaitActions" hidden>
+                    <button id="luxLevelTryPlayback" type="button">TRY VIDEO PLAYBACK</button>
+                    <button id="luxLevelEndSession" type="button">END SESSION</button>
                 </div>
             </div>
         </div>
